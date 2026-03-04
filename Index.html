@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>⚽ Bot Tracker</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg:#060b14; --card:#0d1525; --border:#1a2744;
+  --green:#00e676; --red:#ff1744; --gold:#ffd600;
+  --blue:#448aff; --purple:#e040fb; --text:#e8f0fe; --muted:#546e7a;
+}
+body { background:var(--bg); color:var(--text); font-family:'Courier New',monospace; min-height:100vh; padding-bottom:90px; }
+
+.header { background:linear-gradient(135deg,#0d1525,#0a1a3a); border-bottom:2px solid var(--green); padding:15px 18px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:99; }
+.header-title { font-size:16px; font-weight:900; color:var(--green); letter-spacing:3px; }
+.header-sub { font-size:9px; color:var(--muted); letter-spacing:1px; margin-top:2px; }
+.header-lucro { font-size:15px; font-weight:900; text-align:right; }
+.header-info { font-size:9px; color:var(--muted); text-align:right; margin-top:2px; }
+
+.nav { display:flex; gap:6px; padding:10px 14px; background:#080d1a; border-bottom:1px solid var(--border); }
+.nav-btn { flex:1; padding:9px 4px; border-radius:8px; border:none; background:var(--card); color:var(--muted); font-weight:900; font-size:10px; cursor:pointer; letter-spacing:1px; font-family:'Courier New',monospace; }
+.nav-btn.active { background:var(--green); color:#060b14; }
+
+.view { display:none; padding:16px 14px; }
+.view.active { display:block; }
+
+.stats-row { display:flex; gap:8px; margin-bottom:8px; }
+.stat-card { background:var(--card); border-radius:12px; padding:12px 10px; flex:1; min-width:0; border-top:2px solid; }
+.stat-value { font-size:20px; font-weight:900; }
+.stat-label { font-size:8px; color:var(--muted); letter-spacing:1.5px; margin-top:2px; text-transform:uppercase; }
+
+.form-group { margin-bottom: 15px; }
+label { font-size:9px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:5px; display:block; }
+input, select { width:100%; padding:11px 13px; background:#0a1020; border:1px solid var(--border); border-radius:9px; color:var(--text); font-size:13px; font-family:'Courier New',monospace; outline:none; }
+
+.btn-salvar { width:100%; padding:14px; background:var(--green); border:none; border-radius:10px; color:#060b14; font-weight:900; font-size:13px; cursor:pointer; letter-spacing:2px; margin-top:10px; }
+.entry-card { background:var(--card); border-radius:12px; padding:12px 14px; margin-bottom:10px; border-left:4px solid var(--border); position: relative; }
+.btn-del { position: absolute; right: 10px; top: 10px; background: transparent; border: none; color: var(--red); cursor: pointer; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-title">⚽ BOT TRACKER</div>
+    <div class="header-sub">SISTEMA ATIVO</div>
+  </div>
+  <div>
+    <div class="header-lucro" id="hLucro">R$ 0,00</div>
+    <div class="header-info" id="hInfo">0 entradas · 0% green</div>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="nav-btn active" id="btn-dash" onclick="setView('dash')">📊 RESUMO</button>
+  <button class="nav-btn" id="btn-add" onclick="setView('add')">➕ ENTRADA</button>
+  <button class="nav-btn" id="btn-hist" onclick="setView('hist')">📋 HISTÓRICO</button>
+</div>
+
+<!-- DASHBOARD -->
+<div class="view active" id="view-dash">
+  <div class="stats-row">
+    <div class="stat-card" style="border-color:var(--green)"><div class="stat-value" id="sG" style="color:var(--green)">0</div><div class="stat-label">Greens</div></div>
+    <div class="stat-card" style="border-color:var(--red)"><div class="stat-value" id="sR" style="color:var(--red)">0</div><div class="stat-label">Reds</div></div>
+  </div>
+  <div class="stat-card" style="border-color:var(--blue); width: 100%; margin-top: 10px;">
+    <div class="stat-value" id="sLucro" style="color:var(--text)">R$ 0,00</div>
+    <div class="stat-label">Lucro Líquido</div>
+  </div>
+</div>
+
+<!-- ADICIONAR -->
+<div class="view" id="view-add">
+  <div class="form-group">
+    <label>Evento / Jogo</label>
+    <input type="text" id="jogo" placeholder="Ex: Flamengo x Vasco">
+  </div>
+  <div class="form-group">
+    <label>Valor da Entrada (R$)</label>
+    <input type="number" id="valor" placeholder="0.00">
+  </div>
+  <div class="form-group">
+    <label>Resultado</label>
+    <select id="resultado">
+      <option value="green">✅ GREEN</option>
+      <option value="red">❌ RED</option>
+    </select>
+  </div>
+  <button class="btn-salvar" onclick="salvarEntrada()">SALVAR ENTRADA</button>
+</div>
+
+<!-- HISTÓRICO -->
+<div class="view" id="view-hist">
+  <div id="lista-historico"></div>
+</div>
+
+<script>
+let entradas = JSON.parse(localStorage.getItem('apostas')) || [];
+
+function setView(view) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  document.getElementById('btn-' + view).classList.add('active');
+  if(view === 'hist') renderHist();
+  if(view === 'dash') atualizarStats();
+}
+
+function salvarEntrada() {
+  const jogo = document.getElementById('jogo').value;
+  const valor = parseFloat(document.getElementById('valor').value);
+  const result = document.getElementById('resultado').value;
+
+  if(!jogo || !valor) return alert("Preencha os campos!");
+
+  entradas.push({ jogo, valor, result, data: new Date().toLocaleDateString() });
+  localStorage.setItem('apostas', JSON.stringify(entradas));
+  
+  document.getElementById('jogo').value = '';
+  document.getElementById('valor').value = '';
+  
+  alert("Salvo com sucesso!");
+  atualizarStats();
+  setView('dash');
+}
+
+function atualizarStats() {
+  let greens = entradas.filter(e => e.result === 'green').length;
+  let reds = entradas.filter(e => e.result === 'red').length;
+  let lucro = entradas.reduce((acc, e) => e.result === 'green' ? acc + e.valor : acc - e.valor, 0);
+  let perc = entradas.length > 0 ? ((greens / entradas.length) * 100).toFixed(0) : 0;
+
+  document.getElementById('sG').innerText = greens;
+  document.getElementById('sR').innerText = reds;
+  document.getElementById('sLucro').innerText = `R$ ${lucro.toFixed(2)}`;
+  document.getElementById('hLucro').innerText = `R$ ${lucro.toFixed(2)}`;
+  document.getElementById('hInfo').innerText = `${entradas.length} entradas · ${perc}% green`;
+}
+
+function renderHist() {
+  const lista = document.getElementById('lista-historico');
+  lista.innerHTML = entradas.length === 0 ? '<p style="text-align:center; color:var(--muted)">Nenhuma aposta salva.</p>' : '';
+  
+  entradas.forEach((e, i) => {
+    const cor = e.result === 'green' ? 'var(--green)' : 'var(--red)';
+    lista.innerHTML += `
+      <div class="entry-card" style="border-color: ${cor}">
+        <button class="btn-del" onclick="deletar(${i})">X</button>
+        <div style="font-weight:bold">${e.jogo}</div>
+        <div style="font-size:11px; color:var(--muted)">${e.data} - R$ ${e.valor.toFixed(2)}</div>
+        <div style="color:${cor}; font-size:10px; font-weight:bold; margin-top:5px">${e.result.toUpperCase()}</div>
+      </div>
+    `;
+  });
+}
+
+function deletar(index) {
+  entradas.splice(index, 1);
+  localStorage.setItem('apostas', JSON.stringify(entradas));
+  renderHist();
+  atualizarStats();
+}
+
+// Inicializa
+atualizarStats();
+</script>
+
+</body>
+</html>
