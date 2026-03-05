@@ -119,9 +119,9 @@ select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.or
   <div class="section-title">NOVA ENTRADA</div>
 
   <div class="api-box">
-    <div class="api-box-title">CHAVE DE API GOOGLE</div>
+    <div class="api-box-title">CHAVE DE API CLAUDE (sk-ant-...)</div>
     <div class="api-row">
-      <input type="password" id="apiKeyInput" placeholder="AIzaSy...">
+      <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-...">
       <button class="btn-api" onclick="salvarApiKey()">SALVAR</button>
     </div>
     <div id="apiStatus" style="font-size:10px;margin-top:6px;"></div>
@@ -200,26 +200,24 @@ select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.or
 
 <script>
 const BOTS = ["Fora favorito 00","Casa favorito 00","Fora perdendo 2.5","Fora vencendo 2.5","Casa vencendo 2.5","Casa perdendo 2.5"];
-const KEY = "bottracker_v4";
-const APIKEY_STORAGE = "bt_google_apikey";
+const KEY = "bottracker_v5";
+const APIKEY_STORAGE = "bt_claude_apikey";
 let entries = (() => { try { return JSON.parse(localStorage.getItem(KEY))||[]; } catch { return []; } })();
 let currentPeriod = "all";
 let pendingEntry = null;
 
 function save() { localStorage.setItem(KEY, JSON.stringify(entries)); }
-
 function getApiKey() { return localStorage.getItem(APIKEY_STORAGE)||""; }
 
 function salvarApiKey() {
   const key = document.getElementById("apiKeyInput").value.trim();
-  if(!key.startsWith("AIza")) {
-    document.getElementById("apiStatus").innerHTML = '<span style="color:var(--red)">Chave invalida. Deve comecar com AIza</span>';
+  if(!key.startsWith("sk-ant-")) {
+    document.getElementById("apiStatus").innerHTML = '<span style="color:var(--red)">Chave invalida. Deve comecar com sk-ant-</span>';
     return;
   }
   localStorage.setItem(APIKEY_STORAGE, key);
   document.getElementById("apiKeyInput").value = "â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢";
-  document.getElementById("apiStatus").innerHTML = '<span style="color:var(--green)">Chave salva com seguranca!</span>';
-  checkReady();
+  document.getElementById("apiStatus").innerHTML = '<span style="color:var(--green)">Chave salva!</span>';
 }
 
 function initApiKey() {
@@ -318,14 +316,22 @@ async function buscarResultado() {
   document.getElementById("btnBuscar").disabled = true;
 
   try {
-    const prompt = `Busque o resultado do jogo de futebol entre "${casa}" e "${visit}" que aconteceu recentemente. Preciso: placar final, minutos de cada gol, liga e data. A aposta foi no minuto ${minEnt} em Over 0.5 FT (precisa de pelo menos 1 gol). Retorne SOMENTE JSON sem markdown: {"timeCasa":"${casa}","timeVisitante":"${visit}","liga":"nome","data":"DD/MM/YYYY","placarCasa":0,"placarVisit":0,"totalGols":0,"minutosGols":[23,67],"resultado":"Green","observacao":"texto"}. resultado e Green se totalGols>=1 senao Red. Se nao encontrar: {"erro":"Jogo nao encontrado"}`;
-
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
       method:"POST",
-      headers:{"Content-Type":"application/json"},
+      headers:{
+        "Content-Type":"application/json",
+        "x-api-key":apiKey,
+        "anthropic-version":"2023-06-01",
+        "anthropic-dangerous-direct-browser-access":"true"
+      },
       body:JSON.stringify({
-        contents:[{parts:[{text:prompt}]}],
-        tools:[{google_search:{}}]
+        model:"claude-haiku-4-5-20251001",
+        max_tokens:1000,
+        tools:[{type:"web_search_20250305",name:"web_search"}],
+        messages:[{
+          role:"user",
+          content:`Busque na internet o resultado do jogo de futebol entre "${casa}" e "${visit}" que aconteceu recentemente. Preciso: placar final, minutos de cada gol, liga e data. A aposta foi no minuto ${minEnt} em Over 0.5 FT (precisa de pelo menos 1 gol no total). Retorne SOMENTE JSON sem markdown: {"timeCasa":"${casa}","timeVisitante":"${visit}","liga":"nome","data":"DD/MM/YYYY","placarCasa":0,"placarVisit":0,"totalGols":0,"minutosGols":[23,67],"resultado":"Green","observacao":"texto"}. resultado e Green se totalGols>=1 senao Red. Se nao encontrar: {"erro":"Jogo nao encontrado"}`
+        }]
       })
     });
 
@@ -333,7 +339,7 @@ async function buscarResultado() {
     document.getElementById("loadBox").style.display = "none";
 
     if(data.error) {
-      document.getElementById("errTxt").textContent = "Erro API: " + (data.error.message||"Verifique sua chave");
+      document.getElementById("errTxt").textContent = "Erro: " + (data.error.message||"Verifique sua chave");
       document.getElementById("errTxt").style.display = "block";
       document.getElementById("btnEdit").style.display = "block";
       pendingEntry = {bot,timeCasa:casa,timeVisitante:visit,minEntrada:parseInt(minEnt),odd,resultado:"Green",qtdGols:0,minutos:"",liga:"",data:"",placar:""};
@@ -341,10 +347,9 @@ async function buscarResultado() {
       return;
     }
 
-    const text = data.candidates?.[0]?.content?.parts?.filter(p=>p.text).map(p=>p.text).join("")||"";
-    const clean = text.replace(/```json|```/g,"").trim();
-    const jsonMatch = clean.match(/\{[\s\S]*\}/);
-    const parsed = JSON.parse(jsonMatch?jsonMatch[0]:clean);
+    const text = (data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("");
+    const jsonMatch = text.replace(/```json|```/g,"").trim().match(/\{[\s\S]*\}/);
+    const parsed = JSON.parse(jsonMatch?jsonMatch[0]:text);
 
     if(parsed.erro) {
       document.getElementById("errTxt").textContent = parsed.erro;
@@ -498,7 +503,7 @@ function renderMins() {
   const top=[...sorted].sort((a,b)=>b.count-a.count).slice(0,5);
   const total=entries.filter(e=>e.minutos).length;
   document.getElementById("topMinutos").innerHTML=top.map((s,i)=>{
-    const medal=i===0?"1o":i===1?"2o":"3o";
+    const medal=i===0?"1o":i===1?"2o":i===2?"3o":"  ";
     const pct=total?Math.round(s.count/total*100):0;
     return `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
       <div>
