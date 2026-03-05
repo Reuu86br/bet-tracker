@@ -342,6 +342,15 @@ async function buscarResultado() {
     const parsed = JSON.parse(clean);
     document.getElementById("loadBox").style.display = "none";
 
+    if(data.error) {
+      document.getElementById("errTxt").textContent = "âš ï¸ API: " + (data.error.message||JSON.stringify(data.error));
+      document.getElementById("errTxt").style.display = "block";
+      document.getElementById("btnEdit").style.display = "block";
+      pendingEntry = {bot,timeCasa:casa,timeVisitante:visit,minEntrada:parseInt(minEnt),odd,resultado:"Green",qtdGols:0,minutos:"",liga:"",data:"",placar:""};
+      document.getElementById("loadBox").style.display="none";
+      document.getElementById("btnBuscar").disabled=false;
+      return;
+    }
     if(parsed.erro) {
       document.getElementById("errTxt").textContent = "âš ï¸ "+parsed.erro;
       document.getElementById("errTxt").style.display = "block";
@@ -363,7 +372,7 @@ async function buscarResultado() {
     }
   } catch(e) {
     document.getElementById("loadBox").style.display = "none";
-    document.getElementById("errTxt").textContent = "âš ï¸ Erro na busca. Tente novamente ou preencha manualmente.";
+    document.getElementById("errTxt").textContent = "âš ï¸ Erro: " + (e.message||"Verifique sua chave API e tente novamente.");
     document.getElementById("errTxt").style.display = "block";
     document.getElementById("btnEdit").style.display = "block";
     pendingEntry = {bot,timeCasa:casa,timeVisitante:visit,minEntrada:parseInt(minEnt),odd,resultado:"Green",qtdGols:0,minutos:"",liga:"",data:"",placar:""};
