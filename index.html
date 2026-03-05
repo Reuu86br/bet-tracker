@@ -54,6 +54,7 @@ input, select { width:100%; padding:11px 13px; background:#0a1020; border:1px so
   <button class="nav-btn" onclick="setView('hist')">📜 HISTÓRICO</button>
 </div>
 
+<!-- VIEW: ADICIONAR ENTRADA -->
 <div id="add" class="view active">
   <div class="section-title">NOVA ENTRADA (GEMINI FREE)</div>
   
@@ -74,30 +75,32 @@ input, select { width:100%; padding:11px 13px; background:#0a1020; border:1px so
     <div><label>TIME CASA</label><input type="text" id="tCasa" value="Palmeiras"></div>
     <div><label>TIME VISITANTE</label><input type="text" id="tVis" value="Botafogo"></div>
     <div><label>MINUTO ENTRADA</label><input type="number" id="minEnt" value="31"></div>
-    <div><label>ODD DE ENTRADA</label><input type="text" id="oddEnt" value="1,66"></div>
+    <div><label>ODD DE ENTRADA</label><input type="text" id="oddEnt" value="1.66"></div>
   </div>
 
   <div id="errorDisplay" class="err-txt"></div>
   <button class="btn-buscar" onclick="buscarResultado()">📊 BUSCAR RESULTADO</button>
 </div>
 
+<!-- Scripts -->
 <script>
 function setView(v) {
   document.querySelectorAll('.view').forEach(e => e.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(e => e.classList.remove('active'));
   document.getElementById(v).classList.add('active');
-  if(event) event.currentTarget.classList.add('active');
+  if(window.event) window.event.currentTarget.classList.add('active');
 }
 
 function saveApiKey() {
   const key = document.getElementById('apiKeyInput').value.trim();
+  const status = document.getElementById('apiStatus');
   if (key.startsWith('AIza')) {
     localStorage.setItem('gemini_key', key);
-    document.getElementById('apiStatus').innerText = "✅ CHAVE GEMINI SALVA!";
-    document.getElementById('apiStatus').style.color = "var(--green)";
+    status.innerText = "✅ CHAVE GEMINI SALVA COM SUCESSO!";
+    status.style.color = "var(--green)";
   } else {
-    document.getElementById('apiStatus').innerText = "❌ Chave inválida! Deve começar com AIza";
-    document.getElementById('apiStatus').style.color = "var(--red)";
+    status.innerText = "❌ Chave inválida! Deve começar com AIza";
+    status.style.color = "var(--red)";
   }
 }
 
@@ -108,33 +111,47 @@ async function buscarResultado() {
   const casa = document.getElementById('tCasa').value;
   const vis = document.getElementById('tVis').value;
 
-  if (!key) return alert("Configure e salve a chave AIza primeiro!");
+  if (!key) {
+    alert("Configure e salve a chave AIza primeiro!");
+    return;
+  }
 
-  btn.innerText = "⏳ CONSULTANDO GEMINI...";
+  btn.innerText = "⏳ BUSCANDO...";
   err.style.display = "none";
 
   try {
-    // URL direta do Gemini que não exige proxy
+    // Usando o modelo Gemini 1.5 Flash do Google
     const url = `https://generativelanguage.googleapis.com{key}`;
 
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
         contents: [{
-          parts: [{ text: `Responda apenas o placar final do jogo entre ${casa} e ${vis}. Exemplo: 2-1. Se o jogo não existir ou for futuro, responda 'Não disponível'.` }]
+          parts: [{ text: `Qual foi o placar final do jogo entre ${casa} e ${vis}? Responda apenas o placar (ex: 2-0). Se o jogo não ocorreu, diga 'Indisponível'.` }]
         }]
       })
     });
 
-    if (!response.ok) throw new Error("Erro na chave ou limite de uso atingido.");
+    if (!response.ok) {
+       const errorData = await response.json();
+       throw new Error("Erro na Chave: " + (errorData.error.message || "Verifique sua conexão"));
+    }
 
     const data = await response.json();
-    const textoPlacar = data.candidates[0].content.parts[0].text;
-
-    alert("📊 RESULTADO ENCONTRADO: " + textoPlacar);
+    
+    // Acessando o texto da resposta corretamente
+    if (data.candidates && data.candidates[0].content.parts[0].text) {
+        const placar = data.candidates[0].content.parts[0].text;
+        alert("⚽ RESULTADO: " + placar);
+    } else {
+        throw new Error("Resposta vazia do Google.");
+    }
 
   } catch (e) {
+    console.error(e);
     err.innerText = "⚠️ " + e.message;
     err.style.display = "block";
   } finally {
