@@ -23,60 +23,16 @@ body { background:var(--bg); color:var(--text); font-family:'Courier New',monosp
 .nav-btn.active { background:var(--green); color:#060b14; }
 .view { display:none; padding:16px 14px; }
 .view.active { display:block; }
-.stats-row { display:flex; gap:8px; margin-bottom:8px; }
-.stat-card { background:var(--card); border-radius:12px; padding:12px 10px; flex:1; min-width:0; border-top:2px solid; }
-.stat-value { font-size:20px; font-weight:900; }
-.stat-label { font-size:8px; color:var(--muted); letter-spacing:1.5px; margin-top:2px; text-transform:uppercase; }
-.bot-bar { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:8px; }
-.progress-bg { background:var(--border); border-radius:4px; height:5px; margin-top:6px; }
-.progress-fill { height:5px; border-radius:4px; }
 .section-title { font-size:11px; font-weight:900; color:var(--green); letter-spacing:3px; margin-bottom:16px; }
 .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
 .form-full { grid-column:1/-1; }
 label { font-size:9px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:5px; display:block; }
 input, select { width:100%; padding:11px 13px; background:#0a1020; border:1px solid var(--border); border-radius:9px; color:var(--text); font-size:13px; font-family:'Courier New',monospace; outline:none; -webkit-appearance:none; }
-select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org' width='12' height='8'%3E%3Cpath fill='%23546e7a' d='M6 8L0 0h12z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:32px; }
-.loading-box { background:var(--card); border:1px solid #448aff44; border-radius:12px; padding:24px; text-align:center; display:none; margin-bottom:16px; }
-.spinner { font-size:32px; animation:spin 1s linear infinite; display:inline-block; }
-@keyframes spin { to { transform:rotate(360deg); } }
-.loading-txt { font-size:10px; color:var(--blue); letter-spacing:2px; margin-top:10px; }
-.result-box { border-radius:12px; padding:14px; margin-bottom:16px; display:none; }
-.result-box.green { background:#00e67611; border:1px solid #00e67644; border-left:3px solid var(--green); }
-.result-box.red { background:#ff174411; border:1px solid #ff174444; border-left:3px solid var(--red); }
-.result-badge { font-size:20px; font-weight:900; margin-bottom:6px; }
-.result-teams { font-size:14px; font-weight:900; color:var(--text); margin-bottom:4px; }
-.result-info { font-size:10px; color:var(--muted); line-height:1.8; }
-.gol-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
-.gol-tag { background:var(--card); border:1px solid #00e67633; border-radius:6px; padding:3px 10px; font-size:11px; color:var(--green); }
-.btn-buscar { width:100%; padding:13px; background:var(--blue); border:none; border-radius:10px; color:#fff; font-weight:900; font-size:13px; cursor:pointer; letter-spacing:2px; font-family:'Courier New',monospace; margin-bottom:12px; }
-.btn-buscar:disabled { background:var(--border); color:var(--muted); cursor:not-allowed; }
-.btn-salvar { width:100%; padding:14px; background:var(--green); border:none; border-radius:10px; color:#060b14; font-weight:900; font-size:13px; cursor:pointer; letter-spacing:2px; font-family:'Courier New',monospace; display:none; margin-bottom:10px; }
-.btn-edit { width:100%; padding:10px; background:transparent; border:1px solid var(--border); border-radius:10px; color:var(--muted); font-weight:900; font-size:11px; cursor:pointer; letter-spacing:1px; font-family:'Courier New',monospace; display:none; }
-.entry-card { background:var(--card); border-radius:12px; padding:12px 14px; margin-bottom:10px; border-left:3px solid; }
-.entry-hdr { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:5px; }
-.entry-teams { font-size:13px; font-weight:900; color:var(--text); }
-.entry-meta { font-size:10px; color:var(--muted); margin-top:2px; }
-.entry-tags { display:flex; gap:8px; flex-wrap:wrap; font-size:11px; margin-top:5px; }
-.entry-bot { font-size:9px; color:var(--muted); margin-top:6px; letter-spacing:1px; }
-.btn-del { background:transparent; border:none; color:var(--muted); cursor:pointer; font-size:20px; line-height:1; }
-.chart-box { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:16px; }
-.chart-title { font-size:9px; color:var(--muted); letter-spacing:2px; margin-bottom:14px; text-transform:uppercase; }
-.chart-bars { display:flex; align-items:flex-end; gap:3px; height:80px; overflow-x:auto; }
-.chart-bar-wrap { display:flex; flex-direction:column; align-items:center; min-width:24px; height:100%; justify-content:flex-end; }
-.chart-bar { width:100%; border-radius:3px 3px 0 0; min-height:3px; }
-.chart-min { font-size:7px; color:var(--muted); margin-top:3px; }
-.chart-count { font-size:8px; color:var(--green); margin-bottom:2px; }
-.period-tabs { display:flex; gap:6px; margin-bottom:14px; }
-.period-tab { flex:1; padding:7px 4px; border-radius:7px; border:1px solid var(--border); background:transparent; color:var(--muted); font-size:10px; cursor:pointer; font-family:'Courier New',monospace; font-weight:700; }
-.period-tab.active { background:var(--gold); color:#060b14; border-color:var(--gold); }
-.empty { text-align:center; color:var(--muted); padding:40px 20px; font-size:13px; }
-.err-txt { font-size:11px; color:var(--red); margin-bottom:10px; display:none; }
-
 .api-box { background:var(--card); border:1px solid var(--gold)44; border-radius:12px; padding:14px; margin-bottom:18px; }
-.api-box-title { font-size:9px; color:var(--gold); letter-spacing:2px; margin-bottom:8px; }
-.api-status { font-size:10px; margin-top:6px; }
 .api-row { display:flex; gap:8px; }
-.btn-api { padding:11px 14px; background:var(--gold); border:none; border-radius:9px; color:#060b14; font-weight:900; font-size:11px; cursor:pointer; font-family:'Courier New',monospace; white-space:nowrap; }
+.btn-api { padding:11px 14px; background:var(--gold); border:none; border-radius:9px; color:#060b14; font-weight:900; font-size:11px; cursor:pointer; font-family:'Courier New',monospace; }
+.btn-buscar { width:100%; padding:13px; background:var(--blue); border:none; border-radius:10px; color:#fff; font-weight:900; font-size:13px; cursor:pointer; letter-spacing:2px; font-family:'Courier New',monospace; margin-top:10px; }
+.err-txt { font-size:11px; color:var(--red); margin:10px 0; display:none; }
 </style>
 </head>
 <body>
@@ -87,85 +43,45 @@ select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.or
     <div class="header-sub">BOLSA DE APOSTA</div>
   </div>
   <div>
-    <div class="header-lucro" id="hLucro">R$0.00</div>
-    <div class="header-info" id="hInfo">0 entradas · 0% green</div>
+    <div class="header-lucro">R$0.00</div>
+    <div class="header-info">0 entradas · 0% green</div>
   </div>
 </div>
 
 <div class="nav">
-  <button class="nav-btn active" onclick="setView('dash')">📊 RESUMO</button>
-  <button class="nav-btn" onclick="setView('add')">➕ ENTRADA</button>
+  <button class="nav-btn" onclick="setView('dash')">📊 RESUMO</button>
+  <button class="nav-btn active" onclick="setView('add')">➕ ENTRADA</button>
   <button class="nav-btn" onclick="setView('hist')">📜 HISTÓRICO</button>
 </div>
 
-<!-- VIEW: RESUMO -->
-<div id="dash" class="view active">
-  <div class="stats-row">
-    <div class="stat-card" style="border-color:var(--green)">
-      <div class="stat-value" id="valGreen">0</div>
-      <div class="stat-label">Greens</div>
-    </div>
-    <div class="stat-card" style="border-color:var(--red)">
-      <div class="stat-value" id="valRed">0</div>
-      <div class="stat-label">Reds</div>
-    </div>
-  </div>
-  <div id="resumoContent" class="empty">Nenhum dado registrado.</div>
-</div>
-
-<!-- VIEW: ADICIONAR ENTRADA -->
-<div id="add" class="view">
+<div id="add" class="view active">
   <div class="section-title">NOVA ENTRADA</div>
   
   <div class="api-box">
-    <label>🗝️ CHAVE DE API (necessária para busca automática)</label>
+    <label>🗝️ CHAVE DE API (ANTHROPIC)</label>
     <div class="api-row">
       <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-...">
       <button class="btn-api" onclick="saveApiKey()">SALVAR</button>
     </div>
-    <div id="apiStatus" class="err-txt"></div>
+    <div id="apiStatus" style="font-size:10px; margin-top:8px;"></div>
   </div>
 
   <div class="form-grid">
     <div class="form-full">
       <label>NOME DO BOT</label>
-      <select id="botName">
-        <option>Casa vencendo 2.5</option>
-        <option>Over 0.5 HT</option>
-      </select>
+      <select id="botName"><option>Casa vencendo 2.5</option></select>
     </div>
-    <div>
-      <label>TIME CASA</label>
-      <input type="text" id="tCasa" placeholder="Ex: Palmeiras">
-    </div>
-    <div>
-      <label>TIME VISITANTE</label>
-      <input type="text" id="tVis" placeholder="Ex: Botafogo">
-    </div>
-    <div>
-      <label>MINUTO ENTRADA</label>
-      <input type="number" id="minEnt" placeholder="31">
-    </div>
-    <div>
-      <label>ODD DE ENTRADA</label>
-      <input type="text" id="oddEnt" placeholder="1.66">
-    </div>
+    <div><label>TIME CASA</label><input type="text" id="tCasa" value="Palmeiras"></div>
+    <div><label>TIME VISITANTE</label><input type="text" id="tVis" value="Botafogo"></div>
+    <div><label>MINUTO ENTRADA</label><input type="number" id="minEnt" value="31"></div>
+    <div><label>ODD DE ENTRADA</label><input type="text" id="oddEnt" value="1,66"></div>
   </div>
 
-  <div id="fetchErr" class="err-txt"></div>
-
+  <div id="errorDisplay" class="err-txt"></div>
   <button class="btn-buscar" onclick="buscarResultado()">📊 BUSCAR RESULTADO</button>
-  <button class="btn-salvar" id="btnSalvar">SALVAR ENTRADA</button>
-</div>
-
-<!-- VIEW: HISTÓRICO -->
-<div id="hist" class="view">
-  <div class="section-title">HISTÓRICO RECENTE</div>
-  <div id="histList"></div>
 </div>
 
 <script>
-// --- CONFIGURAÇÕES DE NAVEGAÇÃO ---
 function setView(v) {
   document.querySelectorAll('.view').forEach(e => e.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(e => e.classList.remove('active'));
@@ -173,84 +89,55 @@ function setView(v) {
   event.currentTarget.classList.add('active');
 }
 
-// --- CORREÇÃO 1: VALIDAÇÃO DA CHAVE (ACEITA sk-ant-api03) ---
 function saveApiKey() {
-  const input = document.getElementById('apiKeyInput');
-  const apiStatus = document.getElementById('apiStatus');
-  const key = input.value.trim();
-
+  const key = document.getElementById('apiKeyInput').value;
   if (key.startsWith('sk-ant-')) {
     localStorage.setItem('anthropic_key', key);
-    apiStatus.innerText = "✅ CHAVE SALVA COM SUCESSO!";
-    apiStatus.style.color = "var(--green)";
-    apiStatus.style.display = "block";
-  } else {
-    apiStatus.innerText = "⚠️ Chave inválida. Deve começar com sk-ant-";
-    apiStatus.style.color = "var(--red)";
-    apiStatus.style.display = "block";
+    document.getElementById('apiStatus').innerText = "✅ CHAVE SALVA COM SUCESSO!";
+    document.getElementById('apiStatus').style.color = "var(--green)";
   }
 }
 
-// --- CORREÇÃO 2: BUSCAR RESULTADO (EVITA ERRO DE JSON) ---
 async function buscarResultado() {
-  const apiKey = localStorage.getItem('anthropic_key');
-  const btnBusca = document.querySelector('.btn-buscar');
-  const errTxt = document.getElementById('fetchErr');
-  const tCasa = document.getElementById('tCasa').value;
-  const tVis = document.getElementById('tVis').value;
+  const key = localStorage.getItem('anthropic_key');
+  const err = document.getElementById('errorDisplay');
+  const btn = document.querySelector('.btn-buscar');
+  const casa = document.getElementById('tCasa').value;
+  const vis = document.getElementById('tVis').value;
 
-  if (!apiKey) {
-    alert("Configure e salve a API Key primeiro!");
-    return;
-  }
-  if (!tCasa || !tVis) {
-    alert("Preencha os nomes dos times.");
-    return;
-  }
+  if (!key) return alert("Salve a chave primeiro!");
 
-  btnBusca.innerText = "⏳ BUSCANDO...";
-  btnBusca.disabled = true;
-  errTxt.style.display = "none";
+  btn.innerText = "⏳ BUSCANDO...";
+  err.style.display = "none";
 
   try {
-    const response = await fetch('https://api.anthropic.com', {
+    // CORREÇÃO: Usando um proxy para evitar o "Failed to fetch" no navegador
+    const response = await fetch('https://corsproxy.io?' + encodeURIComponent('https://api.anthropic.com'), {
       method: 'POST',
       headers: {
-        'x-api-key': apiKey,
+        'x-api-key': key,
         'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
-        'dangerously-allow-browser': 'true'
+        'content-type': 'application/json'
       },
       body: JSON.stringify({
         model: "claude-3-5-sonnet-20241022",
         max_tokens: 1024,
-        messages: [{ 
-          role: "user", 
-          content: `Qual foi o resultado final do jogo ${tCasa} vs ${tVis}? Responda apenas o placar.` 
-        }]
+        messages: [{ role: "user", content: `Resultado final de ${casa} x ${vis}?` }]
       })
     });
 
-    // Verificação de resposta OK para evitar erro de JSON inesperado
-    if (!response.ok) {
-      const errorData = await response.text();
-      throw new Error(`Erro API: Verifique créditos ou chave.`);
-    }
-
+    if (!response.ok) throw new Error("Erro na API. Verifique créditos/chave.");
+    
     const data = await response.json();
-    alert("Resultado encontrado: " + data.content[0].text);
-    document.getElementById('btnSalvar').style.display = 'block';
+    alert("Resultado: " + data.content[0].text);
 
-  } catch (error) {
-    console.error(error);
-    errTxt.innerText = "⚠️ " + error.message;
-    errTxt.style.display = "block";
+  } catch (e) {
+    err.innerText = "⚠️ " + e.message;
+    err.style.display = "block";
   } finally {
-    btnBusca.innerText = "📊 BUSCAR RESULTADO";
-    btnBusca.disabled = false;
+    btn.innerText = "📊 BUSCAR RESULTADO";
   }
 }
 </script>
-
 </body>
 </html>
