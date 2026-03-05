@@ -36,6 +36,10 @@ body { background:var(--bg); color:var(--text); font-family:'Courier New',monosp
 label { font-size:9px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:5px; display:block; }
 input, select { width:100%; padding:11px 13px; background:#0a1020; border:1px solid var(--border); border-radius:9px; color:var(--text); font-size:13px; font-family:'Courier New',monospace; outline:none; -webkit-appearance:none; }
 select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='%23546e7a' d='M6 8L0 0h12z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:32px; }
+/* OVER SELECTOR */
+.over-tabs { display:flex; gap:8px; margin-bottom:16px; }
+.over-tab { flex:1; padding:12px 4px; border-radius:9px; border:2px solid var(--border); background:transparent; color:var(--muted); font-weight:900; font-size:12px; cursor:pointer; font-family:'Courier New',monospace; text-align:center; }
+.over-tab.active { border-color:var(--gold); background:#ffd60022; color:var(--gold); }
 .loading-box { background:var(--card); border:1px solid #448aff44; border-radius:12px; padding:24px; text-align:center; display:none; margin-bottom:16px; }
 .spinner { font-size:32px; animation:spin 1s linear infinite; display:inline-block; }
 @keyframes spin { to { transform:rotate(360deg); } }
@@ -43,11 +47,9 @@ select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.or
 .result-box { border-radius:12px; padding:14px; margin-bottom:16px; display:none; }
 .result-box.green { background:#00e67611; border:1px solid #00e67644; border-left:3px solid var(--green); }
 .result-box.red { background:#ff174411; border:1px solid #ff174444; border-left:3px solid var(--red); }
-.result-badge { font-size:20px; font-weight:900; margin-bottom:6px; }
-.result-teams { font-size:14px; font-weight:900; color:var(--text); margin-bottom:4px; }
-.result-info { font-size:10px; color:var(--muted); line-height:1.8; }
 .gol-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
 .gol-tag { background:var(--card); border:1px solid #00e67633; border-radius:6px; padding:3px 10px; font-size:11px; color:var(--green); }
+.gol-tag-before { background:var(--card); border:1px solid #546e7a33; border-radius:6px; padding:3px 10px; font-size:11px; color:var(--muted); text-decoration:line-through; }
 .btn-buscar { width:100%; padding:13px; background:var(--blue); border:none; border-radius:10px; color:#fff; font-weight:900; font-size:13px; cursor:pointer; letter-spacing:2px; font-family:'Courier New',monospace; margin-bottom:12px; }
 .btn-buscar:disabled { background:var(--border); color:var(--muted); cursor:not-allowed; }
 .btn-salvar { width:100%; padding:14px; background:var(--green); border:none; border-radius:10px; color:#060b14; font-weight:900; font-size:13px; cursor:pointer; letter-spacing:2px; font-family:'Courier New',monospace; display:none; margin-bottom:10px; }
@@ -152,6 +154,15 @@ select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.or
       <label>Odd de Entrada</label>
       <input type="number" id="fOdd" placeholder="Ex: 1.81" step="0.01" oninput="checkReady()">
     </div>
+    <div class="form-full">
+      <label>Mercado (Over)</label>
+      <div class="over-tabs">
+        <button class="over-tab active" onclick="setOver('0.5',this)">Over 0.5</button>
+        <button class="over-tab" onclick="setOver('1.5',this)">Over 1.5</button>
+        <button class="over-tab" onclick="setOver('2.5',this)">Over 2.5</button>
+        <button class="over-tab" onclick="setOver('3.5',this)">Over 3.5</button>
+      </div>
+    </div>
   </div>
 
   <div class="err-txt" id="errTxt"></div>
@@ -190,7 +201,7 @@ select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.or
     <button class="period-tab" onclick="setPeriod('2t',this)">2 TEMPO</button>
   </div>
   <div class="chart-box" id="chartBox">
-    <div class="chart-title">FREQUENCIA DE GOLS POR MINUTO</div>
+    <div class="chart-title">FREQUENCIA DE GOLS APOS ENTRADA</div>
     <div class="chart-bars" id="chartBars"></div>
   </div>
   <div style="font-size:9px;color:var(--muted);letter-spacing:2px;margin-bottom:10px">TOP MINUTOS</div>
@@ -200,19 +211,34 @@ select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.or
 
 <script>
 const BOTS = ["Fora favorito 00","Casa favorito 00","Fora perdendo 2.5","Fora vencendo 2.5","Casa vencendo 2.5","Casa perdendo 2.5"];
-const KEY = "bottracker_v5";
+const KEY = "bottracker_v7";
 const APIKEY_STORAGE = "bt_claude_apikey";
 let entries = (() => { try { return JSON.parse(localStorage.getItem(KEY))||[]; } catch { return []; } })();
 let currentPeriod = "all";
 let pendingEntry = null;
+let selectedOver = "0.5";
 
 function save() { localStorage.setItem(KEY, JSON.stringify(entries)); }
 function getApiKey() { return localStorage.getItem(APIKEY_STORAGE)||""; }
 
+function setOver(val, btn) {
+  selectedOver = val;
+  document.querySelectorAll(".over-tab").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+}
+
+function golsNecessarios(over) {
+  if(over==="0.5") return 1;
+  if(over==="1.5") return 2;
+  if(over==="2.5") return 3;
+  if(over==="3.5") return 4;
+  return 1;
+}
+
 function salvarApiKey() {
   const key = document.getElementById("apiKeyInput").value.trim();
   if(!key.startsWith("sk-ant-")) {
-    document.getElementById("apiStatus").innerHTML = '<span style="color:var(--red)">Chave invalida. Deve comecar com sk-ant-</span>';
+    document.getElementById("apiStatus").innerHTML = '<span style="color:var(--red)">Chave invalida.</span>';
     return;
   }
   localStorage.setItem(APIKEY_STORAGE, key);
@@ -304,9 +330,11 @@ async function buscarResultado() {
   }
   const casa = document.getElementById("fCasa").value.trim();
   const visit = document.getElementById("fVisit").value.trim();
-  const minEnt = document.getElementById("fMinEnt").value.trim();
+  const minEnt = parseInt(document.getElementById("fMinEnt").value);
   const odd = parseFloat(document.getElementById("fOdd").value);
   const bot = document.getElementById("fBot").value;
+  const over = selectedOver;
+  const golesNec = golsNecessarios(over);
 
   document.getElementById("errTxt").style.display = "none";
   document.getElementById("resultBox").style.display = "none";
@@ -330,7 +358,7 @@ async function buscarResultado() {
         tools:[{type:"web_search_20250305",name:"web_search"}],
         messages:[{
           role:"user",
-          content:`Busque na internet o resultado do jogo de futebol entre "${casa}" e "${visit}" que aconteceu recentemente. Preciso: placar final, minutos de cada gol, liga e data. A aposta foi no minuto ${minEnt} em Over 0.5 FT (precisa de pelo menos 1 gol no total). Retorne SOMENTE JSON sem markdown: {"timeCasa":"${casa}","timeVisitante":"${visit}","liga":"nome","data":"DD/MM/YYYY","placarCasa":0,"placarVisit":0,"totalGols":0,"minutosGols":[23,67],"resultado":"Green","observacao":"texto"}. resultado e Green se totalGols>=1 senao Red. Se nao encontrar: {"erro":"Jogo nao encontrado"}`
+          content:`Busque na internet o resultado do jogo de futebol entre "${casa}" e "${visit}" que aconteceu recentemente. Preciso de TODOS os minutos de cada gol do jogo. Retorne SOMENTE JSON sem markdown: {"timeCasa":"${casa}","timeVisitante":"${visit}","liga":"nome","data":"DD/MM/YYYY","placarCasa":0,"placarVisit":0,"todosGols":[lista com TODOS os minutos ex: 12,34,67],"observacao":""}. Se nao encontrar: {"erro":"Jogo nao encontrado"}`
         }]
       })
     });
@@ -342,7 +370,7 @@ async function buscarResultado() {
       document.getElementById("errTxt").textContent = "Erro: " + (data.error.message||"Verifique sua chave");
       document.getElementById("errTxt").style.display = "block";
       document.getElementById("btnEdit").style.display = "block";
-      pendingEntry = {bot,timeCasa:casa,timeVisitante:visit,minEntrada:parseInt(minEnt),odd,resultado:"Green",qtdGols:0,minutos:"",liga:"",data:"",placar:""};
+      pendingEntry = {bot,timeCasa:casa,timeVisitante:visit,minEntrada:minEnt,odd,over,resultado:"Red",qtdGols:0,minutos:"",liga:"",data:"",placar:""};
       document.getElementById("btnBuscar").disabled = false;
       return;
     }
@@ -355,24 +383,40 @@ async function buscarResultado() {
       document.getElementById("errTxt").textContent = parsed.erro;
       document.getElementById("errTxt").style.display = "block";
       document.getElementById("btnEdit").style.display = "block";
-      pendingEntry = {bot,timeCasa:casa,timeVisitante:visit,minEntrada:parseInt(minEnt),odd,resultado:"Green",qtdGols:0,minutos:"",liga:"",data:"",placar:""};
+      pendingEntry = {bot,timeCasa:casa,timeVisitante:visit,minEntrada:minEnt,odd,over,resultado:"Red",qtdGols:0,minutos:"",liga:"",data:"",placar:""};
     } else {
+      const todosGols = parsed.todosGols || [];
+      const golsAntes = todosGols.filter(m => m < minEnt);
+      const golsDepois = todosGols.filter(m => m >= minEnt);
+      // GREEN se gols apos entrada >= gols necessarios para o over
+      const resultado = golsDepois.length >= golesNec ? "Green" : "Red";
+
       pendingEntry = {
         bot, timeCasa:parsed.timeCasa||casa, timeVisitante:parsed.timeVisitante||visit,
-        minEntrada:parseInt(minEnt), odd, resultado:parsed.resultado,
-        qtdGols:parsed.totalGols||0, minutos:(parsed.minutosGols||[]).join(", "),
+        minEntrada:minEnt, odd, over, resultado,
+        qtdGols: golsDepois.length,
+        minutos: golsDepois.join(", "),
+        minutosAntes: golsAntes.join(", "),
         liga:parsed.liga||"", data:parsed.data||"",
         placar:(parsed.placarCasa||0)+"x"+(parsed.placarVisit||0)
       };
+
       const box = document.getElementById("resultBox");
-      box.className = "result-box "+(parsed.resultado==="Green"?"green":"red");
+      box.className = "result-box "+(resultado==="Green"?"green":"red");
       box.style.display = "block";
-      const golTagsHtml = (parsed.minutosGols||[]).map(m=>`<div class="gol-tag">Gol ${m}'</div>`).join("");
+
+      const golsDepoisHtml = golsDepois.map(m=>`<div class="gol-tag">Gol ${m}'</div>`).join("");
+      const golsAntesHtml = golsAntes.map(m=>`<div class="gol-tag-before">Gol ${m}'</div>`).join("");
+
       box.innerHTML = `
-        <div class="result-badge" style="color:${parsed.resultado==="Green"?"var(--green)":"var(--red)"}">${parsed.resultado==="Green"?"GREEN!":"RED"}</div>
-        <div class="result-teams">${parsed.timeCasa||casa} ${parsed.placarCasa} x ${parsed.timeVisitante||visit} ${parsed.placarVisit}</div>
-        <div class="result-info">${parsed.liga||""} - ${parsed.data||""} - ${parsed.totalGols} gols${parsed.observacao?" - "+parsed.observacao:""}</div>
-        ${golTagsHtml?`<div class="gol-tags">${golTagsHtml}</div>`:""}`;
+        <div style="font-size:20px;font-weight:900;margin-bottom:6px;color:${resultado==="Green"?"var(--green)":"var(--red)"}">${resultado==="Green"?"GREEN!":"RED"}</div>
+        <div style="font-size:14px;font-weight:900;color:var(--text);margin-bottom:4px">${parsed.timeCasa||casa} ${parsed.placarCasa} x ${parsed.timeVisitante||visit} ${parsed.placarVisit}</div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.8;margin-bottom:6px">${parsed.liga||""} - ${parsed.data||""}</div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:4px">Mercado: Over ${over} - Precisa de ${golesNec} gol(s) apos min ${minEnt}</div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:6px">Gols apos entrada: ${golsDepois.length} de ${golesNec} necessarios</div>
+        ${golsDepoisHtml||golsAntesHtml?`<div class="gol-tags">${golsDepoisHtml}${golsAntesHtml}</div>`:""}
+        ${golsAntesHtml?`<div style="font-size:9px;color:var(--muted);margin-top:6px">Riscados = gols antes da sua entrada (nao contam)</div>`:""}`;
+
       document.getElementById("btnSalvar").style.display = "block";
       document.getElementById("btnEdit").style.display = "block";
     }
@@ -381,7 +425,7 @@ async function buscarResultado() {
     document.getElementById("errTxt").textContent = "Erro: " + (e.message||"Tente novamente");
     document.getElementById("errTxt").style.display = "block";
     document.getElementById("btnEdit").style.display = "block";
-    pendingEntry = {bot,timeCasa:casa,timeVisitante:visit,minEntrada:parseInt(minEnt),odd,resultado:"Green",qtdGols:0,minutos:"",liga:"",data:"",placar:""};
+    pendingEntry = {bot,timeCasa:casa,timeVisitante:visit,minEntrada:minEnt,odd,over,resultado:"Red",qtdGols:0,minutos:"",liga:"",data:"",placar:""};
   }
   document.getElementById("btnBuscar").disabled = false;
 }
@@ -398,8 +442,8 @@ function editarManual() {
         <select id="mRes"><option value="Green">Green</option><option value="Red">Red</option></select>
       </div>
       <div><label>Placar Final</label><input type="text" id="mPlacar" placeholder="2x1" value="${pendingEntry.placar||''}"></div>
-      <div><label>Total de Gols</label><input type="number" id="mGols" placeholder="2" value="${pendingEntry.qtdGols||''}"></div>
-      <div class="form-full"><label>Minutos dos Gols</label><input type="text" id="mMins" placeholder="23, 45, 67" value="${pendingEntry.minutos||''}"></div>
+      <div><label>Gols Apos Entrada</label><input type="number" id="mGols" placeholder="2" value="${pendingEntry.qtdGols||''}"></div>
+      <div class="form-full"><label>Minutos dos Gols (apos entrada)</label><input type="text" id="mMins" placeholder="34, 67, 88" value="${pendingEntry.minutos||''}"></div>
       <div><label>Liga</label><input type="text" id="mLiga" placeholder="Brasileirao" value="${pendingEntry.liga||''}"></div>
       <div><label>Data</label><input type="text" id="mData" placeholder="DD/MM/YYYY" value="${pendingEntry.data||''}"></div>
     </div>`;
@@ -443,7 +487,7 @@ function renderHist() {
       <div class="entry-hdr">
         <div>
           <div class="entry-teams">${e.timeCasa} x ${e.timeVisitante}</div>
-          <div class="entry-meta">${e.liga||"-"} - ${e.data||"-"} - Entrada: ${e.minEntrada}'</div>
+          <div class="entry-meta">${e.liga||"-"} - ${e.data||"-"} - Entrada: ${e.minEntrada}' - Over ${e.over||"0.5"}</div>
         </div>
         <button class="btn-del" onclick="deletar(${e.id})">x</button>
       </div>
