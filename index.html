@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>⚽ Bot Tracker</title>
+<title>Bot Tracker</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 :root {
@@ -23,141 +23,498 @@ body { background:var(--bg); color:var(--text); font-family:'Courier New',monosp
 .nav-btn.active { background:var(--green); color:#060b14; }
 .view { display:none; padding:16px 14px; }
 .view.active { display:block; }
+.stats-row { display:flex; gap:8px; margin-bottom:8px; }
+.stat-card { background:var(--card); border-radius:12px; padding:12px 10px; flex:1; min-width:0; border-top:2px solid; }
+.stat-value { font-size:20px; font-weight:900; }
+.stat-label { font-size:8px; color:var(--muted); letter-spacing:1.5px; margin-top:2px; text-transform:uppercase; }
+.bot-bar { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:8px; }
+.progress-bg { background:var(--border); border-radius:4px; height:5px; margin-top:6px; }
+.progress-fill { height:5px; border-radius:4px; }
 .section-title { font-size:11px; font-weight:900; color:var(--green); letter-spacing:3px; margin-bottom:16px; }
 .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
 .form-full { grid-column:1/-1; }
 label { font-size:9px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:5px; display:block; }
 input, select { width:100%; padding:11px 13px; background:#0a1020; border:1px solid var(--border); border-radius:9px; color:var(--text); font-size:13px; font-family:'Courier New',monospace; outline:none; -webkit-appearance:none; }
-.api-box { background:var(--card); border:1px solid var(--gold)44; border-radius:12px; padding:14px; margin-bottom:18px; }
+select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='%23546e7a' d='M6 8L0 0h12z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:32px; }
+.loading-box { background:var(--card); border:1px solid #448aff44; border-radius:12px; padding:24px; text-align:center; display:none; margin-bottom:16px; }
+.spinner { font-size:32px; animation:spin 1s linear infinite; display:inline-block; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.loading-txt { font-size:10px; color:var(--blue); letter-spacing:2px; margin-top:10px; }
+.result-box { border-radius:12px; padding:14px; margin-bottom:16px; display:none; }
+.result-box.green { background:#00e67611; border:1px solid #00e67644; border-left:3px solid var(--green); }
+.result-box.red { background:#ff174411; border:1px solid #ff174444; border-left:3px solid var(--red); }
+.result-badge { font-size:20px; font-weight:900; margin-bottom:6px; }
+.result-teams { font-size:14px; font-weight:900; color:var(--text); margin-bottom:4px; }
+.result-info { font-size:10px; color:var(--muted); line-height:1.8; }
+.gol-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.gol-tag { background:var(--card); border:1px solid #00e67633; border-radius:6px; padding:3px 10px; font-size:11px; color:var(--green); }
+.btn-buscar { width:100%; padding:13px; background:var(--blue); border:none; border-radius:10px; color:#fff; font-weight:900; font-size:13px; cursor:pointer; letter-spacing:2px; font-family:'Courier New',monospace; margin-bottom:12px; }
+.btn-buscar:disabled { background:var(--border); color:var(--muted); cursor:not-allowed; }
+.btn-salvar { width:100%; padding:14px; background:var(--green); border:none; border-radius:10px; color:#060b14; font-weight:900; font-size:13px; cursor:pointer; letter-spacing:2px; font-family:'Courier New',monospace; display:none; margin-bottom:10px; }
+.btn-edit { width:100%; padding:10px; background:transparent; border:1px solid var(--border); border-radius:10px; color:var(--muted); font-weight:900; font-size:11px; cursor:pointer; letter-spacing:1px; font-family:'Courier New',monospace; display:none; }
+.entry-card { background:var(--card); border-radius:12px; padding:12px 14px; margin-bottom:10px; border-left:3px solid; }
+.entry-hdr { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:5px; }
+.entry-teams { font-size:13px; font-weight:900; color:var(--text); }
+.entry-meta { font-size:10px; color:var(--muted); margin-top:2px; }
+.entry-tags { display:flex; gap:8px; flex-wrap:wrap; font-size:11px; margin-top:5px; }
+.entry-bot { font-size:9px; color:var(--muted); margin-top:6px; letter-spacing:1px; }
+.btn-del { background:transparent; border:none; color:var(--muted); cursor:pointer; font-size:20px; line-height:1; }
+.chart-box { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:16px; }
+.chart-title { font-size:9px; color:var(--muted); letter-spacing:2px; margin-bottom:14px; text-transform:uppercase; }
+.chart-bars { display:flex; align-items:flex-end; gap:3px; height:80px; overflow-x:auto; }
+.chart-bar-wrap { display:flex; flex-direction:column; align-items:center; min-width:24px; height:100%; justify-content:flex-end; }
+.chart-bar { width:100%; border-radius:3px 3px 0 0; min-height:3px; }
+.chart-min { font-size:7px; color:var(--muted); margin-top:3px; }
+.chart-count { font-size:8px; color:var(--green); margin-bottom:2px; }
+.period-tabs { display:flex; gap:6px; margin-bottom:14px; }
+.period-tab { flex:1; padding:7px 4px; border-radius:7px; border:1px solid var(--border); background:transparent; color:var(--muted); font-size:10px; cursor:pointer; font-family:'Courier New',monospace; font-weight:700; }
+.period-tab.active { background:var(--gold); color:#060b14; border-color:var(--gold); }
+.empty { text-align:center; color:var(--muted); padding:40px 20px; font-size:13px; }
+.err-txt { font-size:11px; color:var(--red); margin-bottom:10px; display:none; }
+.api-box { background:var(--card); border:1px solid #ffd60044; border-radius:12px; padding:14px; margin-bottom:18px; }
+.api-box-title { font-size:9px; color:var(--gold); letter-spacing:2px; margin-bottom:8px; }
 .api-row { display:flex; gap:8px; }
-.btn-api { padding:11px 14px; background:var(--gold); border:none; border-radius:9px; color:#060b14; font-weight:900; font-size:11px; cursor:pointer; font-family:'Courier New',monospace; }
-.btn-buscar { width:100%; padding:13px; background:var(--blue); border:none; border-radius:10px; color:#fff; font-weight:900; font-size:13px; cursor:pointer; letter-spacing:2px; font-family:'Courier New',monospace; margin-top:10px; }
-.err-txt { font-size:11px; color:var(--red); margin:10px 0; display:none; }
+.btn-api { padding:11px 14px; background:var(--gold); border:none; border-radius:9px; color:#060b14; font-weight:900; font-size:11px; cursor:pointer; font-family:'Courier New',monospace; white-space:nowrap; }
 </style>
 </head>
 <body>
 
 <div class="header">
   <div>
-    <div class="header-title">⚽ BOT TRACKER</div>
+    <div class="header-title">BOT TRACKER</div>
     <div class="header-sub">BOLSA DE APOSTA</div>
   </div>
   <div>
-    <div class="header-lucro">R$0.00</div>
-    <div class="header-info">0 entradas · 0% green</div>
+    <div class="header-lucro" id="hLucro">R$0.00</div>
+    <div class="header-info" id="hInfo">0 entradas - 0% green</div>
   </div>
 </div>
 
 <div class="nav">
-  <button class="nav-btn" onclick="setView('dash')">📊 RESUMO</button>
-  <button class="nav-btn active" onclick="setView('add')">➕ ENTRADA</button>
-  <button class="nav-btn" onclick="setView('hist')">📜 HISTÓRICO</button>
+  <button class="nav-btn active" onclick="setView('dash')">RESUMO</button>
+  <button class="nav-btn" onclick="setView('add')">+ ENTRADA</button>
+  <button class="nav-btn" onclick="setView('hist')">HISTORICO</button>
+  <button class="nav-btn" onclick="setView('mins')">MINUTOS</button>
 </div>
 
-<!-- VIEW: ADICIONAR ENTRADA -->
-<div id="add" class="view active">
-  <div class="section-title">NOVA ENTRADA (GEMINI FREE)</div>
-  
+<!-- DASHBOARD -->
+<div class="view active" id="view-dash">
+  <div class="stats-row">
+    <div class="stat-card" style="border-color:var(--green)"><div class="stat-value" style="color:var(--green)" id="sG">0</div><div class="stat-label">Greens</div></div>
+    <div class="stat-card" style="border-color:var(--red)"><div class="stat-value" style="color:var(--red)" id="sR">0</div><div class="stat-label">Reds</div></div>
+    <div class="stat-card" style="border-color:var(--blue)"><div class="stat-value" style="color:var(--blue)" id="sP">0%</div><div class="stat-label">% Green</div></div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card" style="border-color:var(--green)"><div class="stat-value" id="sL" style="color:var(--green)">R$0</div><div class="stat-label">Lucro R$10</div></div>
+    <div class="stat-card" style="border-color:var(--gold)"><div class="stat-value" style="color:var(--gold)" id="sO">0</div><div class="stat-label">Odd Media</div></div>
+    <div class="stat-card" style="border-color:var(--purple)"><div class="stat-value" style="color:var(--purple)" id="sGols">0</div><div class="stat-label">Gols</div></div>
+  </div>
+  <div style="font-size:9px;color:var(--muted);letter-spacing:2px;margin:14px 0 10px">DESEMPENHO POR BOT</div>
+  <div id="botBars"></div>
+  <div class="empty" id="emptyDash"><span style="color:var(--green)">Toque em + ENTRADA para comecar!</span></div>
+</div>
+
+<!-- ADD ENTRY -->
+<div class="view" id="view-add">
+  <div class="section-title">NOVA ENTRADA</div>
+
   <div class="api-box">
-    <label>🗝️ CHAVE DE API GOOGLE (AIza...)</label>
+    <div class="api-box-title">CHAVE DE API GOOGLE</div>
     <div class="api-row">
-      <input type="password" id="apiKeyInput" placeholder="Cole sua chave AIza aqui">
-      <button class="btn-api" onclick="saveApiKey()">SALVAR</button>
+      <input type="password" id="apiKeyInput" placeholder="AIzaSy...">
+      <button class="btn-api" onclick="salvarApiKey()">SALVAR</button>
     </div>
-    <div id="apiStatus" style="font-size:10px; margin-top:8px;"></div>
+    <div id="apiStatus" style="font-size:10px;margin-top:6px;"></div>
   </div>
 
   <div class="form-grid">
     <div class="form-full">
-      <label>NOME DO BOT</label>
-      <select id="botName"><option>Casa vencendo 2.5</option></select>
+      <label>Nome do Bot</label>
+      <select id="fBot">
+        <option>Fora favorito 00</option><option>Casa favorito 00</option>
+        <option>Fora perdendo 2.5</option><option>Fora vencendo 2.5</option>
+        <option>Casa vencendo 2.5</option><option>Casa perdendo 2.5</option>
+      </select>
     </div>
-    <div><label>TIME CASA</label><input type="text" id="tCasa" value="Palmeiras"></div>
-    <div><label>TIME VISITANTE</label><input type="text" id="tVis" value="Botafogo"></div>
-    <div><label>MINUTO ENTRADA</label><input type="number" id="minEnt" value="31"></div>
-    <div><label>ODD DE ENTRADA</label><input type="text" id="oddEnt" value="1.66"></div>
+    <div class="form-full">
+      <label>Time Casa</label>
+      <input type="text" id="fCasa" placeholder="Ex: Palmeiras" oninput="checkReady()">
+    </div>
+    <div class="form-full">
+      <label>Time Visitante</label>
+      <input type="text" id="fVisit" placeholder="Ex: Flamengo" oninput="checkReady()">
+    </div>
+    <div>
+      <label>Minuto Entrada</label>
+      <input type="number" id="fMinEnt" placeholder="Ex: 27" oninput="checkReady()">
+    </div>
+    <div>
+      <label>Odd de Entrada</label>
+      <input type="number" id="fOdd" placeholder="Ex: 1.81" step="0.01" oninput="checkReady()">
+    </div>
   </div>
 
-  <div id="errorDisplay" class="err-txt"></div>
-  <button class="btn-buscar" onclick="buscarResultado()">📊 BUSCAR RESULTADO</button>
+  <div class="err-txt" id="errTxt"></div>
+  <button class="btn-buscar" id="btnBuscar" onclick="buscarResultado()" disabled>BUSCAR RESULTADO</button>
+
+  <div class="loading-box" id="loadBox">
+    <div class="spinner">o</div>
+    <div class="loading-txt">BUSCANDO RESULTADO...</div>
+  </div>
+
+  <div class="result-box" id="resultBox"></div>
+  <button class="btn-salvar" id="btnSalvar" onclick="salvarEntrada()">SALVAR ENTRADA</button>
+  <button class="btn-edit" id="btnEdit" onclick="editarManual()">EDITAR MANUALMENTE</button>
 </div>
 
-<!-- Scripts -->
+<!-- HISTORICO -->
+<div class="view" id="view-hist">
+  <div style="margin-bottom:12px">
+    <label>Filtrar por Bot</label>
+    <select id="filterBot" onchange="renderHist()">
+      <option value="Todos">Todos os bots</option>
+      <option>Fora favorito 00</option><option>Casa favorito 00</option>
+      <option>Fora perdendo 2.5</option><option>Fora vencendo 2.5</option>
+      <option>Casa vencendo 2.5</option><option>Casa perdendo 2.5</option>
+    </select>
+  </div>
+  <div id="histList"></div>
+</div>
+
+<!-- MINUTOS -->
+<div class="view" id="view-mins">
+  <div class="section-title">ANALISE DE MINUTOS</div>
+  <div class="period-tabs">
+    <button class="period-tab active" onclick="setPeriod('all',this)">TODOS</button>
+    <button class="period-tab" onclick="setPeriod('1t',this)">1 TEMPO</button>
+    <button class="period-tab" onclick="setPeriod('2t',this)">2 TEMPO</button>
+  </div>
+  <div class="chart-box" id="chartBox">
+    <div class="chart-title">FREQUENCIA DE GOLS POR MINUTO</div>
+    <div class="chart-bars" id="chartBars"></div>
+  </div>
+  <div style="font-size:9px;color:var(--muted);letter-spacing:2px;margin-bottom:10px">TOP MINUTOS</div>
+  <div id="topMinutos"></div>
+  <div class="empty" id="emptyMins" style="display:none">Nenhum dado de minutos ainda.</div>
+</div>
+
 <script>
-function setView(v) {
-  document.querySelectorAll('.view').forEach(e => e.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(e => e.classList.remove('active'));
-  document.getElementById(v).classList.add('active');
-  if(window.event) window.event.currentTarget.classList.add('active');
+const BOTS = ["Fora favorito 00","Casa favorito 00","Fora perdendo 2.5","Fora vencendo 2.5","Casa vencendo 2.5","Casa perdendo 2.5"];
+const KEY = "bottracker_v4";
+const APIKEY_STORAGE = "bt_google_apikey";
+let entries = (() => { try { return JSON.parse(localStorage.getItem(KEY))||[]; } catch { return []; } })();
+let currentPeriod = "all";
+let pendingEntry = null;
+
+function save() { localStorage.setItem(KEY, JSON.stringify(entries)); }
+
+function getApiKey() { return localStorage.getItem(APIKEY_STORAGE)||""; }
+
+function salvarApiKey() {
+  const key = document.getElementById("apiKeyInput").value.trim();
+  if(!key.startsWith("AIza")) {
+    document.getElementById("apiStatus").innerHTML = '<span style="color:var(--red)">Chave invalida. Deve comecar com AIza</span>';
+    return;
+  }
+  localStorage.setItem(APIKEY_STORAGE, key);
+  document.getElementById("apiKeyInput").value = "â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢";
+  document.getElementById("apiStatus").innerHTML = '<span style="color:var(--green)">Chave salva com seguranca!</span>';
+  checkReady();
 }
 
-function saveApiKey() {
-  const key = document.getElementById('apiKeyInput').value.trim();
-  const status = document.getElementById('apiStatus');
-  if (key.startsWith('AIza')) {
-    localStorage.setItem('gemini_key', key);
-    status.innerText = "✅ CHAVE GEMINI SALVA COM SUCESSO!";
-    status.style.color = "var(--green)";
-  } else {
-    status.innerText = "❌ Chave inválida! Deve começar com AIza";
-    status.style.color = "var(--red)";
+function initApiKey() {
+  const saved = getApiKey();
+  if(saved) {
+    document.getElementById("apiKeyInput").value = "â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢";
+    document.getElementById("apiStatus").innerHTML = '<span style="color:var(--green)">Chave configurada!</span>';
   }
+}
+
+function setView(v) {
+  document.querySelectorAll(".view").forEach(e=>e.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(e=>e.classList.remove("active"));
+  document.getElementById("view-"+v).classList.add("active");
+  const idx = ["dash","add","hist","mins"].indexOf(v);
+  document.querySelectorAll(".nav-btn")[idx].classList.add("active");
+  if(v==="dash") renderDash();
+  if(v==="hist") renderHist();
+  if(v==="mins") renderMins();
+}
+
+function checkReady() {
+  const ok = document.getElementById("fCasa").value.trim() &&
+             document.getElementById("fVisit").value.trim() &&
+             document.getElementById("fMinEnt").value.trim() &&
+             document.getElementById("fOdd").value.trim();
+  document.getElementById("btnBuscar").disabled = !ok;
+}
+
+function calcStats(list) {
+  const g = list.filter(e=>e.resultado==="Green").length;
+  const lucro = list.reduce((s,e)=>e.resultado==="Green"?s+(e.odd-1)*10:s-10,0).toFixed(2);
+  const avgOdd = list.length?(list.reduce((s,e)=>s+e.odd,0)/list.length).toFixed(2):"0";
+  const totalGols = list.reduce((s,e)=>s+(e.qtdGols||0),0);
+  const pct = list.length?Math.round(g/list.length*100):0;
+  return {greens:g, reds:list.length-g, lucro, avgOdd, totalGols, pct, total:list.length};
+}
+
+function renderDash() {
+  const s = calcStats(entries);
+  document.getElementById("sG").textContent = s.greens;
+  document.getElementById("sR").textContent = s.reds;
+  document.getElementById("sP").textContent = s.pct+"%";
+  const lEl = document.getElementById("sL");
+  lEl.textContent = (parseFloat(s.lucro)>=0?"+":"")+"R$"+s.lucro;
+  lEl.style.color = parseFloat(s.lucro)>=0?"var(--green)":"var(--red)";
+  document.getElementById("sO").textContent = s.avgOdd;
+  document.getElementById("sGols").textContent = s.totalGols;
+  const hl = document.getElementById("hLucro");
+  hl.textContent = (parseFloat(s.lucro)>=0?"+":"")+"R$"+s.lucro;
+  hl.style.color = parseFloat(s.lucro)>=0?"var(--green)":"var(--red)";
+  document.getElementById("hInfo").textContent = s.total+" entradas - "+s.pct+"% green";
+  document.getElementById("emptyDash").style.display = entries.length?"none":"block";
+  const bars = document.getElementById("botBars");
+  bars.innerHTML = "";
+  BOTS.forEach(bot=>{
+    const list = entries.filter(e=>e.bot===bot);
+    if(!list.length) return;
+    const bs = calcStats(list);
+    const bc = bs.pct>=65?"var(--green)":bs.pct>=50?"var(--gold)":"var(--red)";
+    const lc = parseFloat(bs.lucro)>=0?"var(--green)":"var(--red)";
+    bars.innerHTML += `<div class="bot-bar">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+        <span style="font-size:11px;font-weight:700">${bot}</span>
+        <span style="font-size:11px;font-weight:700;color:${lc}">${parseFloat(bs.lucro)>=0?"+":""}R$${bs.lucro}</span>
+      </div>
+      <div style="display:flex;gap:10px;font-size:10px;color:var(--muted)">
+        <span style="color:var(--green)">${bs.greens} green</span>
+        <span style="color:var(--red)">${bs.reds} red</span>
+        <span>${bs.total} jogos</span>
+        <span style="color:var(--gold)">${bs.pct}%</span>
+      </div>
+      <div class="progress-bg"><div class="progress-fill" style="width:${bs.pct}%;background:${bc}"></div></div>
+    </div>`;
+  });
 }
 
 async function buscarResultado() {
-  const key = localStorage.getItem('gemini_key');
-  const err = document.getElementById('errorDisplay');
-  const btn = document.querySelector('.btn-buscar');
-  const casa = document.getElementById('tCasa').value;
-  const vis = document.getElementById('tVis').value;
-
-  if (!key) {
-    alert("Configure e salve a chave AIza primeiro!");
+  const apiKey = getApiKey();
+  if(!apiKey) {
+    document.getElementById("errTxt").textContent = "Configure sua chave de API primeiro!";
+    document.getElementById("errTxt").style.display = "block";
     return;
   }
+  const casa = document.getElementById("fCasa").value.trim();
+  const visit = document.getElementById("fVisit").value.trim();
+  const minEnt = document.getElementById("fMinEnt").value.trim();
+  const odd = parseFloat(document.getElementById("fOdd").value);
+  const bot = document.getElementById("fBot").value;
 
-  btn.innerText = "⏳ BUSCANDO...";
-  err.style.display = "none";
+  document.getElementById("errTxt").style.display = "none";
+  document.getElementById("resultBox").style.display = "none";
+  document.getElementById("btnSalvar").style.display = "none";
+  document.getElementById("btnEdit").style.display = "none";
+  document.getElementById("loadBox").style.display = "block";
+  document.getElementById("btnBuscar").disabled = true;
 
   try {
-    // Usando o modelo Gemini 1.5 Flash do Google
-    const url = `https://generativelanguage.googleapis.com{key}`;
+    const prompt = `Busque o resultado do jogo de futebol entre "${casa}" e "${visit}" que aconteceu recentemente. Preciso: placar final, minutos de cada gol, liga e data. A aposta foi no minuto ${minEnt} em Over 0.5 FT (precisa de pelo menos 1 gol). Retorne SOMENTE JSON sem markdown: {"timeCasa":"${casa}","timeVisitante":"${visit}","liga":"nome","data":"DD/MM/YYYY","placarCasa":0,"placarVisit":0,"totalGols":0,"minutosGols":[23,67],"resultado":"Green","observacao":"texto"}. resultado e Green se totalGols>=1 senao Red. Se nao encontrar: {"erro":"Jogo nao encontrado"}`;
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: `Qual foi o placar final do jogo entre ${casa} e ${vis}? Responda apenas o placar (ex: 2-0). Se o jogo não ocorreu, diga 'Indisponível'.` }]
-        }]
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        contents:[{parts:[{text:prompt}]}],
+        tools:[{google_search:{}}]
       })
     });
 
-    if (!response.ok) {
-       const errorData = await response.json();
-       throw new Error("Erro na Chave: " + (errorData.error.message || "Verifique sua conexão"));
+    const data = await res.json();
+    document.getElementById("loadBox").style.display = "none";
+
+    if(data.error) {
+      document.getElementById("errTxt").textContent = "Erro API: " + (data.error.message||"Verifique sua chave");
+      document.getElementById("errTxt").style.display = "block";
+      document.getElementById("btnEdit").style.display = "block";
+      pendingEntry = {bot,timeCasa:casa,timeVisitante:visit,minEntrada:parseInt(minEnt),odd,resultado:"Green",qtdGols:0,minutos:"",liga:"",data:"",placar:""};
+      document.getElementById("btnBuscar").disabled = false;
+      return;
     }
 
-    const data = await response.json();
-    
-    // Acessando o texto da resposta corretamente
-    if (data.candidates && data.candidates[0].content.parts[0].text) {
-        const placar = data.candidates[0].content.parts[0].text;
-        alert("⚽ RESULTADO: " + placar);
+    const text = data.candidates?.[0]?.content?.parts?.filter(p=>p.text).map(p=>p.text).join("")||"";
+    const clean = text.replace(/```json|```/g,"").trim();
+    const jsonMatch = clean.match(/\{[\s\S]*\}/);
+    const parsed = JSON.parse(jsonMatch?jsonMatch[0]:clean);
+
+    if(parsed.erro) {
+      document.getElementById("errTxt").textContent = parsed.erro;
+      document.getElementById("errTxt").style.display = "block";
+      document.getElementById("btnEdit").style.display = "block";
+      pendingEntry = {bot,timeCasa:casa,timeVisitante:visit,minEntrada:parseInt(minEnt),odd,resultado:"Green",qtdGols:0,minutos:"",liga:"",data:"",placar:""};
     } else {
-        throw new Error("Resposta vazia do Google.");
+      pendingEntry = {
+        bot, timeCasa:parsed.timeCasa||casa, timeVisitante:parsed.timeVisitante||visit,
+        minEntrada:parseInt(minEnt), odd, resultado:parsed.resultado,
+        qtdGols:parsed.totalGols||0, minutos:(parsed.minutosGols||[]).join(", "),
+        liga:parsed.liga||"", data:parsed.data||"",
+        placar:(parsed.placarCasa||0)+"x"+(parsed.placarVisit||0)
+      };
+      const box = document.getElementById("resultBox");
+      box.className = "result-box "+(parsed.resultado==="Green"?"green":"red");
+      box.style.display = "block";
+      const golTagsHtml = (parsed.minutosGols||[]).map(m=>`<div class="gol-tag">Gol ${m}'</div>`).join("");
+      box.innerHTML = `
+        <div class="result-badge" style="color:${parsed.resultado==="Green"?"var(--green)":"var(--red)"}">${parsed.resultado==="Green"?"GREEN!":"RED"}</div>
+        <div class="result-teams">${parsed.timeCasa||casa} ${parsed.placarCasa} x ${parsed.timeVisitante||visit} ${parsed.placarVisit}</div>
+        <div class="result-info">${parsed.liga||""} - ${parsed.data||""} - ${parsed.totalGols} gols${parsed.observacao?" - "+parsed.observacao:""}</div>
+        ${golTagsHtml?`<div class="gol-tags">${golTagsHtml}</div>`:""}`;
+      document.getElementById("btnSalvar").style.display = "block";
+      document.getElementById("btnEdit").style.display = "block";
     }
-
-  } catch (e) {
-    console.error(e);
-    err.innerText = "⚠️ " + e.message;
-    err.style.display = "block";
-  } finally {
-    btn.innerText = "📊 BUSCAR RESULTADO";
+  } catch(e) {
+    document.getElementById("loadBox").style.display = "none";
+    document.getElementById("errTxt").textContent = "Erro: " + (e.message||"Tente novamente");
+    document.getElementById("errTxt").style.display = "block";
+    document.getElementById("btnEdit").style.display = "block";
+    pendingEntry = {bot,timeCasa:casa,timeVisitante:visit,minEntrada:parseInt(minEnt),odd,resultado:"Green",qtdGols:0,minutos:"",liga:"",data:"",placar:""};
   }
+  document.getElementById("btnBuscar").disabled = false;
 }
+
+function editarManual() {
+  if(!pendingEntry) return;
+  const box = document.getElementById("resultBox");
+  box.className = "result-box green";
+  box.style.display = "block";
+  box.innerHTML = `
+    <div style="font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:12px">PREENCHER MANUALMENTE</div>
+    <div class="form-grid">
+      <div class="form-full"><label>Resultado</label>
+        <select id="mRes"><option value="Green">Green</option><option value="Red">Red</option></select>
+      </div>
+      <div><label>Placar Final</label><input type="text" id="mPlacar" placeholder="2x1" value="${pendingEntry.placar||''}"></div>
+      <div><label>Total de Gols</label><input type="number" id="mGols" placeholder="2" value="${pendingEntry.qtdGols||''}"></div>
+      <div class="form-full"><label>Minutos dos Gols</label><input type="text" id="mMins" placeholder="23, 45, 67" value="${pendingEntry.minutos||''}"></div>
+      <div><label>Liga</label><input type="text" id="mLiga" placeholder="Brasileirao" value="${pendingEntry.liga||''}"></div>
+      <div><label>Data</label><input type="text" id="mData" placeholder="DD/MM/YYYY" value="${pendingEntry.data||''}"></div>
+    </div>`;
+  document.getElementById("btnSalvar").style.display = "block";
+  document.getElementById("btnEdit").style.display = "none";
+}
+
+function salvarEntrada() {
+  if(!pendingEntry) return;
+  const mRes = document.getElementById("mRes");
+  if(mRes) {
+    pendingEntry.resultado = mRes.value;
+    pendingEntry.placar = document.getElementById("mPlacar").value;
+    pendingEntry.qtdGols = parseInt(document.getElementById("mGols").value)||0;
+    pendingEntry.minutos = document.getElementById("mMins").value;
+    pendingEntry.liga = document.getElementById("mLiga").value;
+    pendingEntry.data = document.getElementById("mData").value;
+  }
+  entries.unshift({...pendingEntry, id:Date.now()});
+  save();
+  ["fCasa","fVisit","fMinEnt","fOdd"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("fBot").selectedIndex=0;
+  document.getElementById("resultBox").style.display="none";
+  document.getElementById("btnSalvar").style.display="none";
+  document.getElementById("btnEdit").style.display="none";
+  document.getElementById("errTxt").style.display="none";
+  document.getElementById("btnBuscar").disabled=true;
+  pendingEntry=null;
+  setView("dash");
+}
+
+function renderHist() {
+  const fb = document.getElementById("filterBot").value;
+  const filtered = fb==="Todos"?entries:entries.filter(e=>e.bot===fb);
+  const list = document.getElementById("histList");
+  if(!filtered.length){list.innerHTML=`<div class="empty">Nenhuma entrada encontrada.</div>`;return;}
+  list.innerHTML = filtered.map(e=>{
+    const bc = e.resultado==="Green"?"var(--green)":"var(--red)";
+    const mins = e.minutos?e.minutos.split(",").map(m=>`<div class="gol-tag">Gol ${m.trim()}'</div>`).join(""):"";
+    return `<div class="entry-card" style="border-color:${bc}22;border-left-color:${bc}">
+      <div class="entry-hdr">
+        <div>
+          <div class="entry-teams">${e.timeCasa} x ${e.timeVisitante}</div>
+          <div class="entry-meta">${e.liga||"-"} - ${e.data||"-"} - Entrada: ${e.minEntrada}'</div>
+        </div>
+        <button class="btn-del" onclick="deletar(${e.id})">x</button>
+      </div>
+      <div class="entry-tags">
+        <span style="color:${bc};font-weight:900">${e.resultado}</span>
+        <span style="color:var(--gold)">odd ${e.odd}</span>
+        ${e.placar?`<span style="color:var(--muted)">${e.placar}</span>`:""}
+        ${e.qtdGols?`<span style="color:var(--purple)">${e.qtdGols} gols</span>`:""}
+      </div>
+      ${mins?`<div class="gol-tags" style="margin-top:6px">${mins}</div>`:""}
+      <div class="entry-bot">Bot: ${e.bot}</div>
+    </div>`;
+  }).join("");
+}
+
+function deletar(id) {
+  if(!confirm("Apagar esta entrada?")) return;
+  entries=entries.filter(e=>e.id!==id);
+  save(); renderHist(); renderDash();
+}
+
+function setPeriod(p,btn) {
+  currentPeriod=p;
+  document.querySelectorAll(".period-tab").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  renderMins();
+}
+
+function renderMins() {
+  const counts={};
+  entries.forEach(e=>{
+    if(!e.minutos) return;
+    e.minutos.split(",").forEach(m=>{
+      const n=parseInt(m.trim());
+      if(isNaN(n)) return;
+      if(currentPeriod==="1t"&&n>45) return;
+      if(currentPeriod==="2t"&&n<=45) return;
+      counts[n]=(counts[n]||0)+1;
+    });
+  });
+  const sorted=Object.entries(counts).map(([m,c])=>({min:parseInt(m),count:c})).sort((a,b)=>a.min-b.min);
+  const emptyEl=document.getElementById("emptyMins");
+  const chartBox=document.getElementById("chartBox");
+  if(!sorted.length){emptyEl.style.display="block";chartBox.style.display="none";document.getElementById("topMinutos").innerHTML="";return;}
+  emptyEl.style.display="none";
+  chartBox.style.display="block";
+  const maxCount=Math.max(...sorted.map(s=>s.count));
+  document.getElementById("chartBars").innerHTML=sorted.map(s=>{
+    const h=Math.round((s.count/maxCount)*100);
+    const color=s.min<=45?"var(--green)":"var(--blue)";
+    return `<div class="chart-bar-wrap">
+      <div class="chart-count">${s.count}</div>
+      <div class="chart-bar" style="height:${h}%;background:${color}"></div>
+      <div class="chart-min">${s.min}'</div>
+    </div>`;
+  }).join("");
+  const top=[...sorted].sort((a,b)=>b.count-a.count).slice(0,5);
+  const total=entries.filter(e=>e.minutos).length;
+  document.getElementById("topMinutos").innerHTML=top.map((s,i)=>{
+    const medal=i===0?"1o":i===1?"2o":"3o";
+    const pct=total?Math.round(s.count/total*100):0;
+    return `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <span style="font-size:13px;font-weight:900;color:var(--text)">${medal} - Minuto ${s.min}'</span>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">${s.min<=45?"1 Tempo":"2 Tempo"}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:16px;font-weight:900;color:var(--green)">${s.count}x</div>
+        <div style="font-size:10px;color:var(--muted)">${pct}% dos jogos</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+initApiKey();
+renderDash();
 </script>
 </body>
 </html>
