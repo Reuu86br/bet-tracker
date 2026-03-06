@@ -111,6 +111,7 @@ select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.or
     <div class="stat-card" style="border-color:var(--gold)"><div class="stat-value" style="color:var(--gold)" id="sO">0</div><div class="stat-label">Odd Media</div></div>
     <div class="stat-card" style="border-color:var(--purple)"><div class="stat-value" style="color:var(--purple)" id="sGols">0</div><div class="stat-label">Gols</div></div>
   </div>
+  <button onclick="exportarCSV()" style="width:100%;padding:11px;background:transparent;border:1px solid var(--gold);border-radius:10px;color:var(--gold);font-weight:900;font-size:11px;cursor:pointer;letter-spacing:2px;font-family:'Courier New',monospace;margin-bottom:14px;">EXPORTAR DADOS CSV</button>
   <div style="font-size:9px;color:var(--muted);letter-spacing:2px;margin:14px 0 10px">DESEMPENHO POR BOT</div>
   <div id="botBars"></div>
   <div class="empty" id="emptyDash"><span style="color:var(--green)">Toque em + ENTRADA para comecar!</span></div>
@@ -242,14 +243,14 @@ function salvarApiKey() {
     return;
   }
   localStorage.setItem(APIKEY_STORAGE, key);
-  document.getElementById("apiKeyInput").value = "â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢";
+  document.getElementById("apiKeyInput").value = "Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢";
   document.getElementById("apiStatus").innerHTML = '<span style="color:var(--green)">Chave salva!</span>';
 }
 
 function initApiKey() {
   const saved = getApiKey();
   if(saved) {
-    document.getElementById("apiKeyInput").value = "â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢";
+    document.getElementById("apiKeyInput").value = "Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢";
     document.getElementById("apiStatus").innerHTML = '<span style="color:var(--green)">Chave configurada!</span>';
   }
 }
@@ -560,6 +561,23 @@ function renderMins() {
       </div>
     </div>`;
   }).join("");
+}
+
+
+function exportarCSV() {
+  if(!entries.length){alert("Nenhuma entrada para exportar!");return;}
+  const header = "Bot,Time Casa,Time Visitante,Liga,Data,Minuto Entrada,Odd,Over,Resultado,Placar,Gols Apos Entrada,Minutos dos Gols";
+  const rows = entries.map(e => [
+    e.bot, e.timeCasa, e.timeVisitante, e.liga||"", e.data||"",
+    e.minEntrada, e.odd, e.over||"0.5", e.resultado,
+    e.placar||"", e.qtdGols||0, e.minutos||""
+  ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(","));
+  const csv = [header, ...rows].join("\n");
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "bot-tracker-dados.csv";
+  a.click(); URL.revokeObjectURL(url);
 }
 
 initApiKey();
