@@ -355,11 +355,11 @@ async function buscarResultado() {
       },
       body:JSON.stringify({
         model:"claude-haiku-4-5-20251001",
-        max_tokens:1000,
+        max_tokens:300,
         tools:[{type:"web_search_20250305",name:"web_search"}],
         messages:[{
           role:"user",
-          content:`Busque na internet o resultado do jogo de futebol entre "${casa}" e "${visit}" que aconteceu recentemente. Preciso de TODOS os minutos de cada gol do jogo. Retorne SOMENTE JSON sem markdown: {"timeCasa":"${casa}","timeVisitante":"${visit}","liga":"nome","data":"DD/MM/YYYY","placarCasa":0,"placarVisit":0,"todosGols":[lista com TODOS os minutos ex: 12,34,67],"observacao":""}. Se nao encontrar: {"erro":"Jogo nao encontrado"}`
+          content:`Resultado do jogo ${casa} x ${visit} recente: minutos dos gols. JSON apenas: {"liga":"","data":"DD/MM/YYYY","placarCasa":0,"placarVisit":0,"todosGols":[12,34,67]}. Se nao achar: {"erro":"nao encontrado"}`
         }]
       })
     });
