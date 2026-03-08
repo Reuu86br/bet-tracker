@@ -167,6 +167,18 @@ select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.or
   </div>
 
   <div class="err-txt" id="errTxt"></div>
+  
+  <!-- COLAR TEXTO DA BOLSA -->
+  <div id="colarBox" style="margin-bottom:12px">
+    <button onclick="toggleColar()" style="width:100%;padding:10px;background:transparent;border:1px solid var(--purple);border-radius:10px;color:var(--purple);font-weight:900;font-size:11px;cursor:pointer;letter-spacing:2px;font-family:'Courier New',monospace;">
+      ðŸ“‹ COLAR TEXTO DA BOLSA
+    </button>
+    <div id="colarArea" style="display:none;margin-top:8px">
+      <textarea id="txtBolsa" rows="6" placeholder="Cole aqui o texto copiado da Bolsa de Aposta..." style="width:100%;background:#0d1525;border:1px solid #1e3a5f;border-radius:8px;color:var(--text);font-family:'Courier New',monospace;font-size:11px;padding:10px;box-sizing:border-box;resize:vertical"></textarea>
+      <button onclick="analisarTexto()" style="width:100%;margin-top:8px;padding:10px;background:var(--purple);border:none;border-radius:8px;color:#000;font-weight:900;font-size:11px;cursor:pointer;letter-spacing:2px;font-family:'Courier New',monospace;">âš¡ ANALISAR E PREENCHER</button>
+    </div>
+  </div>
+
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0">
     <button class="btn-buscar" id="btnBuscar" onclick="buscarResultado()" disabled>BUSCAR AUTO</button>
     <button class="btn-buscar" id="btnManual" onclick="inserirManual()" disabled style="background:transparent;border:1px solid var(--blue);color:var(--blue);">INSERIR MANUAL</button>
@@ -632,6 +644,121 @@ function exportarCSV() {
   const a = document.createElement("a");
   a.href = url; a.download = "bot-tracker-dados.csv";
   a.click(); URL.revokeObjectURL(url);
+}
+
+function toggleColar() {
+  const area = document.getElementById("colarArea");
+  area.style.display = area.style.display === "none" ? "block" : "none";
+}
+
+async function analisarTexto() {
+  const txt = document.getElementById("txtBolsa").value.trim();
+  if(!txt) { alert("Cole o texto primeiro!"); return; }
+  
+  const apiKey = getApiKey();
+  if(!apiKey) { alert("Configure sua chave API primeiro!"); return; }
+
+  const btn = document.querySelector("#colarArea button:last-child");
+  btn.textContent = "ANALISANDO...";
+  btn.disabled = true;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "x-api-key":apiKey,
+        "anthropic-version":"2023-06-01",
+        "anthropic-dangerous-direct-browser-access":"true"
+      },
+      body:JSON.stringify({
+        model:"claude-haiku-4-5-20251001",
+        max_tokens:500,
+        messages:[{
+          role:"user",
+          content:`Extraia os dados deste texto de aposta e retorne SOMENTE JSON sem markdown:
+{"timeCasa":"","timeVisitante":"","minEntrada":0,"odd":0,"over":"2.5","placar":"","resultado":"Green","bot":"","chGolCasa":"","chGolFora":"","chCasa":"","chFora":"","esCasa":"","esFora":"","poCasa":"","poFora":"","atCasa":"","atFora":""}
+
+Regras:
+- resultado: "Ganha"=Green, "Perdida"=Red
+- over: extrair numero da linha de gols (ex: "2.50 a 2.50" = "2.5")
+- bot: mapear nome para um destes: "Casa favorito 00","Fora favorito 00","Casa vencendo 2.5","Fora vencendo 2.5","Casa perdendo 2.5","Fora perdendo 2.5"
+- placar: usar placar final formato "2x1"
+- chCasa/chFora: FinalizaÃ§Ãµes no jogo
+- chGolCasa/chGolFora: FinalizaÃ§Ãµes no alvo
+- esCasa/esFora: Escanteios
+- poCasa/poFora: Posse % (so numero)
+- atCasa/atFora: Ataques perigosos
+
+Texto:
+${txt}`
+        }]
+      })
+    });
+
+    const data = await res.json();
+    const text = (data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("");
+    const clean = text.replace(/\`\`\`json|\`\`\`/g,"").trim();
+    const parsed = JSON.parse(clean.match(/\{[\s\S]*\}/)[0]);
+
+    // Fill form fields
+    if(parsed.timeCasa) document.getElementById("fCasa").value = parsed.timeCasa;
+    if(parsed.timeVisitante) document.getElementById("fVisit").value = parsed.timeVisitante;
+    if(parsed.minEntrada) document.getElementById("fMinEnt").value = parsed.minEntrada;
+    if(parsed.odd) document.getElementById("fOdd").value = parsed.odd;
+    if(parsed.bot) {
+      const sel = document.getElementById("fBot");
+      for(let i=0;i<sel.options.length;i++){
+        if(sel.options[i].value===parsed.bot){sel.selectedIndex=i;break;}
+      }
+    }
+    if(parsed.over) {
+      document.querySelectorAll(".over-tab").forEach(btn=>{
+        btn.classList.remove("active");
+        if(btn.textContent===`Over ${parsed.over}`) btn.classList.add("active");
+      });
+      selectedOver = parsed.over;
+    }
+
+    // Store stats for pendingEntry
+    window._parsedStats = parsed;
+    
+    checkReady();
+    
+    // Show success and auto open manual with pre-filled stats
+    document.getElementById("colarArea").style.display = "none";
+    
+    // Pre-fill pending entry with stats and open manual form
+    const bot = document.getElementById("fBot").value;
+    const casa = document.getElementById("fCasa").value.trim();
+    const visit = document.getElementById("fVisit").value.trim();
+    const minEnt = parseInt(document.getElementById("fMinEnt").value);
+    const odd = parseFloat(document.getElementById("fOdd").value);
+    const over = selectedOver;
+
+    pendingEntry = {
+      bot, timeCasa:casa, timeVisitante:visit, minEntrada:minEnt, odd, over,
+      resultado: parsed.resultado||"Green",
+      placar: parsed.placar||"",
+      qtdGols:0, minutos:"", liga:"", data:"",
+      chGolCasa:parsed.chGolCasa||"", chGolFora:parsed.chGolFora||"",
+      chCasa:parsed.chCasa||"", chFora:parsed.chFora||"",
+      esCasa:parsed.esCasa||"", esFora:parsed.esFora||"",
+      poCasa:parsed.poCasa||"", poFora:parsed.poFora||"",
+      atCasa:parsed.atCasa||"", atFora:parsed.atFora||""
+    };
+
+    document.getElementById("btnSalvar").style.display = "none";
+    document.getElementById("btnEdit").style.display = "none";
+    document.getElementById("resultBox").style.display = "none";
+    editarManual();
+
+  } catch(err) {
+    alert("Erro ao analisar: " + err.message);
+  } finally {
+    btn.textContent = "âš¡ ANALISAR E PREENCHER";
+    btn.disabled = false;
+  }
 }
 
 initApiKey();
