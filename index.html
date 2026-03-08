@@ -439,7 +439,7 @@ function inserirManual() {
   const bot = document.getElementById("fBot").value;
   const casa = document.getElementById("fCasa").value.trim();
   const visit = document.getElementById("fVisit").value.trim();
-  const minEnt = parseInt(document.getElementById("fMin").value);
+  const minEnt = parseInt(document.getElementById("fMinEnt").value);
   const odd = parseFloat(document.getElementById("fOdd").value);
   const over = selectedOver;
   
@@ -469,6 +469,17 @@ function editarManual() {
       <div class="form-full"><label>Minutos dos Gols (apos entrada)</label><input type="text" id="mMins" placeholder="34, 67, 88" value="${pendingEntry.minutos||''}"></div>
       <div><label>Liga</label><input type="text" id="mLiga" placeholder="Brasileirao" value="${pendingEntry.liga||''}"></div>
       <div><label>Data</label><input type="text" id="mData" placeholder="DD/MM/YYYY" value="${pendingEntry.data||''}"></div>
+    </div>
+    <div style="font-size:9px;color:var(--muted);letter-spacing:2px;margin:12px 0 8px">ESTATISTICAS NA ENTRADA</div>
+    <div class="form-grid">
+      <div><label>Chutes Casa</label><input type="number" id="mChCasa" placeholder="5" value="${pendingEntry.chCasa||''}"></div>
+      <div><label>Chutes Fora</label><input type="number" id="mChFora" placeholder="3" value="${pendingEntry.chFora||''}"></div>
+      <div><label>Escanteios Casa</label><input type="number" id="mEsCasa" placeholder="3" value="${pendingEntry.esCasa||''}"></div>
+      <div><label>Escanteios Fora</label><input type="number" id="mEsFora" placeholder="2" value="${pendingEntry.esFora||''}"></div>
+      <div><label>Posse Casa %</label><input type="number" id="mPoCasa" placeholder="55" value="${pendingEntry.poCasa||''}"></div>
+      <div><label>Posse Fora %</label><input type="number" id="mPoFora" placeholder="45" value="${pendingEntry.poFora||''}"></div>
+      <div><label>Ataques Perig. Casa</label><input type="number" id="mAtCasa" placeholder="8" value="${pendingEntry.atCasa||''}"></div>
+      <div><label>Ataques Perig. Fora</label><input type="number" id="mAtFora" placeholder="5" value="${pendingEntry.atFora||''}"></div>
     </div>`;
   document.getElementById("btnSalvar").style.display = "block";
   document.getElementById("btnEdit").style.display = "none";
@@ -484,6 +495,14 @@ function salvarEntrada() {
     pendingEntry.minutos = document.getElementById("mMins").value;
     pendingEntry.liga = document.getElementById("mLiga").value;
     pendingEntry.data = document.getElementById("mData").value;
+    pendingEntry.chCasa = document.getElementById("mChCasa").value||"";
+    pendingEntry.chFora = document.getElementById("mChFora").value||"";
+    pendingEntry.esCasa = document.getElementById("mEsCasa").value||"";
+    pendingEntry.esFora = document.getElementById("mEsFora").value||"";
+    pendingEntry.poCasa = document.getElementById("mPoCasa").value||"";
+    pendingEntry.poFora = document.getElementById("mPoFora").value||"";
+    pendingEntry.atCasa = document.getElementById("mAtCasa").value||"";
+    pendingEntry.atFora = document.getElementById("mAtFora").value||"";
   }
   entries.unshift({...pendingEntry, id:Date.now()});
   save();
@@ -523,6 +542,12 @@ function renderHist() {
       </div>
       ${mins?`<div class="gol-tags" style="margin-top:6px">${mins}</div>`:""}
       <div class="entry-bot">Bot: ${e.bot}</div>
+      ${(e.chCasa||e.esCasa)?`<div style="font-size:9px;color:var(--muted);margin-top:4px;letter-spacing:1px">
+        ${e.chCasa?`âš½ Chutes: ${e.chCasa}x${e.chFora||0}`:""}
+        ${e.esCasa?`  ðŸš© Escanteios: ${e.esCasa}x${e.esFora||0}`:""}
+        ${e.poCasa?`  ðŸ“Š Posse: ${e.poCasa}%x${e.poFora||0}%`:""}
+        ${e.atCasa?`  ðŸ”¥ Ataques: ${e.atCasa}x${e.atFora||0}`:""}
+      </div>`:""}
     </div>`;
   }).join("");
 }
@@ -589,11 +614,12 @@ function renderMins() {
 
 function exportarCSV() {
   if(!entries.length){alert("Nenhuma entrada para exportar!");return;}
-  const header = "Bot,Time Casa,Time Visitante,Liga,Data,Minuto Entrada,Odd,Over,Resultado,Placar,Gols Apos Entrada,Minutos dos Gols";
+  const header = "Bot,Time Casa,Time Visitante,Liga,Data,Minuto Entrada,Odd,Over,Resultado,Placar,Gols Apos Entrada,Minutos dos Gols,Chutes Casa,Chutes Fora,Escanteios Casa,Escanteios Fora,Posse Casa,Posse Fora,Ataques Perig Casa,Ataques Perig Fora";
   const rows = entries.map(e => [
     e.bot, e.timeCasa, e.timeVisitante, e.liga||"", e.data||"",
     e.minEntrada, e.odd, e.over||"0.5", e.resultado,
-    e.placar||"", e.qtdGols||0, e.minutos||""
+    e.placar||"", e.qtdGols||0, e.minutos||"",
+    e.chCasa||"", e.chFora||"", e.esCasa||"", e.esFora||"", e.poCasa||"", e.poFora||"", e.atCasa||"", e.atFora||""
   ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(","));
   const csv = [header, ...rows].join("\n");
   const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
