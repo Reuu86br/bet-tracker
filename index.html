@@ -167,7 +167,10 @@ select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.or
   </div>
 
   <div class="err-txt" id="errTxt"></div>
-  <button class="btn-buscar" id="btnBuscar" onclick="buscarResultado()" disabled>BUSCAR RESULTADO</button>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0">
+    <button class="btn-buscar" id="btnBuscar" onclick="buscarResultado()" disabled>BUSCAR AUTO</button>
+    <button class="btn-buscar" id="btnManual" onclick="inserirManual()" disabled style="background:transparent;border:1px solid var(--blue);color:var(--blue);">INSERIR MANUAL</button>
+  </div>
 
   <div class="loading-box" id="loadBox">
     <div class="spinner">o</div>
@@ -272,6 +275,7 @@ function checkReady() {
              document.getElementById("fMinEnt").value.trim() &&
              document.getElementById("fOdd").value.trim();
   document.getElementById("btnBuscar").disabled = !ok;
+  document.getElementById("btnManual").disabled = !ok;
 }
 
 function calcStats(list) {
@@ -355,11 +359,11 @@ async function buscarResultado() {
       },
       body:JSON.stringify({
         model:"claude-haiku-4-5-20251001",
-        max_tokens:300,
+        max_tokens:500,
         tools:[{type:"web_search_20250305",name:"web_search"}],
         messages:[{
           role:"user",
-          content:`Resultado do jogo ${casa} x ${visit} recente: minutos dos gols. JSON apenas: {"liga":"","data":"DD/MM/YYYY","placarCasa":0,"placarVisit":0,"todosGols":[12,34,67]}. Se nao achar: {"erro":"nao encontrado"}`
+          content:`Busque o resultado do jogo de futebol "${casa}" x "${visit}" de hoje ou recente. Preciso dos minutos de cada gol marcado. Responda SOMENTE com JSON sem markdown: {"liga":"","data":"DD/MM/YYYY","placarCasa":0,"placarVisit":0,"todosGols":[12,34,67]}. Se nao encontrar: {"erro":"Jogo nao encontrado"}`
         }]
       })
     });
@@ -431,6 +435,24 @@ async function buscarResultado() {
   document.getElementById("btnBuscar").disabled = false;
 }
 
+function inserirManual() {
+  const bot = document.getElementById("fBot").value;
+  const casa = document.getElementById("fCasa").value.trim();
+  const visit = document.getElementById("fVisit").value.trim();
+  const minEnt = parseInt(document.getElementById("fMin").value);
+  const odd = parseFloat(document.getElementById("fOdd").value);
+  const over = selectedOver;
+  
+  pendingEntry = {bot,timeCasa:casa,timeVisitante:visit,minEntrada:minEnt,odd,over,resultado:"Red",qtdGols:0,minutos:"",liga:"",data:"",placar:""};
+  
+  document.getElementById("errTxt").style.display = "none";
+  document.getElementById("loadBox").style.display = "none";
+  document.getElementById("btnSalvar").style.display = "none";
+  document.getElementById("btnEdit").style.display = "none";
+  
+  editarManual();
+}
+
 function editarManual() {
   if(!pendingEntry) return;
   const box = document.getElementById("resultBox");
@@ -472,6 +494,7 @@ function salvarEntrada() {
   document.getElementById("btnEdit").style.display="none";
   document.getElementById("errTxt").style.display="none";
   document.getElementById("btnBuscar").disabled=true;
+  document.getElementById("btnManual").disabled=true;
   pendingEntry=null;
   setView("dash");
 }
