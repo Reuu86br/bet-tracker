@@ -229,7 +229,7 @@ const APIKEY_STORAGE = "bt_claude_apikey";
 let entries = (() => { try { return JSON.parse(localStorage.getItem(KEY))||[]; } catch { return []; } })();
 let currentPeriod = "all";
 let pendingEntry = null;
-let selectedOver = "0.5";
+let selectedOver = "1.5";
 
 function save() { localStorage.setItem(KEY, JSON.stringify(entries)); }
 function getApiKey() { return localStorage.getItem(APIKEY_STORAGE)||""; }
