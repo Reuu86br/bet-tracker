@@ -174,8 +174,10 @@ select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.or
       COLAR TEXTO DA BOLSA
     </button>
     <div id="colarArea" style="display:none;margin-top:8px">
-      <textarea id="txtBolsa" rows="8" placeholder="Cole aqui o texto copiado da Bolsa de Aposta..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="width:100%;background:#0d1525;border:1px solid #1e3a5f;border-radius:8px;color:var(--text);font-family:'Courier New',monospace;font-size:12px;padding:10px;box-sizing:border-box;resize:vertical;-webkit-user-select:text;user-select:text"></textarea>
-      <button onclick="analisarTexto()" style="width:100%;margin-top:8px;padding:10px;background:var(--purple);border:none;border-radius:8px;color:#000;font-weight:900;font-size:11px;cursor:pointer;letter-spacing:2px;font-family:'Courier New',monospace;">ANALISAR E PREENCHER</button>
+      <div style="font-size:10px;color:var(--muted);margin-bottom:8px;text-align:center">Copie o texto na Bolsa de Aposta e clique no botao abaixo</div>
+      <button onclick="colarDoClipboard()" style="width:100%;padding:12px;background:#1e3a5f;border:1px solid var(--blue);border-radius:8px;color:var(--blue);font-weight:900;font-size:11px;cursor:pointer;letter-spacing:2px;font-family:'Courier New',monospace;margin-bottom:8px;">COLAR DO CLIPBOARD</button>
+      <div id="txtPreview" style="display:none;background:#0d1525;border:1px solid #1e3a5f;border-radius:8px;padding:10px;font-size:10px;color:var(--muted);max-height:100px;overflow:auto;margin-bottom:8px;word-break:break-all"></div>
+      <button onclick="analisarTexto()" id="btnAnalisar" style="display:none;width:100%;padding:10px;background:var(--purple);border:none;border-radius:8px;color:#000;font-weight:900;font-size:11px;cursor:pointer;letter-spacing:2px;font-family:'Courier New',monospace;">ANALISAR E PREENCHER</button>
     </div>
   </div>
 
@@ -646,13 +648,39 @@ function exportarCSV() {
   a.click(); URL.revokeObjectURL(url);
 }
 
+async function colarDoClipboard() {
+  try {
+    const txt = await navigator.clipboard.readText();
+    if(!txt) { alert("Clipboard vazio! Copie o texto na Bolsa primeiro."); return; }
+    window._clipboardTxt = txt;
+    const preview = document.getElementById("txtPreview");
+    preview.textContent = txt.substring(0, 200) + (txt.length > 200 ? "..." : "");
+    preview.style.display = "block";
+    document.getElementById("btnAnalisar").style.display = "block";
+  } catch(err) {
+    // Fallback: show textarea if clipboard API not allowed
+    const area = document.getElementById("colarArea");
+    area.innerHTML = `
+      <div style="font-size:10px;color:var(--muted);margin-bottom:8px;text-align:center">Cole o texto abaixo (pressione e segure para colar):</div>
+      <textarea id="txtBolsa" rows="8" autocomplete="off" style="width:100%;background:#0d1525;border:1px solid #1e3a5f;border-radius:8px;color:var(--text);font-family:'Courier New',monospace;font-size:11px;padding:10px;box-sizing:border-box"></textarea>
+      <button onclick="analisarTextoManual()" style="width:100%;margin-top:8px;padding:10px;background:var(--purple);border:none;border-radius:8px;color:#000;font-weight:900;font-size:11px;cursor:pointer;letter-spacing:2px;font-family:'Courier New',monospace;">ANALISAR E PREENCHER</button>
+    `;
+  }
+}
+
+function analisarTextoManual() {
+  const el = document.getElementById("txtBolsa");
+  if(el) window._clipboardTxt = el.value;
+  analisarTexto();
+}
+
 function toggleColar() {
   const area = document.getElementById("colarArea");
   area.style.display = area.style.display === "none" ? "block" : "none";
 }
 
 async function analisarTexto() {
-  const txt = document.getElementById("txtBolsa").value.trim();
+  const txt = (window._clipboardTxt||'').trim();
   if(!txt) { alert("Cole o texto primeiro!"); return; }
   
   const apiKey = getApiKey();
