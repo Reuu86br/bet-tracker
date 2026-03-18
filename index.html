@@ -212,6 +212,28 @@
   .btn-delete { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; padding: 2px 6px; border-radius: 4px; transition: color 0.2s; font-family: var(--mono); }
   .btn-delete:hover { color: var(--red); }
 
+  .btn-edit { background: none; border: 1px solid var(--border); color: var(--muted); cursor: pointer; font-size: 11px; padding: 3px 10px; border-radius: 4px; transition: all 0.2s; font-family: var(--mono); margin-right: 6px; }
+  .btn-edit:hover { border-color: var(--yellow); color: var(--yellow); }
+
+  /* Modal de edição */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85); z-index: 999;
+    align-items: flex-start; justify-content: center;
+    padding: 20px 16px; overflow-y: auto;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px; width: 100%; max-width: 480px;
+    margin: auto;
+  }
+  .modal-title { font-size: 14px; font-weight: 700; margin-bottom: 18px; color: var(--accent); letter-spacing: -0.3px; }
+  .modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+  .btn-save { padding: 11px; background: var(--accent); color: #000; border: none; border-radius: 8px; font-family: var(--sans); font-size: 13px; font-weight: 700; cursor: pointer; }
+  .btn-cancel { padding: 11px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-family: var(--mono); font-size: 12px; cursor: pointer; }
+  .btn-cancel:hover { border-color: var(--red); color: var(--red); }
+
   .empty-state { text-align: center; padding: 50px 20px; color: var(--muted); }
   .empty-icon { font-size: 36px; margin-bottom: 12px; opacity: 0.4; }
   .empty-text { font-family: var(--mono); font-size: 12px; letter-spacing: 1px; }
@@ -375,6 +397,7 @@
   const STORAGE_KEY = 'bottracker_overht_v4';
   let entries = [];
   let selectedResult = '';
+  let editResult = '';
 
   function load() {
     try {
@@ -411,6 +434,15 @@
     selectedResult = r;
     ['green','red'].forEach(x => {
       const btn = document.getElementById('btn-' + x);
+      btn.className = 'result-btn';
+      if (x === r) btn.classList.add('selected-' + r);
+    });
+  }
+
+  function selectEditResult(r) {
+    editResult = r;
+    ['green','red'].forEach(x => {
+      const btn = document.getElementById('edit-btn-' + x);
       btn.className = 'result-btn';
       if (x === r) btn.classList.add('selected-' + r);
     });
@@ -643,14 +675,152 @@
           </div>
           <div class="entry-bottom">
             <div class="entry-date">${dataFmt}${e.liga ? ' · ' + e.liga : ''}</div>
-            <button class="btn-delete" onclick="deleteEntry(${e.id})">✕</button>
+            <div>
+              <button class="btn-edit" onclick="openEdit(${e.id})">✏️ editar</button>
+              <button class="btn-delete" onclick="deleteEntry(${e.id})">✕</button>
+            </div>
           </div>
         </div>
       `;
     }).join('');
   }
 
+  function openEdit(id) {
+    const e = entries.find(x => x.id === id);
+    if (!e) return;
+
+    document.getElementById('edit-id').value = id;
+    document.getElementById('edit-data').value = e.data;
+    document.getElementById('edit-liga').value = e.liga || '';
+    document.getElementById('edit-jogo').value = e.jogo;
+    document.getElementById('edit-minuto').value = e.minuto;
+
+    // Gols HT
+    const htList = document.getElementById('edit-gols-ht-list');
+    const ht = e.golsHT || e.gols || [];
+    htList.innerHTML = '';
+    const htBase = ht.length > 0 ? ht : [''];
+    htBase.forEach(g => {
+      const row = document.createElement('div');
+      row.className = 'gol-row';
+      row.innerHTML = `<input type="number" placeholder="Min. gol HT (ex: 23)" min="1" max="45" class="edit-gol-ht" ${g !== '' ? 'value="'+g+'"' : ''}><button class="btn-remove-gol" onclick="removeGol(this)">✕</button>`;
+      htList.appendChild(row);
+    });
+
+    // Gols FT
+    const ftList = document.getElementById('edit-gols-ft-list');
+    const ft = e.golsFT || [];
+    ftList.innerHTML = '';
+    const ftBase = ft.length > 0 ? ft : [''];
+    ftBase.forEach(g => {
+      const row = document.createElement('div');
+      row.className = 'gol-row';
+      row.innerHTML = `<input type="number" placeholder="Min. gol 2T (ex: 67)" min="46" max="90" class="edit-gol-ft" ${g !== '' ? 'value="'+g+'"' : ''}><button class="btn-remove-gol" onclick="removeGol(this)">✕</button>`;
+      ftList.appendChild(row);
+    });
+
+    // Resultado
+    editResult = e.resultado;
+    ['green','red'].forEach(x => {
+      const btn = document.getElementById('edit-btn-' + x);
+      btn.className = 'result-btn';
+      if (x === e.resultado) btn.classList.add('selected-' + x);
+    });
+
+    document.getElementById('modal-overlay').classList.add('open');
+    window.scrollTo(0, 0);
+  }
+
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+
+  function saveEdit() {
+    const id = parseInt(document.getElementById('edit-id').value);
+    const idx = entries.findIndex(x => x.id === id);
+    if (idx === -1) return;
+    if (!editResult) { alert('Selecione o resultado!'); return; }
+
+    const golsHT = getGols('edit-gol-ht');
+    const golsFT = getGols('edit-gol-ft');
+
+    entries[idx] = {
+      ...entries[idx],
+      data: document.getElementById('edit-data').value,
+      liga: document.getElementById('edit-liga').value.trim(),
+      jogo: document.getElementById('edit-jogo').value.trim(),
+      minuto: parseInt(document.getElementById('edit-minuto').value),
+      golsHT,
+      golsFT,
+      resultado: editResult,
+    };
+
+    save(); closeModal(); render();
+  }
+
+  function addEditGol(tipo) {
+    const listId = tipo === 'ht' ? 'edit-gols-ht-list' : 'edit-gols-ft-list';
+    const min = tipo === 'ht' ? 1 : 46;
+    const max = tipo === 'ht' ? 45 : 90;
+    const placeholder = tipo === 'ht' ? 'Min. gol HT (ex: 23)' : 'Min. gol 2T (ex: 67)';
+    const cls = tipo === 'ht' ? 'edit-gol-ht' : 'edit-gol-ft';
+    const list = document.getElementById(listId);
+    const row = document.createElement('div');
+    row.className = 'gol-row';
+    row.innerHTML = `<input type="number" placeholder="${placeholder}" min="${min}" max="${max}" class="${cls}"><button class="btn-remove-gol" onclick="removeGol(this)">✕</button>`;
+    list.appendChild(row);
+  }
+
   load();
 </script>
+
+<!-- Modal de edição -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-title">✏️ Editar Entrada</div>
+    <input type="hidden" id="edit-id">
+
+    <div class="form-grid" style="margin-bottom:10px">
+      <div class="field">
+        <label>Data</label>
+        <input type="date" id="edit-data">
+      </div>
+      <div class="field">
+        <label>Liga</label>
+        <input type="text" id="edit-liga" placeholder="Ex: Bundesliga">
+      </div>
+    </div>
+
+    <div class="field" style="margin-bottom:10px">
+      <label>Jogo</label>
+      <input type="text" id="edit-jogo">
+    </div>
+
+    <div class="field" style="margin-bottom:10px">
+      <label>Min. Entrada</label>
+      <input type="number" id="edit-minuto" min="1" max="90">
+    </div>
+
+    <div class="gols-section-title">⚽ Gols 1º Tempo (HT)</div>
+    <div class="gols-list" id="edit-gols-ht-list"></div>
+    <button class="btn-add-gol" onclick="addEditGol('ht')">+ Gol HT</button>
+
+    <div class="gols-section-title">⚽ Gols 2º Tempo (FT extra)</div>
+    <div class="gols-list" id="edit-gols-ft-list"></div>
+    <button class="btn-add-gol" onclick="addEditGol('ft')">+ Gol 2T</button>
+
+    <div class="field" style="margin:12px 0 8px"><label>Resultado</label></div>
+    <div class="result-selector">
+      <div class="result-btn" id="edit-btn-green" onclick="selectEditResult('green')">✅ Green</div>
+      <div class="result-btn" id="edit-btn-red" onclick="selectEditResult('red')">❌ Red</div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-save" onclick="saveEdit()">💾 Salvar</button>
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
