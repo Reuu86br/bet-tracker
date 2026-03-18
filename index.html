@@ -14,6 +14,7 @@
     --accent: #00e5a0;
     --accent2: #0084ff;
     --red: #ff3b5c;
+    --yellow: #ffcc00;
     --text: #e8edf3;
     --muted: #5a6475;
     --mono: 'IBM Plex Mono', monospace;
@@ -51,6 +52,7 @@
     text-transform: uppercase; margin-top: 1px;
   }
 
+  /* STATS BAR — 4 principais */
   .stats-bar {
     display: grid; grid-template-columns: repeat(4, 1fr);
     gap: 1px; background: var(--border);
@@ -58,127 +60,100 @@
   }
 
   .stat-item { background: var(--surface); padding: 16px 10px; text-align: center; }
-
-  .stat-value {
-    font-family: var(--mono); font-size: 22px;
-    font-weight: 500; line-height: 1; margin-bottom: 4px;
-  }
-
+  .stat-value { font-family: var(--mono); font-size: 22px; font-weight: 500; line-height: 1; margin-bottom: 4px; }
   .stat-value.green { color: var(--accent); }
   .stat-value.red { color: var(--red); }
   .stat-value.blue { color: var(--accent2); }
   .stat-value.white { color: var(--text); }
+  .stat-value.yellow { color: var(--yellow); }
+  .stat-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; font-family: var(--mono); }
 
-  .stat-label {
-    font-size: 9px; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 1.5px;
-    font-family: var(--mono);
-  }
-
-  .form-section {
-    padding: 20px 16px;
+  /* ANÁLISE BAR — mercados */
+  .analysis-bar {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: var(--border);
     border-bottom: 1px solid var(--border);
   }
+  .analysis-item { background: var(--surface2); padding: 12px 10px; text-align: center; }
+  .analysis-value { font-family: var(--mono); font-size: 17px; font-weight: 500; line-height: 1; margin-bottom: 3px; color: var(--yellow); }
+  .analysis-label { font-size: 8px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-family: var(--mono); }
 
-  .form-title {
-    font-size: 11px; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 2px;
-    font-family: var(--mono); margin-bottom: 14px;
+  /* MELHOR MINUTO */
+  .minute-bar {
+    padding: 12px 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono); font-size: 11px;
   }
-
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-
-  .field { display: flex; flex-direction: column; gap: 5px; }
-
-  .field label {
-    font-size: 10px; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 1.5px;
-    font-family: var(--mono);
-  }
-
-  .field input {
-    background: var(--surface2);
+  .minute-bar-title { color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; font-size: 9px; margin-bottom: 8px; }
+  .minute-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; }
+  .minute-cell {
+    background: var(--surface2); border-radius: 6px; padding: 8px 6px; text-align: center;
     border: 1px solid var(--border);
+  }
+  .minute-cell-label { font-size: 9px; color: var(--muted); margin-bottom: 3px; }
+  .minute-cell-val { font-size: 14px; color: var(--accent); }
+
+  .form-section { padding: 20px 16px; border-bottom: 1px solid var(--border); }
+  .form-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; font-family: var(--mono); margin-bottom: 14px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; font-family: var(--mono); }
+  .field input, .field select {
+    background: var(--surface2); border: 1px solid var(--border);
     border-radius: 6px; color: var(--text);
     font-family: var(--mono); font-size: 13px;
     padding: 9px 12px; outline: none;
     transition: border-color 0.2s; width: 100%;
   }
+  .field input:focus, .field select:focus { border-color: var(--accent); }
 
-  .field input:focus { border-color: var(--accent); }
-
-  /* GOLS SECTION */
-  .gols-label {
-    font-size: 10px; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 1.5px;
-    font-family: var(--mono); margin-bottom: 8px;
-  }
-
-  .gols-list {
-    display: flex; flex-direction: column; gap: 6px;
-    margin-bottom: 8px;
-  }
-
-  .gol-row {
-    display: flex; align-items: center; gap: 8px;
-  }
-
+  .gols-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; font-family: var(--mono); margin-bottom: 8px; }
+  .gols-section-title { font-size: 9px; color: var(--muted); letter-spacing: 1px; font-family: var(--mono); margin: 10px 0 6px; text-transform: uppercase; }
+  .gols-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+  .gol-row { display: flex; align-items: center; gap: 8px; }
   .gol-row input {
-    background: var(--surface2);
-    border: 1px solid var(--border);
+    background: var(--surface2); border: 1px solid var(--border);
     border-radius: 6px; color: var(--text);
     font-family: var(--mono); font-size: 13px;
     padding: 8px 12px; outline: none;
     transition: border-color 0.2s; flex: 1;
   }
-
   .gol-row input:focus { border-color: var(--accent2); }
-
   .btn-remove-gol {
     background: none; border: 1px solid var(--border);
     border-radius: 6px; color: var(--muted);
     cursor: pointer; padding: 8px 10px;
     font-family: var(--mono); font-size: 12px;
-    transition: all 0.2s; white-space: nowrap;
+    transition: all 0.2s;
   }
-
   .btn-remove-gol:hover { border-color: var(--red); color: var(--red); }
-
   .btn-add-gol {
-    background: transparent;
-    border: 1px dashed var(--border);
+    background: transparent; border: 1px dashed var(--border);
     border-radius: 6px; color: var(--muted);
     font-family: var(--mono); font-size: 11px;
     padding: 8px; cursor: pointer;
     transition: all 0.2s; width: 100%;
     letter-spacing: 1px; margin-bottom: 10px;
   }
-
   .btn-add-gol:hover { border-color: var(--accent2); color: var(--accent2); }
 
   .result-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-
   .result-btn {
-    padding: 10px; border-radius: 6px;
-    border: 1px solid var(--border);
+    padding: 10px; border-radius: 6px; border: 1px solid var(--border);
     background: var(--surface2); color: var(--muted);
     font-family: var(--mono); font-size: 12px;
     cursor: pointer; transition: all 0.2s; text-align: center;
   }
-
   .result-btn.selected-green { background: rgba(0,229,160,0.12); border-color: var(--accent); color: var(--accent); }
   .result-btn.selected-red { background: rgba(255,59,92,0.12); border-color: var(--red); color: var(--red); }
 
   .btn-add {
-    width: 100%; padding: 12px;
-    background: var(--accent); color: #000;
-    border: none; border-radius: 8px;
-    font-family: var(--sans); font-size: 13px;
-    font-weight: 700; letter-spacing: 1px;
-    text-transform: uppercase; cursor: pointer;
-    transition: opacity 0.2s; margin-top: 4px;
+    width: 100%; padding: 12px; background: var(--accent); color: #000;
+    border: none; border-radius: 8px; font-family: var(--sans); font-size: 13px;
+    font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    cursor: pointer; transition: opacity 0.2s; margin-top: 4px;
   }
-
   .btn-add:hover { opacity: 0.85; }
 
   .btn-export {
@@ -188,103 +163,65 @@
     font-family: var(--mono); font-size: 12px;
     cursor: pointer; letter-spacing: 1px; transition: all 0.2s;
   }
-
   .btn-export:hover { border-color: var(--accent2); color: var(--accent2); }
 
+  .btn-import {
+    width: 100%; padding: 10px; margin-top: 8px;
+    background: transparent; border: 1px solid var(--border);
+    border-radius: 8px; color: var(--muted);
+    font-family: var(--mono); font-size: 12px;
+    cursor: pointer; letter-spacing: 1px; transition: all 0.2s;
+  }
+  .btn-import:hover { border-color: var(--yellow); color: var(--yellow); }
+
   .table-section { padding: 16px; }
-
-  .table-header {
-    display: flex; align-items: center;
-    justify-content: space-between; margin-bottom: 12px;
-  }
-
-  .table-title {
-    font-size: 11px; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 2px;
-    font-family: var(--mono);
-  }
-
-  .entry-count {
-    font-family: var(--mono); font-size: 11px;
-    color: var(--accent); background: rgba(0,229,160,0.08);
-    padding: 3px 10px; border-radius: 20px;
-  }
-
+  .table-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .table-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; font-family: var(--mono); }
+  .entry-count { font-family: var(--mono); font-size: 11px; color: var(--accent); background: rgba(0,229,160,0.08); padding: 3px 10px; border-radius: 20px; }
   .entries-list { display: flex; flex-direction: column; gap: 8px; }
 
   .entry-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: var(--surface); border: 1px solid var(--border);
     border-radius: 10px; padding: 14px 16px;
     animation: slideIn 0.3s ease;
   }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(-8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
+  @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
   .entry-card.green { border-left: 3px solid var(--accent); }
   .entry-card.red { border-left: 3px solid var(--red); }
 
-  .entry-top {
-    display: flex; align-items: center;
-    justify-content: space-between; margin-bottom: 10px;
-  }
-
+  .entry-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
   .entry-match { font-size: 14px; font-weight: 700; letter-spacing: -0.3px; }
-
-  .badge {
-    font-family: var(--mono); font-size: 11px;
-    font-weight: 500; padding: 3px 10px;
-    border-radius: 20px; letter-spacing: 1px;
-  }
-
+  .badge { font-family: var(--mono); font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; letter-spacing: 1px; }
   .badge.green { background: rgba(0,229,160,0.12); color: var(--accent); }
   .badge.red { background: rgba(255,59,92,0.12); color: var(--red); }
 
   .entry-meta { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; }
-
   .meta-item { display: flex; flex-direction: column; gap: 2px; }
-
-  .meta-label {
-    font-family: var(--mono); font-size: 9px;
-    color: var(--muted); text-transform: uppercase; letter-spacing: 1px;
-  }
-
+  .meta-label { font-family: var(--mono); font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
   .meta-value { font-family: var(--mono); font-size: 13px; color: var(--text); }
   .meta-value.accent { color: var(--accent); }
   .meta-value.muted { color: var(--muted); }
 
   .gols-pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+  .gol-pill { font-family: var(--mono); font-size: 11px; background: rgba(0,132,255,0.12); color: var(--accent2); padding: 2px 8px; border-radius: 10px; }
+  .gol-pill.ht { background: rgba(0,229,160,0.12); color: var(--accent); }
+  .gol-pill.ft { background: rgba(255,204,0,0.12); color: var(--yellow); }
 
-  .gol-pill {
-    font-family: var(--mono); font-size: 11px;
-    background: rgba(0,132,255,0.12);
-    color: var(--accent2);
-    padding: 2px 8px; border-radius: 10px;
-  }
-
-  .entry-bottom {
-    display: flex; align-items: center;
-    justify-content: space-between;
-    margin-top: 8px; padding-top: 8px;
-    border-top: 1px solid var(--border);
-  }
-
+  .entry-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
   .entry-date { font-family: var(--mono); font-size: 10px; color: var(--muted); }
-
-  .btn-delete {
-    background: none; border: none; color: var(--muted);
-    cursor: pointer; font-size: 14px; padding: 2px 6px;
-    border-radius: 4px; transition: color 0.2s; font-family: var(--mono);
-  }
-
+  .btn-delete { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; padding: 2px 6px; border-radius: 4px; transition: color 0.2s; font-family: var(--mono); }
   .btn-delete:hover { color: var(--red); }
 
   .empty-state { text-align: center; padding: 50px 20px; color: var(--muted); }
   .empty-icon { font-size: 36px; margin-bottom: 12px; opacity: 0.4; }
   .empty-text { font-family: var(--mono); font-size: 12px; letter-spacing: 1px; }
+
+  .migrate-notice {
+    background: rgba(255,204,0,0.08); border: 1px solid rgba(255,204,0,0.2);
+    border-radius: 8px; padding: 10px 14px; margin: 10px 0;
+    font-family: var(--mono); font-size: 11px; color: var(--yellow);
+    display: none;
+  }
 </style>
 </head>
 <body>
@@ -297,6 +234,7 @@
   </div>
 </header>
 
+<!-- Stats principais -->
 <div class="stats-bar">
   <div class="stat-item">
     <div class="stat-value white" id="stat-total">0</div>
@@ -312,12 +250,55 @@
   </div>
   <div class="stat-item">
     <div class="stat-value blue" id="stat-rate">—</div>
-    <div class="stat-label">Taxa</div>
+    <div class="stat-label">Taxa HT</div>
+  </div>
+</div>
+
+<!-- Análise de mercados FT -->
+<div class="analysis-bar">
+  <div class="analysis-item">
+    <div class="analysis-value" id="stat-over05ft">—</div>
+    <div class="analysis-label">Over 0.5 FT</div>
+  </div>
+  <div class="analysis-item">
+    <div class="analysis-value" id="stat-over15ft">—</div>
+    <div class="analysis-label">Over 1.5 FT</div>
+  </div>
+  <div class="analysis-item">
+    <div class="analysis-value" id="stat-over25ft">—</div>
+    <div class="analysis-label">Over 2.5 FT</div>
+  </div>
+</div>
+
+<!-- Melhor minuto de entrada -->
+<div class="minute-bar">
+  <div class="minute-bar-title">Primeiro gol — distribuição por faixa</div>
+  <div class="minute-grid">
+    <div class="minute-cell">
+      <div class="minute-cell-label">0–15'</div>
+      <div class="minute-cell-val" id="min-0-15">—</div>
+    </div>
+    <div class="minute-cell">
+      <div class="minute-cell-label">16–30'</div>
+      <div class="minute-cell-val" id="min-16-30">—</div>
+    </div>
+    <div class="minute-cell">
+      <div class="minute-cell-label">31–45'</div>
+      <div class="minute-cell-val" id="min-31-45">—</div>
+    </div>
+    <div class="minute-cell">
+      <div class="minute-cell-label">46–90'</div>
+      <div class="minute-cell-val" id="min-46-90">—</div>
+    </div>
   </div>
 </div>
 
 <div class="form-section">
   <div class="form-title">Nova Entrada</div>
+
+  <div class="migrate-notice" id="migrate-notice">
+    ✅ Dados anteriores importados com sucesso! Seus registros foram preservados.
+  </div>
 
   <div class="form-grid">
     <div class="field">
@@ -337,20 +318,32 @@
 
   <div class="field" style="margin-bottom:10px">
     <label>Min. Entrada</label>
-    <input type="number" id="f-minuto" placeholder="Ex: 8" min="1" max="45">
+    <!-- CORRIGIDO: max removido para permitir entradas no 2T também -->
+    <input type="number" id="f-minuto" placeholder="Ex: 8" min="1" max="90">
   </div>
 
-  <div class="gols-label">Minutos dos Gols</div>
-  <div class="gols-list" id="gols-list">
+  <!-- Gols HT -->
+  <div class="gols-section-title">⚽ Gols 1º Tempo (HT)</div>
+  <div class="gols-list" id="gols-ht-list">
     <div class="gol-row">
-      <input type="number" placeholder="Min. gol (ex: 23)" min="1" max="120" class="gol-input">
+      <input type="number" placeholder="Min. gol HT (ex: 23)" min="1" max="45" class="gol-ht-input">
       <button class="btn-remove-gol" onclick="removeGol(this)">✕</button>
     </div>
   </div>
-  <button class="btn-add-gol" onclick="addGolField()">+ Adicionar Gol</button>
+  <button class="btn-add-gol" onclick="addGolField('ht')">+ Gol HT</button>
+
+  <!-- Gols FT (2T) -->
+  <div class="gols-section-title">⚽ Gols 2º Tempo (FT extra)</div>
+  <div class="gols-list" id="gols-ft-list">
+    <div class="gol-row">
+      <input type="number" placeholder="Min. gol 2T (ex: 67)" min="46" max="90" class="gol-ft-input">
+      <button class="btn-remove-gol" onclick="removeGol(this)">✕</button>
+    </div>
+  </div>
+  <button class="btn-add-gol" onclick="addGolField('ft')">+ Gol 2T</button>
 
   <div class="field" style="margin-bottom:10px">
-    <label>Resultado</label>
+    <label>Resultado (Over 0.5 HT)</label>
   </div>
   <div class="result-selector">
     <div class="result-btn" id="btn-green" onclick="selectResult('green')">✅ Green</div>
@@ -359,6 +352,8 @@
 
   <button class="btn-add" onclick="addEntry()">+ Adicionar Entrada</button>
   <button class="btn-export" onclick="exportData()">⬇ Exportar JSON</button>
+  <button class="btn-import" onclick="document.getElementById('import-file').click()">⬆ Importar JSON</button>
+  <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
 </div>
 
 <div class="table-section">
@@ -375,14 +370,34 @@
 </div>
 
 <script>
-  const STORAGE_KEY = 'bottracker_overht_v3';
+  // Compatível com chave antiga E nova
+  const STORAGE_KEY_OLD = 'bottracker_overht_v3';
+  const STORAGE_KEY = 'bottracker_overht_v4';
   let entries = [];
   let selectedResult = '';
 
   function load() {
     try {
+      // Tenta carregar dados novos primeiro
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) entries = JSON.parse(saved);
+      if (saved) {
+        entries = JSON.parse(saved);
+      } else {
+        // Migra dados antigos se existirem
+        const old = localStorage.getItem(STORAGE_KEY_OLD);
+        if (old) {
+          const oldEntries = JSON.parse(old);
+          // Migra: campo "gols" vira "golsHT", adiciona "golsFT: []"
+          entries = oldEntries.map(e => ({
+            ...e,
+            golsHT: e.golsHT || e.gols || [],
+            golsFT: e.golsFT || [],
+          }));
+          save();
+          document.getElementById('migrate-notice').style.display = 'block';
+          setTimeout(() => document.getElementById('migrate-notice').style.display = 'none', 4000);
+        }
+      }
     } catch(e) { entries = []; }
     document.getElementById('f-data').valueAsDate = new Date();
     render();
@@ -401,19 +416,24 @@
     });
   }
 
-  function addGolField() {
-    const list = document.getElementById('gols-list');
+  function addGolField(tipo) {
+    const listId = tipo === 'ht' ? 'gols-ht-list' : 'gols-ft-list';
+    const min = tipo === 'ht' ? 1 : 46;
+    const max = tipo === 'ht' ? 45 : 90;
+    const placeholder = tipo === 'ht' ? 'Min. gol HT (ex: 23)' : 'Min. gol 2T (ex: 67)';
+    const cls = tipo === 'ht' ? 'gol-ht-input' : 'gol-ft-input';
+    const list = document.getElementById(listId);
     const row = document.createElement('div');
     row.className = 'gol-row';
     row.innerHTML = `
-      <input type="number" placeholder="Min. gol (ex: 23)" min="1" max="120" class="gol-input">
+      <input type="number" placeholder="${placeholder}" min="${min}" max="${max}" class="${cls}">
       <button class="btn-remove-gol" onclick="removeGol(this)">✕</button>
     `;
     list.appendChild(row);
   }
 
   function removeGol(btn) {
-    const list = document.getElementById('gols-list');
+    const list = btn.parentElement.parentElement;
     if (list.children.length > 1) {
       btn.parentElement.remove();
     } else {
@@ -421,14 +441,14 @@
     }
   }
 
-  function getGols() {
-    const inputs = document.querySelectorAll('.gol-input');
+  function getGols(cls) {
+    const inputs = document.querySelectorAll('.' + cls);
     const gols = [];
     inputs.forEach(inp => {
       const val = parseInt(inp.value);
       if (!isNaN(val) && val > 0) gols.push(val);
     });
-    return gols;
+    return gols.sort((a,b) => a-b);
   }
 
   function addEntry() {
@@ -436,7 +456,8 @@
     const liga = document.getElementById('f-liga').value.trim();
     const jogo = document.getElementById('f-jogo').value.trim();
     const minuto = document.getElementById('f-minuto').value;
-    const gols = getGols();
+    const golsHT = getGols('gol-ht-input');
+    const golsFT = getGols('gol-ft-input');
 
     if (!data || !jogo || !minuto || !selectedResult) {
       alert('Preencha: data, jogo, minuto de entrada e resultado!');
@@ -447,7 +468,8 @@
       id: Date.now(),
       data, liga, jogo,
       minuto: parseInt(minuto),
-      gols,
+      golsHT,
+      golsFT,
       resultado: selectedResult
     });
 
@@ -461,10 +483,14 @@
     document.getElementById('f-jogo').value = '';
     document.getElementById('f-minuto').value = '';
     document.getElementById('f-data').valueAsDate = new Date();
-    // Reset gols list to one empty field
-    document.getElementById('gols-list').innerHTML = `
+    document.getElementById('gols-ht-list').innerHTML = `
       <div class="gol-row">
-        <input type="number" placeholder="Min. gol (ex: 23)" min="1" max="120" class="gol-input">
+        <input type="number" placeholder="Min. gol HT (ex: 23)" min="1" max="45" class="gol-ht-input">
+        <button class="btn-remove-gol" onclick="removeGol(this)">✕</button>
+      </div>`;
+    document.getElementById('gols-ft-list').innerHTML = `
+      <div class="gol-row">
+        <input type="number" placeholder="Min. gol 2T (ex: 67)" min="46" max="90" class="gol-ft-input">
         <button class="btn-remove-gol" onclick="removeGol(this)">✕</button>
       </div>`;
     selectedResult = '';
@@ -491,6 +517,35 @@
     URL.revokeObjectURL(url);
   }
 
+  function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const imported = JSON.parse(e.target.result);
+        if (!Array.isArray(imported)) { alert('JSON inválido!'); return; }
+        // Migra campos antigos
+        const migrated = imported.map(e => ({
+          ...e,
+          golsHT: e.golsHT || e.gols || [],
+          golsFT: e.golsFT || [],
+        }));
+        // Merge sem duplicatas por id
+        const existingIds = new Set(entries.map(x => x.id));
+        const newEntries = migrated.filter(x => !existingIds.has(x.id));
+        entries = [...entries, ...newEntries].sort((a,b) => b.id - a.id);
+        save();
+        render();
+        alert(`✅ ${newEntries.length} entradas importadas! Total: ${entries.length}`);
+      } catch(err) {
+        alert('Erro ao ler JSON: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  }
+
   function render() {
     const greens = entries.filter(e => e.resultado === 'green').length;
     const reds = entries.filter(e => e.resultado === 'red').length;
@@ -503,8 +558,44 @@
     document.getElementById('stat-rate').textContent = rate !== null ? rate + '%' : '—';
     document.getElementById('entry-count').textContent = total + ' ' + (total === 1 ? 'entrada' : 'entradas');
 
-    const list = document.getElementById('entries-list');
+    // Análise FT
+    if (total > 0) {
+      let over05 = 0, over15 = 0, over25 = 0;
+      let min0_15 = 0, min16_30 = 0, min31_45 = 0, min46_90 = 0, semGol = 0;
 
+      entries.forEach(e => {
+        const ht = e.golsHT || e.gols || [];
+        const ft = e.golsFT || [];
+        const allGols = [...ht, ...ft].sort((a,b) => a-b);
+        const totalGols = allGols.length;
+
+        if (totalGols >= 1) over05++;
+        if (totalGols >= 2) over15++;
+        if (totalGols >= 3) over25++;
+
+        // Primeiro gol do jogo
+        if (allGols.length === 0) {
+          semGol++;
+        } else {
+          const first = allGols[0];
+          if (first <= 15) min0_15++;
+          else if (first <= 30) min16_30++;
+          else if (first <= 45) min31_45++;
+          else min46_90++;
+        }
+      });
+
+      const pct = v => total > 0 ? Math.round(v/total*100) + '%' : '—';
+      document.getElementById('stat-over05ft').textContent = pct(over05);
+      document.getElementById('stat-over15ft').textContent = pct(over15);
+      document.getElementById('stat-over25ft').textContent = pct(over25);
+      document.getElementById('min-0-15').textContent = pct(min0_15);
+      document.getElementById('min-16-30').textContent = pct(min16_30);
+      document.getElementById('min-31-45').textContent = pct(min31_45);
+      document.getElementById('min-46-90').textContent = semGol > 0 ? pct(min46_90) + ' (+' + semGol + ' sem gol)' : pct(min46_90);
+    }
+
+    const list = document.getElementById('entries-list');
     if (entries.length === 0) {
       list.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">Nenhuma entrada ainda</div></div>`;
       return;
@@ -512,9 +603,18 @@
 
     list.innerHTML = entries.map(e => {
       const dataFmt = e.data ? new Date(e.data + 'T12:00:00').toLocaleDateString('pt-BR') : '—';
-      const golsHtml = e.gols && e.gols.length > 0
-        ? e.gols.map(g => `<span class="gol-pill">${g}'</span>`).join('')
+      const ht = e.golsHT || e.gols || [];
+      const ft = e.golsFT || [];
+
+      const golsHtHtml = ht.length > 0
+        ? ht.map(g => `<span class="gol-pill ht">${g}'</span>`).join('')
         : '<span style="font-family:var(--mono);font-size:11px;color:var(--muted)">—</span>';
+
+      const golsFtHtml = ft.length > 0
+        ? ft.map(g => `<span class="gol-pill ft">${g}'</span>`).join('')
+        : '';
+
+      const totalGols = ht.length + ft.length;
 
       return `
         <div class="entry-card ${e.resultado}">
@@ -528,8 +628,17 @@
               <div class="meta-value accent">${e.minuto}'</div>
             </div>
             <div class="meta-item">
-              <div class="meta-label">Gols</div>
-              <div class="gols-pills">${golsHtml}</div>
+              <div class="meta-label">Gols HT</div>
+              <div class="gols-pills">${golsHtHtml}</div>
+            </div>
+            ${ft.length > 0 ? `
+            <div class="meta-item">
+              <div class="meta-label">Gols 2T</div>
+              <div class="gols-pills">${golsFtHtml}</div>
+            </div>` : ''}
+            <div class="meta-item">
+              <div class="meta-label">Total</div>
+              <div class="meta-value">${totalGols} gol${totalGols !== 1 ? 's' : ''}</div>
             </div>
           </div>
           <div class="entry-bottom">
