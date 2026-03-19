@@ -3,247 +3,107 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bot Tracker — Over HT 0.5</title>
+<title>Bot Tracker v3</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0c0f;
-    --surface: #111418;
-    --surface2: #181c22;
-    --border: #1e2530;
-    --accent: #00e5a0;
-    --accent2: #0084ff;
-    --red: #ff3b5c;
-    --yellow: #ffcc00;
-    --text: #e8edf3;
-    --muted: #5a6475;
-    --mono: 'IBM Plex Mono', monospace;
-    --sans: 'Syne', sans-serif;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    min-height: 100vh;
-    padding: 0 0 60px;
-  }
-
-  header {
-    padding: 28px 24px 20px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center;
-    position: sticky; top: 0;
-    background: var(--bg); z-index: 100; gap: 10px;
-  }
-
-  .logo-icon {
-    width: 32px; height: 32px;
-    background: var(--accent); border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px;
-  }
-  .logo-text { font-size: 16px; font-weight: 800; letter-spacing: -0.5px; }
-  .logo-sub {
-    font-family: var(--mono); font-size: 10px;
-    color: var(--accent); letter-spacing: 2px;
-    text-transform: uppercase; margin-top: 1px;
-  }
-
-  /* STATS BAR — 4 principais */
-  .stats-bar {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 1px; background: var(--border);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .stat-item { background: var(--surface); padding: 16px 10px; text-align: center; }
-  .stat-value { font-family: var(--mono); font-size: 22px; font-weight: 500; line-height: 1; margin-bottom: 4px; }
-  .stat-value.green { color: var(--accent); }
-  .stat-value.red { color: var(--red); }
-  .stat-value.blue { color: var(--accent2); }
-  .stat-value.white { color: var(--text); }
-  .stat-value.yellow { color: var(--yellow); }
-  .stat-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; font-family: var(--mono); }
-
-  /* ANÁLISE BAR — mercados */
-  .analysis-bar {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 1px; background: var(--border);
-    border-bottom: 1px solid var(--border);
-  }
-  .analysis-item { background: var(--surface2); padding: 12px 10px; text-align: center; }
-  .analysis-value { font-family: var(--mono); font-size: 17px; font-weight: 500; line-height: 1; margin-bottom: 3px; color: var(--yellow); }
-  .analysis-label { font-size: 8px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-family: var(--mono); }
-
-  /* MELHOR MINUTO */
-  .minute-bar {
-    padding: 12px 16px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    font-family: var(--mono); font-size: 11px;
-  }
-  .minute-bar-title { color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; font-size: 9px; margin-bottom: 8px; }
-  .minute-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; }
-  .minute-cell {
-    background: var(--surface2); border-radius: 6px; padding: 8px 6px; text-align: center;
-    border: 1px solid var(--border);
-  }
-  .minute-cell-label { font-size: 9px; color: var(--muted); margin-bottom: 3px; }
-  .minute-cell-val { font-size: 14px; color: var(--accent); }
-
-  .form-section { padding: 20px 16px; border-bottom: 1px solid var(--border); }
-  .form-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; font-family: var(--mono); margin-bottom: 14px; }
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-  .field { display: flex; flex-direction: column; gap: 5px; }
-  .field label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; font-family: var(--mono); }
-  .field input, .field select {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 6px; color: var(--text);
-    font-family: var(--mono); font-size: 13px;
-    padding: 9px 12px; outline: none;
-    transition: border-color 0.2s; width: 100%;
-  }
-  .field input:focus, .field select:focus { border-color: var(--accent); }
-
-  .gols-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; font-family: var(--mono); margin-bottom: 8px; }
-  .gols-section-title { font-size: 9px; color: var(--muted); letter-spacing: 1px; font-family: var(--mono); margin: 10px 0 6px; text-transform: uppercase; }
-  .gols-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
-  .gol-row { display: flex; align-items: center; gap: 8px; }
-  .gol-row input {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 6px; color: var(--text);
-    font-family: var(--mono); font-size: 13px;
-    padding: 8px 12px; outline: none;
-    transition: border-color 0.2s; flex: 1;
-  }
-  .gol-row input:focus { border-color: var(--accent2); }
-  .btn-remove-gol {
-    background: none; border: 1px solid var(--border);
-    border-radius: 6px; color: var(--muted);
-    cursor: pointer; padding: 8px 10px;
-    font-family: var(--mono); font-size: 12px;
-    transition: all 0.2s;
-  }
-  .btn-remove-gol:hover { border-color: var(--red); color: var(--red); }
-  .btn-add-gol {
-    background: transparent; border: 1px dashed var(--border);
-    border-radius: 6px; color: var(--muted);
-    font-family: var(--mono); font-size: 11px;
-    padding: 8px; cursor: pointer;
-    transition: all 0.2s; width: 100%;
-    letter-spacing: 1px; margin-bottom: 10px;
-  }
-  .btn-add-gol:hover { border-color: var(--accent2); color: var(--accent2); }
-
-  .result-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-  .result-btn {
-    padding: 10px; border-radius: 6px; border: 1px solid var(--border);
-    background: var(--surface2); color: var(--muted);
-    font-family: var(--mono); font-size: 12px;
-    cursor: pointer; transition: all 0.2s; text-align: center;
-  }
-  .result-btn.selected-green { background: rgba(0,229,160,0.12); border-color: var(--accent); color: var(--accent); }
-  .result-btn.selected-red { background: rgba(255,59,92,0.12); border-color: var(--red); color: var(--red); }
-
-  .btn-add {
-    width: 100%; padding: 12px; background: var(--accent); color: #000;
-    border: none; border-radius: 8px; font-family: var(--sans); font-size: 13px;
-    font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-    cursor: pointer; transition: opacity 0.2s; margin-top: 4px;
-  }
-  .btn-add:hover { opacity: 0.85; }
-
-  .btn-export {
-    width: 100%; padding: 10px; margin-top: 8px;
-    background: transparent; border: 1px solid var(--border);
-    border-radius: 8px; color: var(--muted);
-    font-family: var(--mono); font-size: 12px;
-    cursor: pointer; letter-spacing: 1px; transition: all 0.2s;
-  }
-  .btn-export:hover { border-color: var(--accent2); color: var(--accent2); }
-
-  .btn-import {
-    width: 100%; padding: 10px; margin-top: 8px;
-    background: transparent; border: 1px solid var(--border);
-    border-radius: 8px; color: var(--muted);
-    font-family: var(--mono); font-size: 12px;
-    cursor: pointer; letter-spacing: 1px; transition: all 0.2s;
-  }
-  .btn-import:hover { border-color: var(--yellow); color: var(--yellow); }
-
-  .table-section { padding: 16px; }
-  .table-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-  .table-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; font-family: var(--mono); }
-  .entry-count { font-family: var(--mono); font-size: 11px; color: var(--accent); background: rgba(0,229,160,0.08); padding: 3px 10px; border-radius: 20px; }
-  .entries-list { display: flex; flex-direction: column; gap: 8px; }
-
-  .entry-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 10px; padding: 14px 16px;
-    animation: slideIn 0.3s ease;
-  }
-  @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
-  .entry-card.green { border-left: 3px solid var(--accent); }
-  .entry-card.red { border-left: 3px solid var(--red); }
-
-  .entry-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-  .entry-match { font-size: 14px; font-weight: 700; letter-spacing: -0.3px; }
-  .badge { font-family: var(--mono); font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; letter-spacing: 1px; }
-  .badge.green { background: rgba(0,229,160,0.12); color: var(--accent); }
-  .badge.red { background: rgba(255,59,92,0.12); color: var(--red); }
-
-  .entry-meta { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; }
-  .meta-item { display: flex; flex-direction: column; gap: 2px; }
-  .meta-label { font-family: var(--mono); font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
-  .meta-value { font-family: var(--mono); font-size: 13px; color: var(--text); }
-  .meta-value.accent { color: var(--accent); }
-  .meta-value.muted { color: var(--muted); }
-
-  .gols-pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
-  .gol-pill { font-family: var(--mono); font-size: 11px; background: rgba(0,132,255,0.12); color: var(--accent2); padding: 2px 8px; border-radius: 10px; }
-  .gol-pill.ht { background: rgba(0,229,160,0.12); color: var(--accent); }
-  .gol-pill.ft { background: rgba(255,204,0,0.12); color: var(--yellow); }
-
-  .entry-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
-  .entry-date { font-family: var(--mono); font-size: 10px; color: var(--muted); }
-  .btn-delete { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; padding: 2px 6px; border-radius: 4px; transition: color 0.2s; font-family: var(--mono); }
-  .btn-delete:hover { color: var(--red); }
-
-  .btn-edit { background: none; border: 1px solid var(--border); color: var(--muted); cursor: pointer; font-size: 11px; padding: 3px 10px; border-radius: 4px; transition: all 0.2s; font-family: var(--mono); margin-right: 6px; }
-  .btn-edit:hover { border-color: var(--yellow); color: var(--yellow); }
-
-  /* Modal de edição */
-  .modal-overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.85); z-index: 999;
-    align-items: flex-start; justify-content: center;
-    padding: 20px 16px; overflow-y: auto;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 14px; padding: 24px; width: 100%; max-width: 480px;
-    margin: auto;
-  }
-  .modal-title { font-size: 14px; font-weight: 700; margin-bottom: 18px; color: var(--accent); letter-spacing: -0.3px; }
-  .modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
-  .btn-save { padding: 11px; background: var(--accent); color: #000; border: none; border-radius: 8px; font-family: var(--sans); font-size: 13px; font-weight: 700; cursor: pointer; }
-  .btn-cancel { padding: 11px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-family: var(--mono); font-size: 12px; cursor: pointer; }
-  .btn-cancel:hover { border-color: var(--red); color: var(--red); }
-
-  .empty-state { text-align: center; padding: 50px 20px; color: var(--muted); }
-  .empty-icon { font-size: 36px; margin-bottom: 12px; opacity: 0.4; }
-  .empty-text { font-family: var(--mono); font-size: 12px; letter-spacing: 1px; }
-
-  .migrate-notice {
-    background: rgba(255,204,0,0.08); border: 1px solid rgba(255,204,0,0.2);
-    border-radius: 8px; padding: 10px 14px; margin: 10px 0;
-    font-family: var(--mono); font-size: 11px; color: var(--yellow);
-    display: none;
-  }
+:root {
+  --bg:#0a0c0f;--surface:#111418;--surface2:#181c22;--border:#1e2530;
+  --accent:#00e5a0;--accent2:#0084ff;--red:#ff3b5c;--yellow:#ffcc00;
+  --text:#e8edf3;--muted:#5a6475;--mono:'IBM Plex Mono',monospace;--sans:'Syne',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;padding:0 0 80px;}
+header{padding:20px 16px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;position:sticky;top:0;background:var(--bg);z-index:100;gap:10px;}
+.logo-icon{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.logo-text{font-size:16px;font-weight:800;letter-spacing:-0.5px;}
+.logo-sub{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-top:1px;}
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-bottom:1px solid var(--border);}
+.stat-item{background:var(--surface);padding:14px 8px;text-align:center;}
+.stat-value{font-family:var(--mono);font-size:18px;font-weight:500;line-height:1;margin-bottom:3px;}
+.stat-value.green{color:var(--accent)}.stat-value.red{color:var(--red)}.stat-value.blue{color:var(--accent2)}.stat-value.white{color:var(--text)}.stat-value.yellow{color:var(--yellow)}
+.stat-label{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-family:var(--mono);}
+.markets-section{padding:12px 16px;border-bottom:1px solid var(--border);}
+.markets-title{font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;}
+.market-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.msc{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;}
+.msc-name{font-family:var(--mono);font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.msc-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;}
+.msc-label{font-family:var(--mono);font-size:9px;color:var(--muted);}
+.msc-val{font-family:var(--mono);font-size:12px;}
+.msc-val.green{color:var(--accent)}.msc-val.red{color:var(--red)}.msc-val.yellow{color:var(--yellow)}
+.msc-div{height:1px;background:var(--border);margin:5px 0;}
+.msc-pl{font-family:var(--mono);font-size:13px;font-weight:500;text-align:center;margin-top:4px;}
+.form-section{padding:16px;border-bottom:1px solid var(--border);}
+.form-title{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;font-family:var(--mono);margin-bottom:14px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.field{display:flex;flex-direction:column;gap:4px;}
+.field label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-family:var(--mono);}
+.field input{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:13px;padding:8px 10px;outline:none;transition:border-color 0.2s;width:100%;}
+.field input:focus{border-color:var(--accent);}
+.mkt-block{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;}
+.mkt-title{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.mkt-title .dot{width:6px;height:6px;border-radius:50%;}
+.mkt-title.ht{color:var(--accent)}.mkt-title.ht .dot{background:var(--accent);}
+.mkt-title.ft15{color:var(--accent2)}.mkt-title.ft15 .dot{background:var(--accent2);}
+.mkt-title.ft25{color:var(--yellow)}.mkt-title.ft25 .dot{background:var(--yellow);}
+.entradas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;}
+.ec{display:flex;flex-direction:column;gap:4px;}
+.ec-label{font-family:var(--mono);font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;text-align:center;}
+.ec-input{background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:12px;padding:7px 6px;outline:none;text-align:center;width:100%;}
+.ec-input:focus{border-color:var(--accent);}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;}
+.rbtn{padding:9px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--muted);font-family:var(--mono);font-size:11px;cursor:pointer;transition:all 0.2s;text-align:center;}
+.rbtn.selected-green{background:rgba(0,229,160,0.12);border-color:var(--accent);color:var(--accent);}
+.rbtn.selected-red{background:rgba(255,59,92,0.12);border-color:var(--red);color:var(--red);}
+.rbtn.selected-skip{background:rgba(90,100,117,0.15);border-color:var(--muted);color:var(--muted);}
+.gols-st{font-size:9px;color:var(--muted);letter-spacing:1px;font-family:var(--mono);margin:10px 0 6px;text-transform:uppercase;}
+.gols-list{display:flex;flex-direction:column;gap:5px;margin-bottom:6px;}
+.gol-row{display:flex;align-items:center;gap:6px;}
+.gol-row input{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:12px;padding:7px 10px;outline:none;flex:1;}
+.gol-row input:focus{border-color:var(--accent2);}
+.btn-rm{background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;padding:7px 9px;font-size:11px;}
+.btn-rm:hover{border-color:var(--red);color:var(--red);}
+.btn-ag{background:transparent;border:1px dashed var(--border);border-radius:6px;color:var(--muted);font-family:var(--mono);font-size:10px;padding:7px;cursor:pointer;width:100%;letter-spacing:1px;margin-bottom:8px;}
+.btn-ag:hover{border-color:var(--accent2);color:var(--accent2);}
+.btn-add{width:100%;padding:12px;background:var(--accent);color:#000;border:none;border-radius:8px;font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;margin-top:6px;}
+.btn-add:hover{opacity:0.85;}
+.btn-exp{width:100%;padding:10px;margin-top:8px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:var(--mono);font-size:11px;cursor:pointer;letter-spacing:1px;}
+.btn-exp:hover{border-color:var(--accent2);color:var(--accent2);}
+.btn-imp{width:100%;padding:10px;margin-top:6px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:var(--mono);font-size:11px;cursor:pointer;letter-spacing:1px;}
+.btn-imp:hover{border-color:var(--yellow);color:var(--yellow);}
+.table-section{padding:16px;}
+.table-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.table-title{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;font-family:var(--mono);}
+.entry-count{font-family:var(--mono);font-size:11px;color:var(--accent);background:rgba(0,229,160,0.08);padding:3px 10px;border-radius:20px;}
+.entries-list{display:flex;flex-direction:column;gap:10px;}
+.entry-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;animation:si 0.3s ease;}
+@keyframes si{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.entry-match{font-size:14px;font-weight:700;letter-spacing:-0.3px;margin-bottom:4px;}
+.entry-meta{font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:10px;}
+.mkts-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px;}
+.mc{background:var(--surface2);border-radius:6px;padding:8px 6px;text-align:center;border:1px solid var(--border);}
+.mc-name{font-family:var(--mono);font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.mc-res{font-family:var(--mono);font-size:11px;font-weight:500;}
+.mc-res.green{color:var(--accent)}.mc-res.red{color:var(--red)}.mc-res.skip{color:var(--muted)}
+.mc-stake{font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px;}
+.mc-pl{font-family:var(--mono);font-size:11px;font-weight:500;margin-top:3px;}
+.entry-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+.entry-pl{font-family:var(--mono);font-size:13px;font-weight:500;}
+.entry-actions{display:flex;gap:6px;}
+.btn-edit{background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:10px;padding:3px 8px;border-radius:4px;font-family:var(--mono);}
+.btn-edit:hover{border-color:var(--yellow);color:var(--yellow);}
+.btn-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px;}
+.btn-del:hover{color:var(--red);}
+.empty-state{text-align:center;padding:50px 20px;color:var(--muted);}
+.empty-icon{font-size:36px;margin-bottom:12px;opacity:0.4;}
+.empty-text{font-family:var(--mono);font-size:12px;letter-spacing:1px;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:999;align-items:flex-start;justify-content:center;padding:20px 16px;overflow-y:auto;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;width:100%;max-width:480px;margin:auto;}
+.modal-title{font-size:14px;font-weight:700;margin-bottom:16px;color:var(--accent);}
+.modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;}
+.btn-save{padding:11px;background:var(--accent);color:#000;border:none;border-radius:8px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;}
+.btn-cancel{padding:11px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:var(--mono);font-size:12px;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -252,569 +112,152 @@
   <div class="logo-icon">⚽</div>
   <div>
     <div class="logo-text">Bot Tracker</div>
-    <div class="logo-sub">Over HT 0.5</div>
+    <div class="logo-sub">v3 · 3 Mercados</div>
   </div>
 </header>
 
-<!-- Stats principais -->
 <div class="stats-bar">
-  <div class="stat-item">
-    <div class="stat-value white" id="stat-total">0</div>
-    <div class="stat-label">Entradas</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-value green" id="stat-green">0</div>
-    <div class="stat-label">Greens</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-value red" id="stat-red">0</div>
-    <div class="stat-label">Reds</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-value blue" id="stat-rate">—</div>
-    <div class="stat-label">Taxa HT</div>
-  </div>
+  <div class="stat-item"><div class="stat-value white" id="s-total">0</div><div class="stat-label">Jogos</div></div>
+  <div class="stat-item"><div class="stat-value green" id="s-pl">+R$0</div><div class="stat-label">P&L Total</div></div>
+  <div class="stat-item"><div class="stat-value blue" id="s-roi">—</div><div class="stat-label">ROI</div></div>
+  <div class="stat-item"><div class="stat-value yellow" id="s-inv">R$0</div><div class="stat-label">Investido</div></div>
 </div>
 
-<!-- Análise de mercados FT -->
-<div class="analysis-bar">
-  <div class="analysis-item">
-    <div class="analysis-value" id="stat-over05ft">—</div>
-    <div class="analysis-label">Over 0.5 FT</div>
-  </div>
-  <div class="analysis-item">
-    <div class="analysis-value" id="stat-over15ft">—</div>
-    <div class="analysis-label">Over 1.5 FT</div>
-  </div>
-  <div class="analysis-item">
-    <div class="analysis-value" id="stat-over25ft">—</div>
-    <div class="analysis-label">Over 2.5 FT</div>
-  </div>
-</div>
-
-<!-- Melhor minuto de entrada -->
-<div class="minute-bar">
-  <div class="minute-bar-title">Primeiro gol — distribuição por faixa</div>
-  <div class="minute-grid">
-    <div class="minute-cell">
-      <div class="minute-cell-label">0–15'</div>
-      <div class="minute-cell-val" id="min-0-15">—</div>
-    </div>
-    <div class="minute-cell">
-      <div class="minute-cell-label">16–30'</div>
-      <div class="minute-cell-val" id="min-16-30">—</div>
-    </div>
-    <div class="minute-cell">
-      <div class="minute-cell-label">31–45'</div>
-      <div class="minute-cell-val" id="min-31-45">—</div>
-    </div>
-    <div class="minute-cell">
-      <div class="minute-cell-label">46–90'</div>
-      <div class="minute-cell-val" id="min-46-90">—</div>
-    </div>
+<div class="markets-section">
+  <div class="markets-title">Desempenho por mercado</div>
+  <div class="market-stats-grid">
+    <div class="msc"><div class="msc-name">Over 0.5 HT</div><div class="msc-row"><span class="msc-label">Green</span><span class="msc-val green" id="ht-g">0</span></div><div class="msc-row"><span class="msc-label">Red</span><span class="msc-val red" id="ht-r">0</span></div><div class="msc-row"><span class="msc-label">Taxa</span><span class="msc-val yellow" id="ht-t">—</span></div><div class="msc-div"></div><div class="msc-pl" id="ht-pl">+R$0</div></div>
+    <div class="msc"><div class="msc-name">Over 1.5 FT</div><div class="msc-row"><span class="msc-label">Green</span><span class="msc-val green" id="f15-g">0</span></div><div class="msc-row"><span class="msc-label">Red</span><span class="msc-val red" id="f15-r">0</span></div><div class="msc-row"><span class="msc-label">Taxa</span><span class="msc-val yellow" id="f15-t">—</span></div><div class="msc-div"></div><div class="msc-pl" id="f15-pl">+R$0</div></div>
+    <div class="msc"><div class="msc-name">Over 2.5 FT</div><div class="msc-row"><span class="msc-label">Green</span><span class="msc-val green" id="f25-g">0</span></div><div class="msc-row"><span class="msc-label">Red</span><span class="msc-val red" id="f25-r">0</span></div><div class="msc-row"><span class="msc-label">Taxa</span><span class="msc-val yellow" id="f25-t">—</span></div><div class="msc-div"></div><div class="msc-pl" id="f25-pl">+R$0</div></div>
   </div>
 </div>
 
 <div class="form-section">
   <div class="form-title">Nova Entrada</div>
-
-  <div class="migrate-notice" id="migrate-notice">
-    ✅ Dados anteriores importados com sucesso! Seus registros foram preservados.
-  </div>
-
   <div class="form-grid">
-    <div class="field">
-      <label>Data</label>
-      <input type="date" id="f-data">
+    <div class="field"><label>Data</label><input type="date" id="f-data"></div>
+    <div class="field"><label>Liga</label><input type="text" id="f-liga" placeholder="Ex: Bundesliga"></div>
+  </div>
+  <div class="field" style="margin-bottom:12px"><label>Jogo</label><input type="text" id="f-jogo" placeholder="Ex: Arsenal vs Chelsea"></div>
+
+  <div class="mkt-block">
+    <div class="mkt-title ht"><div class="dot"></div>Over 0.5 HT</div>
+    <div class="entradas-grid">
+      <div class="ec"><div class="ec-label">20' · R$</div><input type="number" class="ec-input" id="ht-s1" placeholder="5.00" step="0.01" min="0"></div>
+      <div class="ec"><div class="ec-label">27' · R$</div><input type="number" class="ec-input" id="ht-s2" placeholder="3.00" step="0.01" min="0"></div>
+      <div class="ec"><div class="ec-label">35' · R$</div><input type="number" class="ec-input" id="ht-s3" placeholder="2.00" step="0.01" min="0"></div>
     </div>
-    <div class="field">
-      <label>Liga</label>
-      <input type="text" id="f-liga" placeholder="Ex: Bundesliga">
+    <div class="r3">
+      <div class="rbtn" id="ht-bg" onclick="selR('ht','green')">✅ Green</div>
+      <div class="rbtn" id="ht-br" onclick="selR('ht','red')">❌ Red</div>
+      <div class="rbtn" id="ht-bs" onclick="selR('ht','skip')">— Skip</div>
     </div>
+    <div class="field"><label>Valor retornado (R$) — 0 se red</label><input type="number" id="ht-ret" placeholder="Ex: 13.50" step="0.01" min="0"></div>
   </div>
 
-  <div class="field" style="margin-bottom:10px">
-    <label>Jogo</label>
-    <input type="text" id="f-jogo" placeholder="Ex: Arsenal vs Chelsea">
-  </div>
-
-  <div class="field" style="margin-bottom:10px">
-    <label>Min. Entrada</label>
-    <!-- CORRIGIDO: max removido para permitir entradas no 2T também -->
-    <input type="number" id="f-minuto" placeholder="Ex: 8" min="1" max="90">
-  </div>
-
-  <!-- Gols HT -->
-  <div class="gols-section-title">⚽ Gols 1º Tempo (HT)</div>
-  <div class="gols-list" id="gols-ht-list">
-    <div class="gol-row">
-      <input type="number" placeholder="Min. gol HT (ex: 23)" min="1" max="45" class="gol-ht-input">
-      <button class="btn-remove-gol" onclick="removeGol(this)">✕</button>
+  <div class="mkt-block">
+    <div class="mkt-title ft15"><div class="dot"></div>Over 1.5 FT</div>
+    <div class="entradas-grid">
+      <div class="ec"><div class="ec-label">20' · R$</div><input type="number" class="ec-input" id="f15-s1" placeholder="5.00" step="0.01" min="0"></div>
+      <div class="ec"><div class="ec-label">27' · R$</div><input type="number" class="ec-input" id="f15-s2" placeholder="3.00" step="0.01" min="0"></div>
+      <div class="ec"><div class="ec-label">35' · R$</div><input type="number" class="ec-input" id="f15-s3" placeholder="2.00" step="0.01" min="0"></div>
     </div>
-  </div>
-  <button class="btn-add-gol" onclick="addGolField('ht')">+ Gol HT</button>
-
-  <!-- Gols FT (2T) -->
-  <div class="gols-section-title">⚽ Gols 2º Tempo (FT extra)</div>
-  <div class="gols-list" id="gols-ft-list">
-    <div class="gol-row">
-      <input type="number" placeholder="Min. gol 2T (ex: 67)" min="46" max="90" class="gol-ft-input">
-      <button class="btn-remove-gol" onclick="removeGol(this)">✕</button>
+    <div class="r3">
+      <div class="rbtn" id="f15-bg" onclick="selR('f15','green')">✅ Green</div>
+      <div class="rbtn" id="f15-br" onclick="selR('f15','red')">❌ Red</div>
+      <div class="rbtn" id="f15-bs" onclick="selR('f15','skip')">— Skip</div>
     </div>
+    <div class="field"><label>Valor retornado (R$) — 0 se red</label><input type="number" id="f15-ret" placeholder="Ex: 13.50" step="0.01" min="0"></div>
   </div>
-  <button class="btn-add-gol" onclick="addGolField('ft')">+ Gol 2T</button>
 
-  <div class="field" style="margin-bottom:10px">
-    <label>Resultado (Over 0.5 HT)</label>
+  <div class="mkt-block">
+    <div class="mkt-title ft25"><div class="dot"></div>Over 2.5 FT</div>
+    <div class="entradas-grid">
+      <div class="ec"><div class="ec-label">20' · R$</div><input type="number" class="ec-input" id="f25-s1" placeholder="5.00" step="0.01" min="0"></div>
+      <div class="ec"><div class="ec-label">27' · R$</div><input type="number" class="ec-input" id="f25-s2" placeholder="3.00" step="0.01" min="0"></div>
+      <div class="ec"><div class="ec-label">35' · R$</div><input type="number" class="ec-input" id="f25-s3" placeholder="2.00" step="0.01" min="0"></div>
+    </div>
+    <div class="r3">
+      <div class="rbtn" id="f25-bg" onclick="selR('f25','green')">✅ Green</div>
+      <div class="rbtn" id="f25-br" onclick="selR('f25','red')">❌ Red</div>
+      <div class="rbtn" id="f25-bs" onclick="selR('f25','skip')">— Skip</div>
+    </div>
+    <div class="field"><label>Valor retornado (R$) — 0 se red</label><input type="number" id="f25-ret" placeholder="Ex: 13.50" step="0.01" min="0"></div>
   </div>
-  <div class="result-selector">
-    <div class="result-btn" id="btn-green" onclick="selectResult('green')">✅ Green</div>
-    <div class="result-btn" id="btn-red" onclick="selectResult('red')">❌ Red</div>
-  </div>
+
+  <div class="gols-st">⚽ Gols 1º Tempo (HT)</div>
+  <div class="gols-list" id="gl-ht"><div class="gol-row"><input type="number" placeholder="Min. gol HT (ex: 23)" min="1" max="45" class="gi-ht"><button class="btn-rm" onclick="rmGol(this)">✕</button></div></div>
+  <button class="btn-ag" onclick="addGol('ht')">+ Gol HT</button>
+  <div class="gols-st">⚽ Gols 2º Tempo</div>
+  <div class="gols-list" id="gl-ft"><div class="gol-row"><input type="number" placeholder="Min. gol 2T (ex: 67)" min="46" max="120" class="gi-ft"><button class="btn-rm" onclick="rmGol(this)">✕</button></div></div>
+  <button class="btn-ag" onclick="addGol('ft')">+ Gol 2T</button>
 
   <button class="btn-add" onclick="addEntry()">+ Adicionar Entrada</button>
-  <button class="btn-export" onclick="exportData()">⬇ Exportar JSON</button>
-  <button class="btn-import" onclick="document.getElementById('import-file').click()">⬆ Importar JSON</button>
-  <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+  <button class="btn-exp" onclick="exportData()">⬇ Exportar JSON</button>
+  <button class="btn-imp" onclick="document.getElementById('fi').click()">⬆ Importar JSON</button>
+  <input type="file" id="fi" accept=".json" style="display:none" onchange="importData(event)">
 </div>
 
 <div class="table-section">
   <div class="table-header">
     <div class="table-title">Histórico</div>
-    <div class="entry-count" id="entry-count">0 entradas</div>
+    <div class="entry-count" id="ec">0 entradas</div>
   </div>
-  <div class="entries-list" id="entries-list">
-    <div class="empty-state">
-      <div class="empty-icon">📋</div>
-      <div class="empty-text">Nenhuma entrada ainda</div>
-    </div>
-  </div>
+  <div class="entries-list" id="el"><div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">Nenhuma entrada ainda</div></div></div>
 </div>
 
-<script>
-  // Compatível com chave antiga E nova
-  const STORAGE_KEY_OLD = 'bottracker_overht_v3';
-  const STORAGE_KEY = 'bottracker_overht_v4';
-  let entries = [];
-  let selectedResult = '';
-  let editResult = '';
-
-  function load() {
-    try {
-      // Tenta carregar dados novos primeiro
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        entries = JSON.parse(saved);
-      } else {
-        // Migra dados antigos se existirem
-        const old = localStorage.getItem(STORAGE_KEY_OLD);
-        if (old) {
-          const oldEntries = JSON.parse(old);
-          // Migra: campo "gols" vira "golsHT", adiciona "golsFT: []"
-          entries = oldEntries.map(e => ({
-            ...e,
-            golsHT: e.golsHT || e.gols || [],
-            golsFT: e.golsFT || [],
-          }));
-          save();
-          document.getElementById('migrate-notice').style.display = 'block';
-          setTimeout(() => document.getElementById('migrate-notice').style.display = 'none', 4000);
-        }
-      }
-    } catch(e) { entries = []; }
-    document.getElementById('f-data').valueAsDate = new Date();
-    render();
-  }
-
-  function save() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-  }
-
-  function selectResult(r) {
-    selectedResult = r;
-    ['green','red'].forEach(x => {
-      const btn = document.getElementById('btn-' + x);
-      btn.className = 'result-btn';
-      if (x === r) btn.classList.add('selected-' + r);
-    });
-  }
-
-  function selectEditResult(r) {
-    editResult = r;
-    ['green','red'].forEach(x => {
-      const btn = document.getElementById('edit-btn-' + x);
-      btn.className = 'result-btn';
-      if (x === r) btn.classList.add('selected-' + r);
-    });
-  }
-
-  function addGolField(tipo) {
-    const listId = tipo === 'ht' ? 'gols-ht-list' : 'gols-ft-list';
-    const min = tipo === 'ht' ? 1 : 46;
-    const max = tipo === 'ht' ? 45 : 90;
-    const placeholder = tipo === 'ht' ? 'Min. gol HT (ex: 23)' : 'Min. gol 2T (ex: 67)';
-    const cls = tipo === 'ht' ? 'gol-ht-input' : 'gol-ft-input';
-    const list = document.getElementById(listId);
-    const row = document.createElement('div');
-    row.className = 'gol-row';
-    row.innerHTML = `
-      <input type="number" placeholder="${placeholder}" min="${min}" max="${max}" class="${cls}">
-      <button class="btn-remove-gol" onclick="removeGol(this)">✕</button>
-    `;
-    list.appendChild(row);
-  }
-
-  function removeGol(btn) {
-    const list = btn.parentElement.parentElement;
-    if (list.children.length > 1) {
-      btn.parentElement.remove();
-    } else {
-      btn.previousElementSibling.value = '';
-    }
-  }
-
-  function getGols(cls) {
-    const inputs = document.querySelectorAll('.' + cls);
-    const gols = [];
-    inputs.forEach(inp => {
-      const val = parseInt(inp.value);
-      if (!isNaN(val) && val > 0) gols.push(val);
-    });
-    return gols.sort((a,b) => a-b);
-  }
-
-  function addEntry() {
-    const data = document.getElementById('f-data').value;
-    const liga = document.getElementById('f-liga').value.trim();
-    const jogo = document.getElementById('f-jogo').value.trim();
-    const minuto = document.getElementById('f-minuto').value;
-    const golsHT = getGols('gol-ht-input');
-    const golsFT = getGols('gol-ft-input');
-
-    if (!data || !jogo || !minuto || !selectedResult) {
-      alert('Preencha: data, jogo, minuto de entrada e resultado!');
-      return;
-    }
-
-    entries.unshift({
-      id: Date.now(),
-      data, liga, jogo,
-      minuto: parseInt(minuto),
-      golsHT,
-      golsFT,
-      resultado: selectedResult
-    });
-
-    save();
-    clearForm();
-    render();
-  }
-
-  function clearForm() {
-    document.getElementById('f-liga').value = '';
-    document.getElementById('f-jogo').value = '';
-    document.getElementById('f-minuto').value = '';
-    document.getElementById('f-data').valueAsDate = new Date();
-    document.getElementById('gols-ht-list').innerHTML = `
-      <div class="gol-row">
-        <input type="number" placeholder="Min. gol HT (ex: 23)" min="1" max="45" class="gol-ht-input">
-        <button class="btn-remove-gol" onclick="removeGol(this)">✕</button>
-      </div>`;
-    document.getElementById('gols-ft-list').innerHTML = `
-      <div class="gol-row">
-        <input type="number" placeholder="Min. gol 2T (ex: 67)" min="46" max="90" class="gol-ft-input">
-        <button class="btn-remove-gol" onclick="removeGol(this)">✕</button>
-      </div>`;
-    selectedResult = '';
-    ['green','red'].forEach(x => {
-      document.getElementById('btn-' + x).className = 'result-btn';
-    });
-  }
-
-  function deleteEntry(id) {
-    if (!confirm('Remover esta entrada?')) return;
-    entries = entries.filter(e => e.id !== id);
-    save();
-    render();
-  }
-
-  function exportData() {
-    if (entries.length === 0) { alert('Nenhuma entrada para exportar!'); return; }
-    const blob = new Blob([JSON.stringify(entries, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'bottracker_' + new Date().toISOString().slice(0,10) + '.json';
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  function importData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      try {
-        const imported = JSON.parse(e.target.result);
-        if (!Array.isArray(imported)) { alert('JSON inválido!'); return; }
-        // Migra campos antigos
-        const migrated = imported.map(e => ({
-          ...e,
-          golsHT: e.golsHT || e.gols || [],
-          golsFT: e.golsFT || [],
-        }));
-        // Merge sem duplicatas por id
-        const existingIds = new Set(entries.map(x => x.id));
-        const newEntries = migrated.filter(x => !existingIds.has(x.id));
-        entries = [...entries, ...newEntries].sort((a,b) => b.id - a.id);
-        save();
-        render();
-        alert(`✅ ${newEntries.length} entradas importadas! Total: ${entries.length}`);
-      } catch(err) {
-        alert('Erro ao ler JSON: ' + err.message);
-      }
-    };
-    reader.readAsText(file);
-    event.target.value = '';
-  }
-
-  function render() {
-    const greens = entries.filter(e => e.resultado === 'green').length;
-    const reds = entries.filter(e => e.resultado === 'red').length;
-    const total = entries.length;
-    const rate = (greens + reds) > 0 ? Math.round((greens / (greens + reds)) * 100) : null;
-
-    document.getElementById('stat-total').textContent = total;
-    document.getElementById('stat-green').textContent = greens;
-    document.getElementById('stat-red').textContent = reds;
-    document.getElementById('stat-rate').textContent = rate !== null ? rate + '%' : '—';
-    document.getElementById('entry-count').textContent = total + ' ' + (total === 1 ? 'entrada' : 'entradas');
-
-    // Análise FT
-    if (total > 0) {
-      let over05 = 0, over15 = 0, over25 = 0;
-      let min0_15 = 0, min16_30 = 0, min31_45 = 0, min46_90 = 0, semGol = 0;
-
-      entries.forEach(e => {
-        const ht = e.golsHT || e.gols || [];
-        const ft = e.golsFT || [];
-        const allGols = [...ht, ...ft].sort((a,b) => a-b);
-        const totalGols = allGols.length;
-
-        if (totalGols >= 1) over05++;
-        if (totalGols >= 2) over15++;
-        if (totalGols >= 3) over25++;
-
-        // Primeiro gol do jogo
-        if (allGols.length === 0) {
-          semGol++;
-        } else {
-          const first = allGols[0];
-          if (first <= 15) min0_15++;
-          else if (first <= 30) min16_30++;
-          else if (first <= 45) min31_45++;
-          else min46_90++;
-        }
-      });
-
-      const pct = v => total > 0 ? Math.round(v/total*100) + '%' : '—';
-      document.getElementById('stat-over05ft').textContent = pct(over05);
-      document.getElementById('stat-over15ft').textContent = pct(over15);
-      document.getElementById('stat-over25ft').textContent = pct(over25);
-      document.getElementById('min-0-15').textContent = pct(min0_15);
-      document.getElementById('min-16-30').textContent = pct(min16_30);
-      document.getElementById('min-31-45').textContent = pct(min31_45);
-      document.getElementById('min-46-90').textContent = semGol > 0 ? pct(min46_90) + ' (+' + semGol + ' sem gol)' : pct(min46_90);
-    }
-
-    const list = document.getElementById('entries-list');
-    if (entries.length === 0) {
-      list.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">Nenhuma entrada ainda</div></div>`;
-      return;
-    }
-
-    list.innerHTML = entries.map(e => {
-      const dataFmt = e.data ? new Date(e.data + 'T12:00:00').toLocaleDateString('pt-BR') : '—';
-      const ht = e.golsHT || e.gols || [];
-      const ft = e.golsFT || [];
-
-      const golsHtHtml = ht.length > 0
-        ? ht.map(g => `<span class="gol-pill ht">${g}'</span>`).join('')
-        : '<span style="font-family:var(--mono);font-size:11px;color:var(--muted)">—</span>';
-
-      const golsFtHtml = ft.length > 0
-        ? ft.map(g => `<span class="gol-pill ft">${g}'</span>`).join('')
-        : '';
-
-      const totalGols = ht.length + ft.length;
-
-      return `
-        <div class="entry-card ${e.resultado}">
-          <div class="entry-top">
-            <div class="entry-match">${e.jogo}</div>
-            <div class="badge ${e.resultado}">${e.resultado === 'green' ? '✅ Green' : '❌ Red'}</div>
-          </div>
-          <div class="entry-meta">
-            <div class="meta-item">
-              <div class="meta-label">Min. Entrada</div>
-              <div class="meta-value accent">${e.minuto}'</div>
-            </div>
-            <div class="meta-item">
-              <div class="meta-label">Gols HT</div>
-              <div class="gols-pills">${golsHtHtml}</div>
-            </div>
-            ${ft.length > 0 ? `
-            <div class="meta-item">
-              <div class="meta-label">Gols 2T</div>
-              <div class="gols-pills">${golsFtHtml}</div>
-            </div>` : ''}
-            <div class="meta-item">
-              <div class="meta-label">Total</div>
-              <div class="meta-value">${totalGols} gol${totalGols !== 1 ? 's' : ''}</div>
-            </div>
-          </div>
-          <div class="entry-bottom">
-            <div class="entry-date">${dataFmt}${e.liga ? ' · ' + e.liga : ''}</div>
-            <div>
-              <button class="btn-edit" onclick="openEdit(${e.id})">✏️ editar</button>
-              <button class="btn-delete" onclick="deleteEntry(${e.id})">✕</button>
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('');
-  }
-
-  function openEdit(id) {
-    const e = entries.find(x => x.id === id);
-    if (!e) return;
-
-    document.getElementById('edit-id').value = id;
-    document.getElementById('edit-data').value = e.data;
-    document.getElementById('edit-liga').value = e.liga || '';
-    document.getElementById('edit-jogo').value = e.jogo;
-    document.getElementById('edit-minuto').value = e.minuto;
-
-    // Gols HT
-    const htList = document.getElementById('edit-gols-ht-list');
-    const ht = e.golsHT || e.gols || [];
-    htList.innerHTML = '';
-    const htBase = ht.length > 0 ? ht : [''];
-    htBase.forEach(g => {
-      const row = document.createElement('div');
-      row.className = 'gol-row';
-      row.innerHTML = `<input type="number" placeholder="Min. gol HT (ex: 23)" min="1" max="45" class="edit-gol-ht" ${g !== '' ? 'value="'+g+'"' : ''}><button class="btn-remove-gol" onclick="removeGol(this)">✕</button>`;
-      htList.appendChild(row);
-    });
-
-    // Gols FT
-    const ftList = document.getElementById('edit-gols-ft-list');
-    const ft = e.golsFT || [];
-    ftList.innerHTML = '';
-    const ftBase = ft.length > 0 ? ft : [''];
-    ftBase.forEach(g => {
-      const row = document.createElement('div');
-      row.className = 'gol-row';
-      row.innerHTML = `<input type="number" placeholder="Min. gol 2T (ex: 67)" min="46" max="90" class="edit-gol-ft" ${g !== '' ? 'value="'+g+'"' : ''}><button class="btn-remove-gol" onclick="removeGol(this)">✕</button>`;
-      ftList.appendChild(row);
-    });
-
-    // Resultado
-    editResult = e.resultado;
-    ['green','red'].forEach(x => {
-      const btn = document.getElementById('edit-btn-' + x);
-      btn.className = 'result-btn';
-      if (x === e.resultado) btn.classList.add('selected-' + x);
-    });
-
-    document.getElementById('modal-overlay').classList.add('open');
-    window.scrollTo(0, 0);
-  }
-
-  function closeModal() {
-    document.getElementById('modal-overlay').classList.remove('open');
-  }
-
-  function saveEdit() {
-    const id = parseInt(document.getElementById('edit-id').value);
-    const idx = entries.findIndex(x => x.id === id);
-    if (idx === -1) return;
-    if (!editResult) { alert('Selecione o resultado!'); return; }
-
-    const golsHT = getGols('edit-gol-ht');
-    const golsFT = getGols('edit-gol-ft');
-
-    entries[idx] = {
-      ...entries[idx],
-      data: document.getElementById('edit-data').value,
-      liga: document.getElementById('edit-liga').value.trim(),
-      jogo: document.getElementById('edit-jogo').value.trim(),
-      minuto: parseInt(document.getElementById('edit-minuto').value),
-      golsHT,
-      golsFT,
-      resultado: editResult,
-    };
-
-    save(); closeModal(); render();
-  }
-
-  function addEditGol(tipo) {
-    const listId = tipo === 'ht' ? 'edit-gols-ht-list' : 'edit-gols-ft-list';
-    const min = tipo === 'ht' ? 1 : 46;
-    const max = tipo === 'ht' ? 45 : 90;
-    const placeholder = tipo === 'ht' ? 'Min. gol HT (ex: 23)' : 'Min. gol 2T (ex: 67)';
-    const cls = tipo === 'ht' ? 'edit-gol-ht' : 'edit-gol-ft';
-    const list = document.getElementById(listId);
-    const row = document.createElement('div');
-    row.className = 'gol-row';
-    row.innerHTML = `<input type="number" placeholder="${placeholder}" min="${min}" max="${max}" class="${cls}"><button class="btn-remove-gol" onclick="removeGol(this)">✕</button>`;
-    list.appendChild(row);
-  }
-
-  load();
-</script>
-
-<!-- Modal de edição -->
-<div class="modal-overlay" id="modal-overlay">
+<!-- Modal -->
+<div class="modal-overlay" id="mo">
   <div class="modal">
     <div class="modal-title">✏️ Editar Entrada</div>
-    <input type="hidden" id="edit-id">
-
+    <input type="hidden" id="eid">
     <div class="form-grid" style="margin-bottom:10px">
-      <div class="field">
-        <label>Data</label>
-        <input type="date" id="edit-data">
+      <div class="field"><label>Data</label><input type="date" id="e-data"></div>
+      <div class="field"><label>Liga</label><input type="text" id="e-liga"></div>
+    </div>
+    <div class="field" style="margin-bottom:12px"><label>Jogo</label><input type="text" id="e-jogo"></div>
+    <div class="mkt-block">
+      <div class="mkt-title ht"><div class="dot"></div>Over 0.5 HT</div>
+      <div class="entradas-grid">
+        <div class="ec"><div class="ec-label">20' · R$</div><input type="number" class="ec-input" id="e-ht-s1" step="0.01" min="0"></div>
+        <div class="ec"><div class="ec-label">27' · R$</div><input type="number" class="ec-input" id="e-ht-s2" step="0.01" min="0"></div>
+        <div class="ec"><div class="ec-label">35' · R$</div><input type="number" class="ec-input" id="e-ht-s3" step="0.01" min="0"></div>
       </div>
-      <div class="field">
-        <label>Liga</label>
-        <input type="text" id="edit-liga" placeholder="Ex: Bundesliga">
+      <div class="r3">
+        <div class="rbtn" id="e-ht-bg" onclick="selER('ht','green')">✅ Green</div>
+        <div class="rbtn" id="e-ht-br" onclick="selER('ht','red')">❌ Red</div>
+        <div class="rbtn" id="e-ht-bs" onclick="selER('ht','skip')">— Skip</div>
       </div>
+      <div class="field"><label>Valor retornado (R$)</label><input type="number" id="e-ht-ret" step="0.01" min="0"></div>
     </div>
-
-    <div class="field" style="margin-bottom:10px">
-      <label>Jogo</label>
-      <input type="text" id="edit-jogo">
+    <div class="mkt-block">
+      <div class="mkt-title ft15"><div class="dot"></div>Over 1.5 FT</div>
+      <div class="entradas-grid">
+        <div class="ec"><div class="ec-label">20' · R$</div><input type="number" class="ec-input" id="e-f15-s1" step="0.01" min="0"></div>
+        <div class="ec"><div class="ec-label">27' · R$</div><input type="number" class="ec-input" id="e-f15-s2" step="0.01" min="0"></div>
+        <div class="ec"><div class="ec-label">35' · R$</div><input type="number" class="ec-input" id="e-f15-s3" step="0.01" min="0"></div>
+      </div>
+      <div class="r3">
+        <div class="rbtn" id="e-f15-bg" onclick="selER('f15','green')">✅ Green</div>
+        <div class="rbtn" id="e-f15-br" onclick="selER('f15','red')">❌ Red</div>
+        <div class="rbtn" id="e-f15-bs" onclick="selER('f15','skip')">— Skip</div>
+      </div>
+      <div class="field"><label>Valor retornado (R$)</label><input type="number" id="e-f15-ret" step="0.01" min="0"></div>
     </div>
-
-    <div class="field" style="margin-bottom:10px">
-      <label>Min. Entrada</label>
-      <input type="number" id="edit-minuto" min="1" max="90">
+    <div class="mkt-block">
+      <div class="mkt-title ft25"><div class="dot"></div>Over 2.5 FT</div>
+      <div class="entradas-grid">
+        <div class="ec"><div class="ec-label">20' · R$</div><input type="number" class="ec-input" id="e-f25-s1" step="0.01" min="0"></div>
+        <div class="ec"><div class="ec-label">27' · R$</div><input type="number" class="ec-input" id="e-f25-s2" step="0.01" min="0"></div>
+        <div class="ec"><div class="ec-label">35' · R$</div><input type="number" class="ec-input" id="e-f25-s3" step="0.01" min="0"></div>
+      </div>
+      <div class="r3">
+        <div class="rbtn" id="e-f25-bg" onclick="selER('f25','green')">✅ Green</div>
+        <div class="rbtn" id="e-f25-br" onclick="selER('f25','red')">❌ Red</div>
+        <div class="rbtn" id="e-f25-bs" onclick="selER('f25','skip')">— Skip</div>
+      </div>
+      <div class="field"><label>Valor retornado (R$)</label><input type="number" id="e-f25-ret" step="0.01" min="0"></div>
     </div>
-
-    <div class="gols-section-title">⚽ Gols 1º Tempo (HT)</div>
-    <div class="gols-list" id="edit-gols-ht-list"></div>
-    <button class="btn-add-gol" onclick="addEditGol('ht')">+ Gol HT</button>
-
-    <div class="gols-section-title">⚽ Gols 2º Tempo (FT extra)</div>
-    <div class="gols-list" id="edit-gols-ft-list"></div>
-    <button class="btn-add-gol" onclick="addEditGol('ft')">+ Gol 2T</button>
-
-    <div class="field" style="margin:12px 0 8px"><label>Resultado</label></div>
-    <div class="result-selector">
-      <div class="result-btn" id="edit-btn-green" onclick="selectEditResult('green')">✅ Green</div>
-      <div class="result-btn" id="edit-btn-red" onclick="selectEditResult('red')">❌ Red</div>
-    </div>
-
     <div class="modal-actions">
       <button class="btn-save" onclick="saveEdit()">💾 Salvar</button>
       <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
@@ -822,5 +265,200 @@
   </div>
 </div>
 
+<script>
+const SK='btv3';
+let entries=[];
+const MR={ht:'',f15:'',f25:''};
+const ER={ht:'',f15:'',f25:''};
+
+function load(){
+  try{const s=localStorage.getItem(SK);if(s)entries=JSON.parse(s);}catch(e){entries=[];}
+  document.getElementById('f-data').valueAsDate=new Date();
+  render();
+}
+function save(){localStorage.setItem(SK,JSON.stringify(entries));}
+
+function selR(m,r){
+  MR[m]=r;
+  ['green','red','skip'].forEach(x=>{
+    const b=document.getElementById(m+'-b'+x[0]);
+    if(b){b.className='rbtn';if(x===r)b.classList.add('selected-'+r);}
+  });
+}
+function selER(m,r){
+  ER[m]=r;
+  ['green','red','skip'].forEach(x=>{
+    const b=document.getElementById('e-'+m+'-b'+x[0]);
+    if(b){b.className='rbtn';if(x===r)b.classList.add('selected-'+r);}
+  });
+}
+
+function getMD(p,prefix){
+  const s1=parseFloat(document.getElementById(prefix+'-s1').value)||0;
+  const s2=parseFloat(document.getElementById(prefix+'-s2').value)||0;
+  const s3=parseFloat(document.getElementById(prefix+'-s3').value)||0;
+  const ret=parseFloat(document.getElementById(prefix+'-ret').value)||0;
+  const stake=s1+s2+s3;
+  const res=p[prefix.includes('f15')?'f15':prefix.includes('f25')?'f25':'ht'];
+  const pl=res==='skip'?0:ret-stake;
+  return{s1,s2,s3,stake,ret,resultado:res,pl};
+}
+function getED(p,prefix){
+  const s1=parseFloat(document.getElementById('e-'+prefix+'-s1').value)||0;
+  const s2=parseFloat(document.getElementById('e-'+prefix+'-s2').value)||0;
+  const s3=parseFloat(document.getElementById('e-'+prefix+'-s3').value)||0;
+  const ret=parseFloat(document.getElementById('e-'+prefix+'-ret').value)||0;
+  const stake=s1+s2+s3;
+  const res=p[prefix];
+  const pl=res==='skip'?0:ret-stake;
+  return{s1,s2,s3,stake,ret,resultado:res,pl};
+}
+
+function addGol(t){
+  const id=t==='ht'?'gl-ht':'gl-ft';
+  const cls=t==='ht'?'gi-ht':'gi-ft';
+  const mn=t==='ht'?1:46,mx=t==='ht'?45:120;
+  const ph=t==='ht'?'Min. gol HT (ex: 23)':'Min. gol 2T (ex: 67)';
+  const l=document.getElementById(id);
+  const r=document.createElement('div');r.className='gol-row';
+  r.innerHTML=`<input type="number" placeholder="${ph}" min="${mn}" max="${mx}" class="${cls}"><button class="btn-rm" onclick="rmGol(this)">✕</button>`;
+  l.appendChild(r);
+}
+function rmGol(btn){
+  const l=btn.parentElement.parentElement;
+  if(l.children.length>1)btn.parentElement.remove();
+  else btn.previousElementSibling.value='';
+}
+function getGols(cls){return Array.from(document.querySelectorAll('.'+cls)).map(i=>parseInt(i.value)).filter(v=>!isNaN(v)&&v>0).sort((a,b)=>a-b);}
+
+function addEntry(){
+  const data=document.getElementById('f-data').value;
+  const liga=document.getElementById('f-liga').value.trim();
+  const jogo=document.getElementById('f-jogo').value.trim();
+  if(!data||!jogo){alert('Preencha data e jogo!');return;}
+  const ht=getMD(MR,'ht');
+  const f15=getMD(MR,'f15');
+  const f25=getMD(MR,'f25');
+  const golsHT=getGols('gi-ht');
+  const golsFT=getGols('gi-ft');
+  entries.unshift({id:Date.now(),data,liga,jogo,ht,f15,f25,golsHT,golsFT});
+  save();clearForm();render();
+}
+
+function clearForm(){
+  document.getElementById('f-liga').value='';
+  document.getElementById('f-jogo').value='';
+  document.getElementById('f-data').valueAsDate=new Date();
+  ['ht-s1','ht-s2','ht-s3','ht-ret','f15-s1','f15-s2','f15-s3','f15-ret','f25-s1','f25-s2','f25-s3','f25-ret'].forEach(id=>document.getElementById(id).value='');
+  ['ht','f15','f25'].forEach(m=>{MR[m]='';['g','r','s'].forEach(x=>{const b=document.getElementById(m+'-b'+x);if(b)b.className='rbtn';});});
+  document.getElementById('gl-ht').innerHTML=`<div class="gol-row"><input type="number" placeholder="Min. gol HT (ex: 23)" min="1" max="45" class="gi-ht"><button class="btn-rm" onclick="rmGol(this)">✕</button></div>`;
+  document.getElementById('gl-ft').innerHTML=`<div class="gol-row"><input type="number" placeholder="Min. gol 2T (ex: 67)" min="46" max="120" class="gi-ft"><button class="btn-rm" onclick="rmGol(this)">✕</button></div>`;
+}
+
+function delEntry(id){if(!confirm('Remover?'))return;entries=entries.filter(e=>e.id!==id);save();render();}
+
+function openEdit(id){
+  const e=entries.find(x=>x.id===id);if(!e)return;
+  document.getElementById('eid').value=id;
+  document.getElementById('e-data').value=e.data;
+  document.getElementById('e-liga').value=e.liga||'';
+  document.getElementById('e-jogo').value=e.jogo;
+  ['ht','f15','f25'].forEach(m=>{
+    const d=e[m]||{};
+    document.getElementById('e-'+m+'-s1').value=d.s1||'';
+    document.getElementById('e-'+m+'-s2').value=d.s2||'';
+    document.getElementById('e-'+m+'-s3').value=d.s3||'';
+    document.getElementById('e-'+m+'-ret').value=d.ret||'';
+    ER[m]=d.resultado||'';
+    ['green','red','skip'].forEach(x=>{
+      const b=document.getElementById('e-'+m+'-b'+x[0]);
+      if(b){b.className='rbtn';if(x===d.resultado)b.classList.add('selected-'+x);}
+    });
+  });
+  document.getElementById('mo').classList.add('open');window.scrollTo(0,0);
+}
+function closeModal(){document.getElementById('mo').classList.remove('open');}
+function saveEdit(){
+  const id=parseInt(document.getElementById('eid').value);
+  const idx=entries.findIndex(x=>x.id===id);if(idx===-1)return;
+  const htD=getED(ER,'ht');const f15D=getED(ER,'f15');const f25D=getED(ER,'f25');
+  entries[idx]={...entries[idx],data:document.getElementById('e-data').value,liga:document.getElementById('e-liga').value.trim(),jogo:document.getElementById('e-jogo').value.trim(),ht:htD,f15:f15D,f25:f25D};
+  save();closeModal();render();
+}
+
+function exportData(){
+  if(!entries.length){alert('Nenhuma entrada!');return;}
+  const b=new Blob([JSON.stringify(entries,null,2)],{type:'application/json'});
+  const u=URL.createObjectURL(b);const a=document.createElement('a');
+  a.href=u;a.download='btv3_'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(u);
+}
+function importData(ev){
+  const f=ev.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=function(e){
+    try{
+      const imp=JSON.parse(e.target.result);if(!Array.isArray(imp)){alert('JSON inválido!');return;}
+      const ids=new Set(entries.map(x=>x.id));
+      const nw=imp.filter(x=>!ids.has(x.id));
+      entries=[...entries,...nw].sort((a,b)=>b.id-a.id);
+      save();render();alert(`✅ ${nw.length} entradas importadas!`);
+    }catch(err){alert('Erro: '+err.message);}
+  };
+  r.readAsText(f);ev.target.value='';
+}
+
+function fmt(v){return(v>=0?'+':'')+' R$'+Math.abs(v).toFixed(2);}
+
+function render(){
+  const tot=entries.length;
+  let tpl=0,tinv=0,htG=0,htR=0,htPL=0,f15G=0,f15R=0,f15PL=0,f25G=0,f25R=0,f25PL=0;
+  entries.forEach(e=>{
+    [['ht',e.ht],['f15',e.f15],['f25',e.f25]].forEach(([k,d])=>{
+      if(!d||!d.resultado||d.resultado==='skip')return;
+      tinv+=d.stake||0;tpl+=d.pl||0;
+      if(k==='ht'){if(d.resultado==='green')htG++;else htR++;htPL+=d.pl||0;}
+      if(k==='f15'){if(d.resultado==='green')f15G++;else f15R++;f15PL+=d.pl||0;}
+      if(k==='f25'){if(d.resultado==='green')f25G++;else f25R++;f25PL+=d.pl||0;}
+    });
+  });
+  const roi=tinv>0?((tpl/tinv)*100).toFixed(1)+'%':'—';
+  const pc=(v)=>v>=0?'var(--accent)':'var(--red)';
+  const plEl=document.getElementById('s-pl');plEl.textContent=fmt(tpl);plEl.style.color=pc(tpl);
+  document.getElementById('s-total').textContent=tot;
+  document.getElementById('s-roi').textContent=roi;
+  document.getElementById('s-inv').textContent='R$'+tinv.toFixed(2);
+  const rt=(g,r)=>(g+r)>0?Math.round(g/(g+r)*100)+'%':'—';
+  document.getElementById('ht-g').textContent=htG;document.getElementById('ht-r').textContent=htR;document.getElementById('ht-t').textContent=rt(htG,htR);const hpl=document.getElementById('ht-pl');hpl.textContent=fmt(htPL);hpl.style.color=pc(htPL);
+  document.getElementById('f15-g').textContent=f15G;document.getElementById('f15-r').textContent=f15R;document.getElementById('f15-t').textContent=rt(f15G,f15R);const fpl=document.getElementById('f15-pl');fpl.textContent=fmt(f15PL);fpl.style.color=pc(f15PL);
+  document.getElementById('f25-g').textContent=f25G;document.getElementById('f25-r').textContent=f25R;document.getElementById('f25-t').textContent=rt(f25G,f25R);const gpl=document.getElementById('f25-pl');gpl.textContent=fmt(f25PL);gpl.style.color=pc(f25PL);
+  document.getElementById('ec').textContent=tot+' '+(tot===1?'entrada':'entradas');
+
+  const list=document.getElementById('el');
+  if(!tot){list.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">Nenhuma entrada ainda</div></div>`;return;}
+
+  list.innerHTML=entries.map(e=>{
+    const df=e.data?new Date(e.data+'T12:00:00').toLocaleDateString('pt-BR'):'—';
+    const epl=(e.ht?.pl||0)+(e.f15?.pl||0)+(e.f25?.pl||0);
+    const mc=(d,nm)=>{
+      if(!d||!d.resultado||d.resultado==='skip')return`<div class="mc"><div class="mc-name">${nm}</div><div class="mc-res skip">—</div></div>`;
+      const pv=d.pl||0;
+      return`<div class="mc"><div class="mc-name">${nm}</div><div class="mc-res ${d.resultado}">${d.resultado==='green'?'✅':'❌'}</div><div class="mc-stake">R$${(d.stake||0).toFixed(2)}</div><div class="mc-pl" style="color:${pv>=0?'var(--accent)':'var(--red)'}">${fmt(pv)}</div></div>`;
+    };
+    return`<div class="entry-card">
+      <div class="entry-match">${e.jogo}</div>
+      <div class="entry-meta">${df}${e.liga?' · '+e.liga:''}</div>
+      <div class="mkts-row">${mc(e.ht,'0.5 HT')}${mc(e.f15,'1.5 FT')}${mc(e.f25,'2.5 FT')}</div>
+      <div class="entry-bottom">
+        <div class="entry-pl" style="color:${epl>=0?'var(--accent)':'var(--red)'}">Jogo: ${fmt(epl)}</div>
+        <div class="entry-actions">
+          <button class="btn-edit" onclick="openEdit(${e.id})">✏️ editar</button>
+          <button class="btn-del" onclick="delEntry(${e.id})">✕</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+load();
+</script>
 </body>
 </html>
