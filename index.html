@@ -1,552 +1,93 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bot Tracker — Fase Coleta</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg:#0a0c0f;--surface:#111418;--surface2:#181c22;--border:#1e2530;
-  --accent:#00e5a0;--accent2:#0084ff;--red:#ff3b5c;--yellow:#ffcc00;
-  --text:#e8edf3;--muted:#5a6475;--mono:'IBM Plex Mono',monospace;--sans:'Syne',sans-serif;
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;padding:0 0 80px;}
-header{padding:20px 16px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;position:sticky;top:0;background:var(--bg);z-index:100;gap:10px;}
-.logo-icon{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
-.logo-text{font-size:16px;font-weight:800;letter-spacing:-0.5px;}
-.logo-sub{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-top:1px;}
+<div class="card">
+  <div class="slabel">COLAR ESTATÍSTICAS</div>
+  
+  <textarea id="inputStats" placeholder="Cole aqui as estatísticas do jogo..."
+  style="width:100%;height:120px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px;font-family:var(--mono);"></textarea>
+  
+  <button class="btn-analyze" onclick="analisarTexto()">⚡ ANALISAR TEXTO</button>
+</div>function analisarTexto() {
+  const texto = document.getElementById("inputStats").value;
 
-/* STATS BAR */
-.stats-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-bottom:1px solid var(--border);}
-.stat-item{background:var(--surface);padding:14px 8px;text-align:center;}
-.stat-value{font-family:var(--mono);font-size:20px;font-weight:500;line-height:1;margin-bottom:3px;}
-.stat-value.green{color:var(--accent)}.stat-value.red{color:var(--red)}.stat-value.white{color:var(--text)}.stat-value.yellow{color:var(--yellow)}
-.stat-label{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-family:var(--mono);}
-
-/* MERCADOS STATS */
-.markets-section{padding:12px 16px;border-bottom:1px solid var(--border);}
-.markets-title{font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;}
-.market-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-.msc{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;}
-.msc-name{font-family:var(--mono);font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
-.msc-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;}
-.msc-label{font-family:var(--mono);font-size:9px;color:var(--muted);}
-.msc-val{font-family:var(--mono);font-size:13px;}
-.msc-val.green{color:var(--accent)}.msc-val.red{color:var(--red)}.msc-val.yellow{color:var(--yellow)}
-.msc-div{height:1px;background:var(--border);margin:5px 0;}
-.msc-rate{font-family:var(--mono);font-size:15px;font-weight:500;text-align:center;margin-top:4px;color:var(--yellow);}
-
-/* FORM */
-.form-section{padding:16px;border-bottom:1px solid var(--border);}
-.form-title{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;font-family:var(--mono);margin-bottom:14px;}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
-.field{display:flex;flex-direction:column;gap:4px;}
-.field label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-family:var(--mono);}
-.field input{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:13px;padding:8px 10px;outline:none;transition:border-color 0.2s;width:100%;}
-.field input:focus{border-color:var(--accent);}
-
-/* MERCADO BLOCK */
-.mkt-block{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;}
-.mkt-title{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
-.mkt-title .dot{width:6px;height:6px;border-radius:50%;}
-.mkt-title.ht{color:var(--accent)}.mkt-title.ht .dot{background:var(--accent);}
-.mkt-title.ft15{color:var(--accent2)}.mkt-title.ft15 .dot{background:var(--accent2);}
-.mkt-title.ft25{color:var(--yellow)}.mkt-title.ft25 .dot{background:var(--yellow);}
-
-/* STAKE ROW */
-.stake-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
-.stake-label{font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;}
-.stake-input{background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:14px;padding:8px 12px;outline:none;width:100px;text-align:center;}
-.stake-input:focus{border-color:var(--accent);}
-.stake-input.ft15:focus{border-color:var(--accent2);}
-.stake-input.ft25:focus{border-color:var(--yellow);}
-
-/* RESULT BUTTONS */
-.r2{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:0;}
-.rbtn{padding:10px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--muted);font-family:var(--mono);font-size:11px;cursor:pointer;transition:all 0.2s;text-align:center;}
-.rbtn.selected-green{background:rgba(0,229,160,0.12);border-color:var(--accent);color:var(--accent);}
-.rbtn.selected-red{background:rgba(255,59,92,0.12);border-color:var(--red);color:var(--red);}
-.rbtn.selected-skip{background:rgba(90,100,117,0.15);border-color:var(--muted);color:var(--muted);}
-
-/* GOLS */
-.gols-section{margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
-.gols-title{font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;}
-.gols-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.gols-field{display:flex;flex-direction:column;gap:4px;}
-.gols-label{font-family:var(--mono);font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
-.gols-input{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:12px;padding:8px 10px;outline:none;width:100%;}
-.gols-input:focus{border-color:var(--accent2);}
-.gols-hint{font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:4px;}
-
-/* BUTTONS */
-.btn-add{width:100%;padding:13px;background:var(--accent);color:#000;border:none;border-radius:8px;font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;margin-top:6px;}
-.btn-add:hover{opacity:0.85;}
-.btn-exp{width:100%;padding:10px;margin-top:8px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:var(--mono);font-size:11px;cursor:pointer;letter-spacing:1px;}
-.btn-exp:hover{border-color:var(--accent2);color:var(--accent2);}
-.btn-imp{width:100%;padding:10px;margin-top:6px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:var(--mono);font-size:11px;cursor:pointer;letter-spacing:1px;}
-.btn-imp:hover{border-color:var(--yellow);color:var(--yellow);}
-
-/* HISTÓRICO */
-.table-section{padding:16px;}
-.table-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.table-title{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;font-family:var(--mono);}
-.entry-count{font-family:var(--mono);font-size:11px;color:var(--accent);background:rgba(0,229,160,0.08);padding:3px 10px;border-radius:20px;}
-.entries-list{display:flex;flex-direction:column;gap:10px;}
-.entry-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;animation:si 0.3s ease;}
-@keyframes si{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-.entry-match{font-size:14px;font-weight:700;letter-spacing:-0.3px;margin-bottom:3px;}
-.entry-meta{font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:10px;}
-
-/* MERCADOS NO CARD */
-.mkts-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px;}
-.mc{background:var(--surface2);border-radius:6px;padding:8px 6px;text-align:center;border:1px solid var(--border);}
-.mc-name{font-family:var(--mono);font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
-.mc-res{font-family:var(--mono);font-size:12px;font-weight:500;}
-.mc-res.green{color:var(--accent)}.mc-res.red{color:var(--red)}.mc-res.skip{color:var(--muted)}
-.mc-stake{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:3px;}
-
-/* GOLS NO CARD */
-.gols-card-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
-.gol-pill-ht{font-family:var(--mono);font-size:10px;background:rgba(0,229,160,0.10);color:var(--accent);padding:2px 8px;border-radius:10px;}
-.gol-pill-ft{font-family:var(--mono);font-size:10px;background:rgba(255,204,0,0.10);color:var(--yellow);padding:2px 8px;border-radius:10px;}
-.gol-pill-label{font-family:var(--mono);font-size:9px;color:var(--muted);padding:2px 0;}
-
-.entry-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
-.entry-date{font-family:var(--mono);font-size:10px;color:var(--muted);}
-.entry-actions{display:flex;gap:6px;}
-.btn-edit{background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:10px;padding:3px 8px;border-radius:4px;font-family:var(--mono);}
-.btn-edit:hover{border-color:var(--yellow);color:var(--yellow);}
-.btn-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px;}
-.btn-del:hover{color:var(--red);}
-
-.empty-state{text-align:center;padding:50px 20px;color:var(--muted);}
-.empty-icon{font-size:36px;margin-bottom:12px;opacity:0.4;}
-.empty-text{font-family:var(--mono);font-size:12px;letter-spacing:1px;}
-
-/* MODAL */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:999;align-items:flex-start;justify-content:center;padding:20px 16px;overflow-y:auto;}
-.modal-overlay.open{display:flex;}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;width:100%;max-width:480px;margin:auto;}
-.modal-title{font-size:14px;font-weight:700;margin-bottom:16px;color:var(--accent);}
-.modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;}
-.btn-save{padding:11px;background:var(--accent);color:#000;border:none;border-radius:8px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;}
-.btn-cancel{padding:11px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:var(--mono);font-size:12px;cursor:pointer;}
-</style>
-</head>
-<body>
-
-<header>
-  <div class="logo-icon">⚽</div>
-  <div>
-    <div class="logo-text">Bot Tracker</div>
-    <div class="logo-sub">Fase Coleta · Min. 1</div>
-  </div>
-</header>
-
-<!-- Stats -->
-<div class="stats-bar">
-  <div class="stat-item"><div class="stat-value white" id="s-total">0</div><div class="stat-label">Jogos</div></div>
-  <div class="stat-item"><div class="stat-value green" id="s-greens">0</div><div class="stat-label">Greens</div></div>
-  <div class="stat-item"><div class="stat-value red" id="s-reds">0</div><div class="stat-label">Reds</div></div>
-</div>
-
-<!-- Mercados -->
-<div class="markets-section">
-  <div class="markets-title">Taxa de acerto por mercado</div>
-  <div class="market-stats-grid">
-    <div class="msc">
-      <div class="msc-name">Over 0.5 HT</div>
-      <div class="msc-row"><span class="msc-label">Green</span><span class="msc-val green" id="ht-g">0</span></div>
-      <div class="msc-row"><span class="msc-label">Red</span><span class="msc-val red" id="ht-r">0</span></div>
-      <div class="msc-div"></div>
-      <div class="msc-rate" id="ht-t">—</div>
-    </div>
-    <div class="msc">
-      <div class="msc-name">Over 1.5 FT</div>
-      <div class="msc-row"><span class="msc-label">Green</span><span class="msc-val green" id="f15-g">0</span></div>
-      <div class="msc-row"><span class="msc-label">Red</span><span class="msc-val red" id="f15-r">0</span></div>
-      <div class="msc-div"></div>
-      <div class="msc-rate" id="f15-t">—</div>
-    </div>
-    <div class="msc">
-      <div class="msc-name">Over 2.5 FT</div>
-      <div class="msc-row"><span class="msc-label">Green</span><span class="msc-val green" id="f25-g">0</span></div>
-      <div class="msc-row"><span class="msc-label">Red</span><span class="msc-val red" id="f25-r">0</span></div>
-      <div class="msc-div"></div>
-      <div class="msc-rate" id="f25-t">—</div>
-    </div>
-  </div>
-</div>
-
-<!-- Formulário -->
-<div class="form-section">
-  <div class="form-title">Nova Entrada</div>
-
-  <div class="form-grid">
-    <div class="field"><label>Data</label><input type="date" id="f-data"></div>
-    <div class="field"><label>Liga</label><input type="text" id="f-liga" placeholder="Ex: Serie A"></div>
-  </div>
-  <div class="field" style="margin-bottom:12px"><label>Jogo</label><input type="text" id="f-jogo" placeholder="Ex: Flamengo vs Palmeiras"></div>
-
-  <!-- HT -->
-  <div class="mkt-block">
-    <div class="mkt-title ht"><div class="dot"></div>Over 0.5 HT</div>
-    <div class="stake-row">
-      <span class="stake-label">Stake R$</span>
-      <input type="number" class="stake-input" id="ht-s" placeholder="1.00" step="0.01" min="0">
-    </div>
-    <div class="r2">
-      <div class="rbtn" id="ht-bg" onclick="selR('ht','green')">✅ Green</div>
-      <div class="rbtn" id="ht-br" onclick="selR('ht','red')">❌ Red</div>
-      <div class="rbtn" id="ht-bs" onclick="selR('ht','skip')">— Skip</div>
-    </div>
-  </div>
-
-  <!-- FT15 -->
-  <div class="mkt-block">
-    <div class="mkt-title ft15"><div class="dot"></div>Over 1.5 FT</div>
-    <div class="stake-row">
-      <span class="stake-label">Stake R$</span>
-      <input type="number" class="stake-input ft15" id="f15-s" placeholder="1.00" step="0.01" min="0">
-    </div>
-    <div class="r2">
-      <div class="rbtn" id="f15-bg" onclick="selR('f15','green')">✅ Green</div>
-      <div class="rbtn" id="f15-br" onclick="selR('f15','red')">❌ Red</div>
-      <div class="rbtn" id="f15-bs" onclick="selR('f15','skip')">— Skip</div>
-    </div>
-  </div>
-
-  <!-- FT25 -->
-  <div class="mkt-block">
-    <div class="mkt-title ft25"><div class="dot"></div>Over 2.5 FT</div>
-    <div class="stake-row">
-      <span class="stake-label">Stake R$</span>
-      <input type="number" class="stake-input ft25" id="f25-s" placeholder="1.00" step="0.01" min="0">
-    </div>
-    <div class="r2">
-      <div class="rbtn" id="f25-bg" onclick="selR('f25','green')">✅ Green</div>
-      <div class="rbtn" id="f25-br" onclick="selR('f25','red')">❌ Red</div>
-      <div class="rbtn" id="f25-bs" onclick="selR('f25','skip')">— Skip</div>
-    </div>
-  </div>
-
-  <!-- Gols -->
-  <div class="gols-section">
-    <div class="gols-title">⚽ Minutos dos Gols</div>
-    <div class="gols-grid">
-      <div class="gols-field">
-        <div class="gols-label">1º Tempo (HT)</div>
-        <input type="text" class="gols-input" id="gols-ht" placeholder="Ex: 13, 27, 44">
-        <div class="gols-hint">separe por vírgula</div>
-      </div>
-      <div class="gols-field">
-        <div class="gols-label">2º Tempo (FT)</div>
-        <input type="text" class="gols-input" id="gols-ft" placeholder="Ex: 56, 78, 83">
-        <div class="gols-hint">separe por vírgula</div>
-      </div>
-    </div>
-  </div>
-
-  <button class="btn-add" onclick="addEntry()">+ Adicionar Entrada</button>
-  <button class="btn-exp" onclick="exportData()">⬇ Exportar JSON</button>
-  <button class="btn-imp" onclick="document.getElementById('fi').click()">⬆ Importar JSON</button>
-  <input type="file" id="fi" accept=".json" style="display:none" onchange="importData(event)">
-</div>
-
-<!-- Histórico -->
-<div class="table-section">
-  <div class="table-header">
-    <div class="table-title">Histórico</div>
-    <div class="entry-count" id="ec">0 entradas</div>
-  </div>
-  <div class="entries-list" id="el">
-    <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">Nenhuma entrada ainda</div></div>
-  </div>
-</div>
-
-<!-- Modal edição -->
-<div class="modal-overlay" id="mo">
-  <div class="modal">
-    <div class="modal-title">✏️ Editar Entrada</div>
-    <input type="hidden" id="eid">
-    <div class="form-grid" style="margin-bottom:10px">
-      <div class="field"><label>Data</label><input type="date" id="e-data"></div>
-      <div class="field"><label>Liga</label><input type="text" id="e-liga"></div>
-    </div>
-    <div class="field" style="margin-bottom:12px"><label>Jogo</label><input type="text" id="e-jogo"></div>
-
-    <div class="mkt-block">
-      <div class="mkt-title ht"><div class="dot"></div>Over 0.5 HT</div>
-      <div class="stake-row"><span class="stake-label">Stake R$</span><input type="number" class="stake-input" id="e-ht-s" step="0.01" min="0"></div>
-      <div class="r2">
-        <div class="rbtn" id="e-ht-bg" onclick="selER('ht','green')">✅ Green</div>
-        <div class="rbtn" id="e-ht-br" onclick="selER('ht','red')">❌ Red</div>
-        <div class="rbtn" id="e-ht-bs" onclick="selER('ht','skip')">— Skip</div>
-      </div>
-    </div>
-    <div class="mkt-block">
-      <div class="mkt-title ft15"><div class="dot"></div>Over 1.5 FT</div>
-      <div class="stake-row"><span class="stake-label">Stake R$</span><input type="number" class="stake-input ft15" id="e-f15-s" step="0.01" min="0"></div>
-      <div class="r2">
-        <div class="rbtn" id="e-f15-bg" onclick="selER('f15','green')">✅ Green</div>
-        <div class="rbtn" id="e-f15-br" onclick="selER('f15','red')">❌ Red</div>
-        <div class="rbtn" id="e-f15-bs" onclick="selER('f15','skip')">— Skip</div>
-      </div>
-    </div>
-    <div class="mkt-block">
-      <div class="mkt-title ft25"><div class="dot"></div>Over 2.5 FT</div>
-      <div class="stake-row"><span class="stake-label">Stake R$</span><input type="number" class="stake-input ft25" id="e-f25-s" step="0.01" min="0"></div>
-      <div class="r2">
-        <div class="rbtn" id="e-f25-bg" onclick="selER('f25','green')">✅ Green</div>
-        <div class="rbtn" id="e-f25-br" onclick="selER('f25','red')">❌ Red</div>
-        <div class="rbtn" id="e-f25-bs" onclick="selER('f25','skip')">— Skip</div>
-      </div>
-    </div>
-
-    <div class="gols-section">
-      <div class="gols-title">⚽ Minutos dos Gols</div>
-      <div class="gols-grid">
-        <div class="gols-field">
-          <div class="gols-label">1º Tempo (HT)</div>
-          <input type="text" class="gols-input" id="e-gols-ht" placeholder="Ex: 13, 27, 44">
-        </div>
-        <div class="gols-field">
-          <div class="gols-label">2º Tempo (FT)</div>
-          <input type="text" class="gols-input" id="e-gols-ft" placeholder="Ex: 56, 78">
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-actions">
-      <button class="btn-save" onclick="saveEdit()">💾 Salvar</button>
-      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-<script>
-const SK='btv4_coleta';
-let entries=[];
-const MR={ht:'',f15:'',f25:''};
-const ER={ht:'',f15:'',f25:''};
-
-function load(){
-  try{const s=localStorage.getItem(SK);if(s)entries=JSON.parse(s);}catch(e){entries=[];}
-  document.getElementById('f-data').valueAsDate=new Date();
-  render();
-}
-function save(){localStorage.setItem(SK,JSON.stringify(entries));}
-
-function selR(m,r){
-  MR[m]=r;
-  ['green','red','skip'].forEach(x=>{
-    const b=document.getElementById(m+'-b'+x[0]);
-    if(b){b.className='rbtn';if(x===r)b.classList.add('selected-'+r);}
-  });
-}
-function selER(m,r){
-  ER[m]=r;
-  ['green','red','skip'].forEach(x=>{
-    const b=document.getElementById('e-'+m+'-b'+x[0]);
-    if(b){b.className='rbtn';if(x===r)b.classList.add('selected-'+r);}
-  });
-}
-
-function parseGols(str){
-  if(!str||!str.trim())return[];
-  return str.split(/[,;.\s]+/).map(v=>parseInt(v.trim())).filter(v=>!isNaN(v)&&v>0).sort((a,b)=>a-b);
-}
-
-function addEntry(){
-  const data=document.getElementById('f-data').value;
-  const liga=document.getElementById('f-liga').value.trim();
-  const jogo=document.getElementById('f-jogo').value.trim();
-  if(!data||!jogo){alert('Preencha data e jogo!');return;}
-
-  const ht={stake:parseFloat(document.getElementById('ht-s').value)||0,resultado:MR.ht};
-  const f15={stake:parseFloat(document.getElementById('f15-s').value)||0,resultado:MR.f15};
-  const f25={stake:parseFloat(document.getElementById('f25-s').value)||0,resultado:MR.f25};
-  const golsHT=parseGols(document.getElementById('gols-ht').value);
-  const golsFT=parseGols(document.getElementById('gols-ft').value);
-
-  entries.unshift({id:Date.now(),data,liga,jogo,ht,f15,f25,golsHT,golsFT});
-  save();clearForm();render();
-}
-
-function clearForm(){
-  document.getElementById('f-liga').value='';
-  document.getElementById('f-jogo').value='';
-  document.getElementById('f-data').valueAsDate=new Date();
-  document.getElementById('ht-s').value='';
-  document.getElementById('f15-s').value='';
-  document.getElementById('f25-s').value='';
-  document.getElementById('gols-ht').value='';
-  document.getElementById('gols-ft').value='';
-  ['ht','f15','f25'].forEach(m=>{
-    MR[m]='';
-    ['g','r','s'].forEach(x=>{const b=document.getElementById(m+'-b'+x);if(b)b.className='rbtn';});
-  });
-}
-
-function delEntry(id){
-  if(!confirm('Remover?'))return;
-  entries=entries.filter(e=>e.id!==id);
-  save();render();
-}
-
-function openEdit(id){
-  const e=entries.find(x=>x.id===id);if(!e)return;
-  document.getElementById('eid').value=id;
-  document.getElementById('e-data').value=e.data;
-  document.getElementById('e-liga').value=e.liga||'';
-  document.getElementById('e-jogo').value=e.jogo;
-  document.getElementById('e-ht-s').value=e.ht?.stake||'';
-  document.getElementById('e-f15-s').value=e.f15?.stake||'';
-  document.getElementById('e-f25-s').value=e.f25?.stake||'';
-  document.getElementById('e-gols-ht').value=(e.golsHT||[]).join(', ');
-  document.getElementById('e-gols-ft').value=(e.golsFT||[]).join(', ');
-  ['ht','f15','f25'].forEach(m=>{
-    const res=e[m]?.resultado||'';
-    ER[m]=res;
-    ['green','red','skip'].forEach(x=>{
-      const b=document.getElementById('e-'+m+'-b'+x[0]);
-      if(b){b.className='rbtn';if(x===res)b.classList.add('selected-'+x);}
-    });
-  });
-  document.getElementById('mo').classList.add('open');
-  window.scrollTo(0,0);
-}
-
-function closeModal(){document.getElementById('mo').classList.remove('open');}
-
-function saveEdit(){
-  const id=parseInt(document.getElementById('eid').value);
-  const idx=entries.findIndex(x=>x.id===id);if(idx===-1)return;
-  entries[idx]={
-    ...entries[idx],
-    data:document.getElementById('e-data').value,
-    liga:document.getElementById('e-liga').value.trim(),
-    jogo:document.getElementById('e-jogo').value.trim(),
-    ht:{stake:parseFloat(document.getElementById('e-ht-s').value)||0,resultado:ER.ht},
-    f15:{stake:parseFloat(document.getElementById('e-f15-s').value)||0,resultado:ER.f15},
-    f25:{stake:parseFloat(document.getElementById('e-f25-s').value)||0,resultado:ER.f25},
-    golsHT:parseGols(document.getElementById('e-gols-ht').value),
-    golsFT:parseGols(document.getElementById('e-gols-ft').value),
-  };
-  save();closeModal();render();
-}
-
-function exportData(){
-  if(!entries.length){alert('Nenhuma entrada!');return;}
-  const b=new Blob([JSON.stringify(entries,null,2)],{type:'application/json'});
-  const u=URL.createObjectURL(b);
-  const a=document.createElement('a');
-  a.href=u;a.download='btcoleta_'+new Date().toISOString().slice(0,10)+'.json';
-  a.click();URL.revokeObjectURL(u);
-}
-
-function importData(ev){
-  const f=ev.target.files[0];if(!f)return;
-  const r=new FileReader();
-  r.onload=function(e){
-    try{
-      const imp=JSON.parse(e.target.result);
-      if(!Array.isArray(imp)){alert('JSON inválido!');return;}
-      const ids=new Set(entries.map(x=>x.id));
-      const nw=imp.filter(x=>!ids.has(x.id));
-      entries=[...entries,...nw].sort((a,b)=>b.id-a.id);
-      save();render();
-      alert('✅ '+nw.length+' entradas importadas! Total: '+entries.length);
-    }catch(err){alert('Erro: '+err.message);}
-  };
-  r.readAsText(f);ev.target.value='';
-}
-
-function render(){
-  const tot=entries.length;
-  let htG=0,htR=0,f15G=0,f15R=0,f25G=0,f25R=0,totG=0,totR=0;
-
-  entries.forEach(e=>{
-    [['ht',e.ht],['f15',e.f15],['f25',e.f25]].forEach(([k,d])=>{
-      if(!d||!d.resultado||d.resultado==='skip')return;
-      if(d.resultado==='green'){
-        if(k==='ht')htG++;
-        if(k==='f15')f15G++;
-        if(k==='f25')f25G++;
-        totG++;
-      } else {
-        if(k==='ht')htR++;
-        if(k==='f15')f15R++;
-        if(k==='f25')f25R++;
-        totR++;
-      }
-    });
-  });
-
-  document.getElementById('s-total').textContent=tot;
-  document.getElementById('s-greens').textContent=totG;
-  document.getElementById('s-reds').textContent=totR;
-
-  const rt=(g,r)=>(g+r)>0?Math.round(g/(g+r)*100)+'%':'—';
-  document.getElementById('ht-g').textContent=htG;
-  document.getElementById('ht-r').textContent=htR;
-  document.getElementById('ht-t').textContent=rt(htG,htR);
-  document.getElementById('f15-g').textContent=f15G;
-  document.getElementById('f15-r').textContent=f15R;
-  document.getElementById('f15-t').textContent=rt(f15G,f15R);
-  document.getElementById('f25-g').textContent=f25G;
-  document.getElementById('f25-r').textContent=f25R;
-  document.getElementById('f25-t').textContent=rt(f25G,f25R);
-  document.getElementById('ec').textContent=tot+' '+(tot===1?'entrada':'entradas');
-
-  const list=document.getElementById('el');
-  if(!tot){
-    list.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">Nenhuma entrada ainda</div></div>';
+  if (!texto) {
+    alert("Cole as estatísticas primeiro.");
     return;
   }
 
-  list.innerHTML=entries.map(e=>{
-    const df=e.data?new Date(e.data+'T12:00:00').toLocaleDateString('pt-BR'):'—';
-    const ht=e.golsHT||[];
-    const ft=e.golsFT||[];
-    const allGols=[...ht,...ft].sort((a,b)=>a-b);
+  const dados = extrairDados(texto);
 
-    const mc=(d,nm)=>{
-      if(!d||!d.resultado||d.resultado==='skip')
-        return`<div class="mc"><div class="mc-name">${nm}</div><div class="mc-res skip">—</div></div>`;
-      return`<div class="mc">
-        <div class="mc-name">${nm}</div>
-        <div class="mc-res ${d.resultado}">${d.resultado==='green'?'✅':'❌'}</div>
-        <div class="mc-stake">R$${(d.stake||0).toFixed(2)}</div>
-      </div>`;
-    };
+  // Preenche automaticamente os campos do app
+  preencherCampos(dados);
 
-    const golsHtml=allGols.length>0
-      ?`<div class="gols-card-row">
-          ${ht.map(g=>`<span class="gol-pill-ht">${g}'</span>`).join('')}
-          ${ft.map(g=>`<span class="gol-pill-ft">${g}'</span>`).join('')}
-        </div>`
-      :`<div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:8px">sem gols registrados</div>`;
+  // Usa sua função normal
+  analyze();
+}function extrairDados(texto) {
 
-    return`<div class="entry-card">
-      <div class="entry-match">${e.jogo}</div>
-      <div class="entry-meta">${df}${e.liga?' · '+e.liga:''} · Total: ${allGols.length} gol${allGols.length!==1?'s':''}</div>
-      <div class="mkts-row">${mc(e.ht,'0.5 HT')}${mc(e.f15,'1.5 FT')}${mc(e.f25,'2.5 FT')}</div>
-      ${golsHtml}
-      <div class="entry-bottom">
-        <div class="entry-date">HT: ${ht.join(', ')||'—'} · 2T: ${ft.join(', ')||'—'}</div>
-        <div class="entry-actions">
-          <button class="btn-edit" onclick="openEdit(${e.id})">✏️</button>
-          <button class="btn-del" onclick="delEntry(${e.id})">✕</button>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
+  function pegarNumeros(regex) {
+    const match = texto.match(regex);
+    if (!match) return [0,0];
+    return match[0].match(/\d+\.?\d*/g).map(Number);
+  }
+
+  return {
+    posse: pegarNumeros(/Posse de bola.*$/im),
+    gm: pegarNumeros(/Média de gols por partida.*$/im),
+    gs: pegarNumeros(/gols sofridos por partida.*$/im),
+    cg: pegarNumeros(/Chutes no Gol.*$/im),
+    cf: pegarNumeros(/Chutes Fora.*$/im),
+    ap: pegarNumeros(/Ataques Perigosos.*$/im),
+    at: pegarNumeros(/Ataques[^P].*$/im),
+    esc: pegarNumeros(/escanteios.*$/im),
+  };
+}function preencherCampos(d) {
+
+  document.getElementById('posse_h').value = d.posse[0] || '';
+  document.getElementById('posse_a').value = d.posse[1] || '';
+
+  document.getElementById('gm_h').value = d.gm[0] || '';
+  document.getElementById('gm_a').value = d.gm[1] || '';
+
+  document.getElementById('gs_h').value = d.gs[0] || '';
+  document.getElementById('gs_a').value = d.gs[1] || '';
+
+  document.getElementById('cg_h').value = d.cg[0] || '';
+  document.getElementById('cg_a').value = d.cg[1] || '';
+
+  document.getElementById('cf_h').value = d.cf[0] || '';
+  document.getElementById('cf_a').value = d.cf[1] || '';
+
+  document.getElementById('ap_h').value = d.ap[0] || '';
+  document.getElementById('ap_a').value = d.ap[1] || '';
+
+  document.getElementById('at_h').value = d.at[0] || '';
+  document.getElementById('at_a').value = d.at[1] || '';
+
+  document.getElementById('esc_h').value = d.esc[0] || '';
+  document.getElementById('esc_a').value = d.esc[1] || '';
+}let gameType = '';
+
+if (ap_diff_pct > 30 && dom_cg > 4.5) {
+  gameType = 'dominance';
+} 
+else if (cg_total > 8 && ap_total > 90) {
+  gameType = 'open';
+} 
+else {
+  gameType = 'low';
 }
 
-load();
-</script>
-</body>
-</html>
+if (score < 30) {
+  decision = 'SKIP';
+  decSub = 'Pouca confiança';
+}
+else if (gameType === 'dominance') {
+  decision = `ML ${dom_name}`;
+  decSub = 'Jogo de domínio';
+}
+else if (gameType === 'open') {
+  decision = 'Over 1.5 FT';
+  decSub = 'Jogo aberto';
+}
+else {
+  decision = 'SKIP';
+  decSub = 'Baixo volume';
+}
