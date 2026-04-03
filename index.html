@@ -432,3 +432,71 @@ function clearHistory() {
 </script>
 </body>
 </html>
+
+function analisarPartida() {
+  // 1. Pegar os valores que foram preenchidos nos campos
+  const h_ap = Number(document.getElementById('ap_h').value) || 0;
+  const a_ap = Number(document.getElementById('ap_a').value) || 0;
+  const h_cg = Number(document.getElementById('cg_h').value) || 0;
+  const a_cg = Number(document.getElementById('cg_a').value) || 0;
+
+  // 2. Cálculos para a lógica da imagem
+  const ap_total = h_ap + a_ap;
+  const cg_total = h_cg + a_cg;
+  
+  // Diferença percentual de Ataques Perigosos
+  const ap_diff_pct = ap_total > 0 ? (Math.abs(h_ap - a_ap) / ap_total) * 100 : 0;
+  
+  // Quem está dominando nos chutes ao gol
+  const dom_cg = Math.max(h_cg, a_cg);
+  const dom_name = h_cg > a_cg ? 'CASA' : 'FORA';
+
+  // 3. Score de Confiança (Exemplo: baseado no volume de ataques)
+  // Se você não tiver um cálculo de score pronto, aqui vai um simples:
+  const score = (ap_total / 2) + (cg_total * 5); 
+
+  // --- INÍCIO DO CÓDIGO DA SUA IMAGEM ---
+  let gameType = '';
+  let decision = '';
+  let decSub = '';
+
+  if (ap_diff_pct > 30 && dom_cg > 4.5) {
+    gameType = 'dominance';
+  } 
+  else if (cg_total > 8 && ap_total > 90) {
+    gameType = 'open';
+  } 
+  else {
+    gameType = 'low';
+  }
+
+  if (score < 30) {
+    decision = 'SKIP';
+    decSub = 'Pouca confiança';
+  }
+  else if (gameType === 'dominance') {
+    decision = `ML ${dom_name}`;
+    decSub = 'Jogo de domínio';
+  }
+  else if (gameType === 'open') {
+    decision = 'Over 1.5 FT';
+    decSub = 'Jogo aberto';
+  }
+  else {
+    decision = 'SKIP';
+    decSub = 'Baixo volume';
+  }
+  // --- FIM DO CÓDIGO DA SUA IMAGEM ---
+
+  // 4. Mostrar o resultado na tela (Decision Box)
+  const mainDiv = document.querySelector('.decision-main');
+  const subDiv = document.querySelector('.decision-sub');
+  
+  if(mainDiv && subDiv) {
+      mainDiv.innerText = decision;
+      subDiv.innerText = decSub;
+      
+      // Mostrar o card de resultado (caso esteja escondido)
+      document.querySelector('.result-card').style.display = 'block';
+  }
+}
