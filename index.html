@@ -1,93 +1,32 @@
-<div class="card">
-  <div class="slabel">COLAR ESTATÍSTICAS</div>
-  
-  <textarea id="inputStats" placeholder="Cole aqui as estatísticas do jogo..."
-  style="width:100%;height:120px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px;font-family:var(--mono);"></textarea>
-  
-  <button class="btn-analyze" onclick="analisarTexto()">⚡ ANALISAR TEXTO</button>
-</div>function analisarTexto() {
-  const texto = document.getElementById("inputStats").value;
-
-  if (!texto) {
-    alert("Cole as estatísticas primeiro.");
-    return;
-  }
-
-  const dados = extrairDados(texto);
-
-  // Preenche automaticamente os campos do app
-  preencherCampos(dados);
-
-  // Usa sua função normal
-  analyze();
-}function extrairDados(texto) {
-
-  function pegarNumeros(regex) {
-    const match = texto.match(regex);
-    if (!match) return [0,0];
-    return match[0].match(/\d+\.?\d*/g).map(Number);
-  }
-
-  return {
-    posse: pegarNumeros(/Posse de bola.*$/im),
-    gm: pegarNumeros(/Média de gols por partida.*$/im),
-    gs: pegarNumeros(/gols sofridos por partida.*$/im),
-    cg: pegarNumeros(/Chutes no Gol.*$/im),
-    cf: pegarNumeros(/Chutes Fora.*$/im),
-    ap: pegarNumeros(/Ataques Perigosos.*$/im),
-    at: pegarNumeros(/Ataques[^P].*$/im),
-    esc: pegarNumeros(/escanteios.*$/im),
-  };
-}function preencherCampos(d) {
-
-  document.getElementById('posse_h').value = d.posse[0] || '';
-  document.getElementById('posse_a').value = d.posse[1] || '';
-
-  document.getElementById('gm_h').value = d.gm[0] || '';
-  document.getElementById('gm_a').value = d.gm[1] || '';
-
-  document.getElementById('gs_h').value = d.gs[0] || '';
-  document.getElementById('gs_a').value = d.gs[1] || '';
-
-  document.getElementById('cg_h').value = d.cg[0] || '';
-  document.getElementById('cg_a').value = d.cg[1] || '';
-
-  document.getElementById('cf_h').value = d.cf[0] || '';
-  document.getElementById('cf_a').value = d.cf[1] || '';
-
-  document.getElementById('ap_h').value = d.ap[0] || '';
-  document.getElementById('ap_a').value = d.ap[1] || '';
-
-  document.getElementById('at_h').value = d.at[0] || '';
-  document.getElementById('at_a').value = d.at[1] || '';
-
-  document.getElementById('esc_h').value = d.esc[0] || '';
-  document.getElementById('esc_a').value = d.esc[1] || '';
-}let gameType = '';
-
-if (ap_diff_pct > 30 && dom_cg > 4.5) {
-  gameType = 'dominance';
-} 
-else if (cg_total > 8 && ap_total > 90) {
-  gameType = 'open';
-} 
-else {
-  gameType = 'low';
-}
-
-if (score < 30) {
-  decision = 'SKIP';
-  decSub = 'Pouca confiança';
-}
-else if (gameType === 'dominance') {
-  decision = `ML ${dom_name}`;
-  decSub = 'Jogo de domínio';
-}
-else if (gameType === 'open') {
-  decision = 'Over 1.5 FT';
-  decSub = 'Jogo aberto';
-}
-else {
-  decision = 'SKIP';
-  decSub = 'Baixo volume';
-}
+<!DOCTYPE html> 
+<html lang="pt-BR"> 
+<head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"> 
+  <title>BET SCOUT</title> 
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@300;400;600;700;900&display=swap" rel="stylesheet"> 
+  <style>
+    :root { --bg: #07080d; --surface: #0d0f18; --card: #111420; --border: #1a1d2e; --accent: #00ff88; --accent-dim: rgba(0,255,136,0.10); --accent2: #ff5533; --accent3: #3d9bff; --warn: #ffcc00; --text: #dde0f0; --muted: #4a4d6a; --mono: 'Space Mono', monospace; --sans: 'Barlow Condensed', sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; padding-bottom: 40px; }
+    body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(0,255,136,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,136,0.025) 1px, transparent 1px); background-size: 44px 44px; pointer-events: none; z-index: 0; }
+    .wrap { max-width: 600px; margin: 0 auto; padding: 20px 14px; position: relative; z-index: 1; }
+    header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+    .logo { font-family: var(--mono); font-size: 20px; font-weight: 700; letter-spacing: -1px; }
+    .logo em { color: var(--accent); font-style: normal; }
+    .logo-sub { font-size: 10px; letter-spacing: 3px; color: var(--muted); margin-top: 3px; }
+    .version { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; text-align: right; }
+    .tabs { display: flex; gap: 2px; margin-bottom: 20px; background: var(--surface); padding: 4px; border-radius: 10px; border: 1px solid var(--border); }
+    .tab { flex: 1; padding: 10px 4px; background: none; border: none; color: var(--muted); font-family: var(--sans); font-size: 14px; font-weight: 600; letter-spacing: 1px; cursor: pointer; border-radius: 7px; transition: all 0.2s; text-transform: uppercase; }
+    .tab.active { background: var(--card); color: var(--accent); border: 1px solid rgba(0,255,136,0.2); }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+    .slabel { font-size: 10px; letter-spacing: 3px; color: var(--muted); font-family: var(--mono); text-transform: uppercase; margin-bottom: 12px; }
+    .context-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 11px; letter-spacing: 2px; color: var(--muted); font-family: var(--mono); }
+    .field input, .field select { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: var(--sans); font-size: 16px; padding: 10px 12px; transition: border-color 0.2s; -webkit-appearance: none; }
+    .field input:focus, .field select:focus { outline: none; border-color: var(--accent); }
+    .stats-header { display: grid; grid-template-columns: 1fr 80px 80px; gap: 8px; margin-bottom: 6px; }
+    .stats-header span { font-size: 11px; letter-spacing: 2px; color:
