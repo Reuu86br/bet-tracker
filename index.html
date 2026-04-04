@@ -3,153 +3,159 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BET SCOUT v4 DASHBOARD PRO</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@300;400;600&display=swap" rel="stylesheet">
+<title>BET SCOUT</title>
 <style>
-:root{
-  --surface:#121212;
-  --text:#fff;
-  --border:#333;
-  --mono:'Space Mono',monospace;
-  --sans:'Barlow Condensed',sans-serif;
-  --btn-bg:#1e88e5;
-  --btn-hover:#1565c0;
-  --good:#43a047;
-  --medium:#fbc02d;
-  --bad:#e53935;
+:root {
+  --surface: #1e1e1e;
+  --border: #333;
+  --text: #fff;
+  --mono: monospace;
 }
-body{margin:0;font-family:var(--sans);background:var(--surface);color:var(--text);}
-.container{max-width:1000px;margin:auto;padding:20px;}
-h1{text-align:center;margin-bottom:20px;}
-.card{background:#1a1a1a;border-radius:10px;padding:15px;margin-bottom:20px;border:1px solid var(--border);}
-.slabel{font-weight:bold;margin-bottom:8px;}
-textarea{width:100%;height:120px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px;font-family:var(--mono);}
-.btn-analyze{background:var(--btn-bg);color:var(--text);border:none;padding:10px 20px;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:10px;}
-.btn-analyze:hover{background:var(--btn-hover);}
-.field-group{display:flex;gap:10px;margin-bottom:10px;align-items:center;}
-.field-group input{flex:1;padding:8px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:var(--mono);}
-.bar-container{height:15px;background:#222;border-radius:6px;margin-top:4px;overflow:hidden;}
-.bar{height:100%;border-radius:6px;}
-.result{padding:15px;border-radius:8px;background:#222;margin-top:10px;font-weight:bold;font-size:1.1em;}
-.history{max-height:250px;overflow-y:auto;background:#1b1b1b;padding:10px;border-radius:8px;font-family:var(--mono);}
-.icon{font-weight:bold;margin-right:6px;}
+body { background: var(--surface); color: var(--text); font-family: var(--mono); padding:20px; }
+.card { background:#2c2c2c; padding:15px; margin-bottom:15px; border-radius:8px; }
+.slabel { font-weight:bold; margin-bottom:5px; }
+button { padding:8px 12px; margin-top:5px; border:none; border-radius:6px; cursor:pointer; background:#4caf50; color:#fff; font-weight:bold; }
+table { width:100%; border-collapse:collapse; margin-top:15px; }
+th, td { border:1px solid var(--border); padding:6px; text-align:center; }
+th { background:#333; }
+.green { color:lime; font-weight:bold; }
+.red { color:red; font-weight:bold; }
 </style>
 </head>
 <body>
-<div class="container">
-<h1>BET SCOUT v4 DASHBOARD PRO</h1>
 
-<!-- INPUT -->
+<h1>BET SCOUT v4</h1>
+
+<!-- COLAR ESTATÍSTICAS -->
 <div class="card">
   <div class="slabel">COLAR ESTATÍSTICAS</div>
-  <textarea id="inputStats" placeholder="Cole aqui as estatísticas do jogo..."></textarea>
-  <button class="btn-analyze" onclick="analisarTexto()">⚡ ANALISAR TEXTO</button>
+  <textarea id="inputStats" placeholder="Cole aqui as estatísticas do jogo..." style="width:100%;height:120px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px;font-family:var(--mono);"></textarea>
+  <button onclick="analisarTexto()">⚡ ANALISAR TEXTO</button>
 </div>
 
-<!-- DADOS -->
-<div class="card" id="dataCard">
-  <div class="slabel">POSSE DE BOLA</div>
-  <div class="field-group"><input id="posse_h" placeholder="Mandante"><input id="posse_a" placeholder="Visitante"></div>
-  <div class="bar-container"><div class="bar" id="bar_posse"></div></div>
-
-  <div class="slabel">MÉDIA DE GOLS</div>
-  <div class="field-group"><input id="gm_h" placeholder="Mandante"><input id="gm_a" placeholder="Visitante"></div>
-  <div class="bar-container"><div class="bar" id="bar_gm"></div></div>
-
-  <div class="slabel">CHUTES NO GOL</div>
-  <div class="field-group"><input id="cg_h" placeholder="Mandante"><input id="cg_a" placeholder="Visitante"></div>
-  <div class="bar-container"><div class="bar" id="bar_cg"></div></div>
-
-  <div class="slabel">ATAQUES PERIGOSOS</div>
-  <div class="field-group"><input id="ap_h" placeholder="Mandante"><input id="ap_a" placeholder="Visitante"></div>
-  <div class="bar-container"><div class="bar" id="bar_ap"></div></div>
-
-  <div class="slabel">ESCANTEIOS</div>
-  <div class="field-group"><input id="esc_h" placeholder="Mandante"><input id="esc_a" placeholder="Visitante"></div>
-</div>
-
-<!-- RESULTADO -->
-<div class="card result" id="result">
-Decisão aparecerá aqui após análise...
+<!-- COLAR RESULTADO -->
+<div class="card">
+  <div class="slabel">COLAR RESULTADO</div>
+  <input type="text" id="inputResultado" placeholder="Ex: 2x1" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--border);margin-top:5px;font-family:var(--mono);">
+  <button onclick="adicionarResultado()">✅ ADICIONAR RESULTADO</button>
 </div>
 
 <!-- HISTÓRICO -->
-<div class="card history" id="history"><b>Histórico das análises:</b></div>
+<div class="card">
+  <div class="slabel">HISTÓRICO</div>
+  <table id="historico">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Previsão</th>
+        <th>Resultado</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Linhas geradas automaticamente -->
+      <tr><td>1</td><td>ML Esquerda</td><td></td><td></td></tr>
+      <tr><td>2</td><td>+0.5 Direita</td><td></td><td></td></tr>
+      <tr><td>3</td><td>Over 1.5</td><td></td><td></td></tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="4">Taxa de acerto: <span id="taxaAcerto">0%</span></td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
 
 <script>
-function analisarTexto(){
-  const texto=document.getElementById("inputStats").value;
-  if(!texto){alert("Cole as estatísticas primeiro.");return;}
-  const d=extrairDados(texto);
-  preencherCampos(d);
-  analyze(d);
-  atualizarBarras(d);
-  salvarHistorico(d);
+/* ==================== ANÁLISE DE ESTATÍSTICAS ==================== */
+function analisarTexto() {
+  const texto = document.getElementById("inputStats").value;
+  if (!texto) return;
+
+  const dados = extrairDados(texto);
+  preencherCampos(dados);
+  analyze(); // Função principal de análise do app
 }
 
-function extrairDados(texto){
-  function pegarNumeros(regex){
-    const match=texto.match(regex);
-    if(!match)return [0,0];
+function extrairDados(texto) {
+  function pegarNumeros(regex) {
+    const match = texto.match(regex);
+    if (!match) return [0,0];
     return match[0].match(/\d+\.?\d*/g).map(Number);
   }
-  return{
-    posse:pegarNumeros(/Posse de bola.*$/im),
-    gm:pegarNumeros(/Média de gols por partida.*$/im),
-    gs:pegarNumeros(/gols sofridos por partida.*$/im),
-    cg:pegarNumeros(/Chutes no Gol.*$/im),
-    cf:pegarNumeros(/Chutes Fora.*$/im),
-    ap:pegarNumeros(/Ataques Perigosos.*$/im),
-    at:pegarNumeros(/Ataques[^P].*$/im),
-    esc:pegarNumeros(/escanteios.*$/im)
+  return {
+    posse: pegarNumeros(/Posse de bola.*$/im),
+    gm: pegarNumeros(/Média de gols por partida.*$/im),
+    gs: pegarNumeros(/gols sofridos por partida.*$/im),
+    cg: pegarNumeros(/Chutes no Gol.*$/im),
+    cf: pegarNumeros(/Chutes Fora.*$/im),
+    ap: pegarNumeros(/Ataques Perigosos.*$/im),
+    at: pegarNumeros(/Ataques[^P].*$/im),
+    esc: pegarNumeros(/escanteios.*$/im),
   };
 }
 
-function preencherCampos(d){
-  ['posse','gm','gs','cg','cf','ap','at','esc'].forEach(f=>{
-    document.getElementById(f+'_h').value=d[f][0]||'';
-    document.getElementById(f+'_a').value=d[f][1]||'';
+function preencherCampos(d) {
+  ['posse','gm','gs','cg','cf','ap','at','esc'].forEach(key=>{
+    document.getElementById(key+'_h')?.value = d[key][0] || '';
+    document.getElementById(key+'_a')?.value = d[key][1] || '';
   });
 }
 
-function analyze(d){
-  const score=d.gm.reduce((a,b)=>a+b,0)*10;
-  const ap_diff_pct=Math.abs(d.ap[0]-d.ap[1])/Math.max(d.ap[0],1)*100;
-  const dom_cg=Math.max(d.cg[0],d.cg[1]);
-  const cg_total=d.cg[0]+d.cg[1];
-  const ap_total=d.ap[0]+d.ap[1];
-  const dom_name=d.posse[0]>d.posse[1]?'Mandante':'Visitante';
+/* ==================== ADICIONAR RESULTADO ==================== */
+function adicionarResultado() {
+  const resultadoInput = document.getElementById('inputResultado').value.trim();
+  if(!resultadoInput.match(/^\d+x\d+$/)) return;
 
-  let gameType='',decision='',decSub='',color='';
+  const [golsCasa, golsFora] = resultadoInput.split('x').map(Number);
+  const tbody = document.getElementById('historico').querySelector('tbody');
+  const ultimaLinha = tbody.rows[tbody.rows.length - 1];
+  if(!ultimaLinha) return;
 
-  if(ap_diff_pct>30 && dom_cg>4.5) gameType='dominance';
-  else if(cg_total>8 && ap_total>90) gameType='open';
-  else gameType='low';
+  // Decidir GREEN ou RED
+  let previsao = ultimaLinha.cells[1].textContent;
+  let status = '';
 
-  if(score<30){decision='SKIP';decSub='Pouca confiança';color='var(--bad)';}
-  else if(gameType==='dominance'){decision=`ML ${dom_name}`;decSub='Jogo de domínio';color='var(--good)';}
-  else if(gameType==='open'){decision='Over 1.5 FT';decSub='Jogo aberto';color='var(--medium)';}
-  else{decision='SKIP';decSub='Baixo volume';color='var(--bad)';}
+  if(previsao.startsWith('ML Esquerda') && golsCasa > golsFora) status='GREEN';
+  else if(previsao.startsWith('ML Direita') && golsFora > golsCasa) status='GREEN';
+  else if(previsao.includes('+0.5')) {
+    if(previsao.includes('Esquerda') && golsCasa >= 1) status='GREEN';
+    else if(previsao.includes('Direita') && golsFora >= 1) status='GREEN';
+    else status='RED';
+  }
+  else if(previsao.includes('Over 1.5')) {
+    if((golsCasa + golsFora) > 1) status='GREEN';
+    else status='RED';
+  }
+  else if(previsao.includes('Over 2.5')) {
+    if((golsCasa + golsFora) > 2) status='GREEN';
+    else status='RED';
+  }
+  else status='RED'; // padrão
 
-  document.getElementById('result').innerHTML=`<span class="icon">⚡</span><b>Decisão:</b> ${decision} | <b>Motivo:</b> ${decSub}`;
-  document.getElementById('result').style.background=color;
+  ultimaLinha.cells[2].textContent = resultadoInput;
+  ultimaLinha.cells[3].textContent = status;
+  ultimaLinha.cells[3].className = status==='GREEN'?'green':'red';
+
+  atualizarTaxaAcerto();
 }
 
-function atualizarBarras(d){
-  const maxVal=Math.max(...d.posse.concat(d.gm,d.cg,d.ap,d.esc,1));
-  function calcWidth(val){return Math.min(100,Math.round(val/maxVal*100))+'%';}
-  document.getElementById('bar_posse').style.width=calcWidth(Math.max(d.posse[0],d.posse[1]));
-  document.getElementById('bar_gm').style.width=calcWidth(d.gm[0]+d.gm[1]);
-  document.getElementById('bar_cg').style.width=calcWidth(d.cg[0]+d.cg[1]);
-  document.getElementById('bar_ap').style.width=calcWidth(d.ap[0]+d.ap[1]);
+function atualizarTaxaAcerto() {
+  const tbody = document.getElementById('historico').querySelector('tbody');
+  let total=0, green=0;
+  for(let r of tbody.rows){
+    if(r.cells[3].textContent) {
+      total++;
+      if(r.cells[3].textContent==='GREEN') green++;
+    }
+  }
+  const taxa = total>0?((green/total)*100).toFixed(1):0;
+  document.getElementById('taxaAcerto').textContent = taxa+'%';
 }
 
-function salvarHistorico(d){
-  const h=document.getElementById('history');
-  const timestamp=new Date().toLocaleTimeString();
-  const entry=`<div>[${timestamp}] P:${d.posse[0]}-${d.posse[1]} | G:${d.gm[0]}-${d.gm[1]} | CG:${d.cg[0]}-${d.cg[1]} | AP:${d.ap[0]}-${d.ap[1]} | ESC:${d.esc[0]}-${d.esc[1]}</div>`;
-  h.innerHTML=entry+h.innerHTML;
-}
+/* ==================== PLACEHOLDERS DE CAMPOS ==================== */
+/* Você precisa ter campos com ids: posse_h, posse_a, gm_h, gm_a, gs_h, gs_a, cg_h, cg_a, cf_h, cf_a, ap_h, ap_a, at_h, at_a, esc_h, esc_a */
 </script>
+
 </body>
 </html>
