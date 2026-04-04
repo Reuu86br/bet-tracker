@@ -3,216 +3,153 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BET SCOUT v4 - Completo</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<title>BET SCOUT v4 DASHBOARD PRO</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#07080d; --surface:#0d0f18; --card:#111420; --border:#1a1d2e;
-  --accent:#00ff88; --accent-dim:rgba(0,255,136,0.1);
-  --accent2:#ff5533; --accent3:#3d9bff; --warn:#ffcc00;
-  --text:#dde0f0; --muted:#4a4d6a;
-  --mono:'Space Mono', monospace; --sans:'Barlow Condensed', sans-serif;
+:root{
+  --surface:#121212;
+  --text:#fff;
+  --border:#333;
+  --mono:'Space Mono',monospace;
+  --sans:'Barlow Condensed',sans-serif;
+  --btn-bg:#1e88e5;
+  --btn-hover:#1565c0;
+  --good:#43a047;
+  --medium:#fbc02d;
+  --bad:#e53935;
 }
-*{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;padding-bottom:40px;}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,136,0.025) 1px,transparent 1px),linear-gradient(90deg, rgba(0,255,136,0.025) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0;}
-.wrap{max-width:600px;margin:0 auto;padding:20px 14px;position:relative;z-index:1;}
-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;padding-bottom:14px;border-bottom:1px solid var(--border);}
-.logo{font-family:var(--mono);font-size:20px;font-weight:700;letter-spacing:-1px;}
-.logo em{color:var(--accent);font-style:normal;}
-.logo-sub{font-size:10px;letter-spacing:3px;color:var(--muted);margin-top:3px;}
-.version{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-align:right;}
-.tabs{display:flex;gap:2px;margin-bottom:20px;background:var(--surface);padding:4px;border-radius:10px;border:1px solid var(--border);}
-.tab{flex:1;padding:10px 4px;background:none;border:none;color:var(--muted);font-family:var(--sans);font-size:14px;font-weight:600;letter-spacing:1px;cursor:pointer;border-radius:7px;transition: all 0.2s;text-transform:uppercase;}
-.tab.active{background:var(--card);color:var(--accent);border:1px solid rgba(0,255,136,0.2);}
-.panel{display:none;}
-.panel.active{display:block;}
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;}
-.slabel{font-size:10px;letter-spacing:3px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;margin-bottom:12px;}
-.context-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
-.field{display:flex;flex-direction:column;gap:5px;}
-.field label{font-size:11px;letter-spacing:2px;color:var(--muted);font-family:var(--mono);}
-.field input, .field select{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:16px;padding:10px 12px;transition:border-color 0.2s;-webkit-appearance:none;}
-.field input:focus, .field select:focus{outline:none;border-color:var(--accent);}
-.stats-header{display:grid;grid-template-columns:1fr 80px 80px;gap:8px;margin-bottom:6px;}
-.stats-header span{font-size:11px;letter-spacing:2px;color:var(--accent);font-family:var(--mono);text-align:center;}
-.stats-header span:first-child{text-align:left;}
-.stat-row{display:grid;grid-template-columns:1fr 80px 80px;gap:8px;align-items:center;margin-bottom:8px;}
-.stat-name{font-size:14px;color:var(--muted);}
-.stat-row input{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:15px;padding:8px;text-align:center;transition:border-color 0.2s;width:100%;}
-.stat-row input:focus{outline:none;border-color:var(--accent);}
-.btn-analyze{width:100%;padding:16px;background:var(--accent);color:#000;border:none;border-radius:10px;font-family:var(--sans);font-size:22px;font-weight:900;letter-spacing:4px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;margin-bottom:20px;-webkit-tap-highlight-color:transparent;}
-.btn-analyze:active{transform:scale(0.98);}
-.result-card{display:none;animation:fadeUp 0.35s ease;}
-.result-card.show{display:block;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
-.score-row{display:flex;align-items:center;gap:16px;margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--border);}
-.score-ring{position:relative;width:88px;height:88px;flex-shrink:0;}
-.score-ring svg{transform:rotate(-90deg);}
-.score-ring-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.score-num{font-family:var(--mono);font-size:26px;font-weight:700;line-height:1;}
-.score-lbl{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
-.score-meta{flex:1;}
-.score-tier{font-size:28px;font-weight:900;letter-spacing:2px;line-height:1;margin-bottom:5px;}
-.score-desc{font-size:13px;color:var(--muted);line-height:1.5;}
-.market-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
-.market-item{display:flex;align-items:center;gap:10px;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);}
-.market-item.strong{border-color:rgba(0,255,136,0.4);background:rgba(0,255,136,0.05);}
-.market-item.medium{border-color:rgba(255,204,0,0.3);background:rgba(255,204,0,0.04);}
-.market-item.weak{border-color:rgba(255,85,51,0.3);background:rgba(255,85,51,0.04);opacity:0.7;}
-.market-badge{font-family:var(--mono);font-size:12px;font-weight:700;padding:4px 9px;border-radius:6px;white-space:nowrap;}
-.market-item.strong .market-badge{background:var(--accent-dim);color:var(--accent);}
-.market-item.medium .market-badge{background:rgba(255,204,0,0.1);color:var(--warn);}
-.market-item.weak .market-badge{background:rgba(255,85,51,0.1);color:var(--accent2);}
-.market-reason{font-size:13px;color:var(--muted);flex:1;line-height:1.4;}
-.market-conf{font-family:var(--mono);font-size:12px;}
-.market-item.strong .market-conf{color:var(--accent);}
-.market-item.medium .market-conf{color:var(--warn);}
-.market-item.weak .market-conf{color:var(--accent2);}
-.alerts{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
-.alert-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid;}
-.alert-item.info{border-color:rgba(61,155,255,0.3);background:rgba(61,155,255,0.05);}
-.alert-item.warn{border-color:rgba(255,204,0,0.3);background:rgba(255,204,0,0.05);}
-.alert-item.danger{border-color:rgba(255,85,51,0.3);background:rgba(255,85,51,0.05);}
-.alert-icon{font-size:15px;flex-shrink:0;}
-.alert-text{font-size:13px;color:var(--muted);line-height:1.5;}
-.alert-text strong{color:var(--text);}
-.decision-box{border:2px solid var(--accent);border-radius:12px;padding:16px;text-align:center;background:var(--accent-dim);margin-bottom:14px;}
-.decision-label{font-size:10px;letter-spacing:3px;color:var(--accent);font-family:var(--mono);margin-bottom:6px;}
-.decision-main{font-size:30px;font-weight:900;letter-spacing:2px;}
-.decision-sub{font-size:13px;color:var(--muted);margin-top:5px;}
-.register-row{display:flex;gap:8px;align-items:center;padding-top:14px;border-top:1px solid var(--border);}
-.register-row input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:15px;padding:10px 12px;}
-.register-row input:focus{outline:none;border-color:var(--accent);}
-.btn-reg{padding:10px 14px;border-radius:8px;border:1px solid;font-family:var(--sans);font-size:15px;font-weight:700;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;}
-.btn-green{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
-.btn-red{border-color:var(--accent2);color:var(--accent2);background:rgba(255,85,51,0.1);}
+body{margin:0;font-family:var(--sans);background:var(--surface);color:var(--text);}
+.container{max-width:1000px;margin:auto;padding:20px;}
+h1{text-align:center;margin-bottom:20px;}
+.card{background:#1a1a1a;border-radius:10px;padding:15px;margin-bottom:20px;border:1px solid var(--border);}
+.slabel{font-weight:bold;margin-bottom:8px;}
+textarea{width:100%;height:120px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px;font-family:var(--mono);}
+.btn-analyze{background:var(--btn-bg);color:var(--text);border:none;padding:10px 20px;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:10px;}
+.btn-analyze:hover{background:var(--btn-hover);}
+.field-group{display:flex;gap:10px;margin-bottom:10px;align-items:center;}
+.field-group input{flex:1;padding:8px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:var(--mono);}
+.bar-container{height:15px;background:#222;border-radius:6px;margin-top:4px;overflow:hidden;}
+.bar{height:100%;border-radius:6px;}
+.result{padding:15px;border-radius:8px;background:#222;margin-top:10px;font-weight:bold;font-size:1.1em;}
+.history{max-height:250px;overflow-y:auto;background:#1b1b1b;padding:10px;border-radius:8px;font-family:var(--mono);}
+.icon{font-weight:bold;margin-right:6px;}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="container">
+<h1>BET SCOUT v4 DASHBOARD PRO</h1>
 
-<header>
-  <div>
-    <div class="logo">BET<em>SCOUT</em></div>
-    <div class="logo-sub">ANALISADOR PRÉ-JOGO</div>
-  </div>
-  <div class="version">v4.0<br>OFFLINE</div>
-</header>
-
-<div class="tabs">
-  <button class="tab active" onclick="switchTab('analyze')">⚡ Analisar</button>
-  <button class="tab" onclick="switchTab('history')">📊 Histórico</button>
-  <button class="tab" onclick="switchTab('criteria')">📋 Critérios</button>
+<!-- INPUT -->
+<div class="card">
+  <div class="slabel">COLAR ESTATÍSTICAS</div>
+  <textarea id="inputStats" placeholder="Cole aqui as estatísticas do jogo..."></textarea>
+  <button class="btn-analyze" onclick="analisarTexto()">⚡ ANALISAR TEXTO</button>
 </div>
 
-<!-- ANALYZE -->
-<div id="panel-analyze" class="panel active">
-  <div class="card">
-    <div class="slabel">JOGO</div>
-    <div class="context-row">
-      <div class="field"><label>CASA</label><input type="text" id="teamHome" placeholder="Time casa"></div>
-      <div class="field"><label>FORA</label><input type="text" id="teamAway" placeholder="Time fora"></div>
-      <div class="field" style="grid-column:1/-1"><label>LIGA</label><input type="text" id="league" placeholder="Ex: Bundesliga"></div>
-    </div>
-  </div>
+<!-- DADOS -->
+<div class="card" id="dataCard">
+  <div class="slabel">POSSE DE BOLA</div>
+  <div class="field-group"><input id="posse_h" placeholder="Mandante"><input id="posse_a" placeholder="Visitante"></div>
+  <div class="bar-container"><div class="bar" id="bar_posse"></div></div>
 
-  <div class="card">
-    <div class="slabel">ESTATÍSTICAS DE TEMPORADA</div>
-    <div class="stats-header"><span></span><span>CASA</span><span>FORA</span></div>
-    <div class="stat-row"><span class="stat-name">Posse de bola (%)</span><input type="number" id="posse_h" placeholder="59.7" step="0.1"><input type="number" id="posse_a" placeholder="46.3" step="0.1"></div>
-    <div class="stat-row"><span class="stat-name">Gols marcados/jogo</span><input type="number" id="gm_h" placeholder="1.51" step="0.01"><input type="number" id="gm_a" placeholder="1.36" step="0.01"></div>
-    <div class="stat-row"><span class="stat-name">Gols sofridos/jogo</span><input type="number" id="gs_h" placeholder="0.95" step="0.01"><input type="number" id="gs_a" placeholder="1.13" step="0.01"></div>
-  </div>
+  <div class="slabel">MÉDIA DE GOLS</div>
+  <div class="field-group"><input id="gm_h" placeholder="Mandante"><input id="gm_a" placeholder="Visitante"></div>
+  <div class="bar-container"><div class="bar" id="bar_gm"></div></div>
 
-  <button class="btn-analyze" onclick="analyze()">🔍 ANALISAR</button>
-  <div id="result" class="result-card card"></div>
+  <div class="slabel">CHUTES NO GOL</div>
+  <div class="field-group"><input id="cg_h" placeholder="Mandante"><input id="cg_a" placeholder="Visitante"></div>
+  <div class="bar-container"><div class="bar" id="bar_cg"></div></div>
+
+  <div class="slabel">ATAQUES PERIGOSOS</div>
+  <div class="field-group"><input id="ap_h" placeholder="Mandante"><input id="ap_a" placeholder="Visitante"></div>
+  <div class="bar-container"><div class="bar" id="bar_ap"></div></div>
+
+  <div class="slabel">ESCANTEIOS</div>
+  <div class="field-group"><input id="esc_h" placeholder="Mandante"><input id="esc_a" placeholder="Visitante"></div>
 </div>
 
-<!-- HISTORY -->
-<div id="panel-history" class="panel">
-  <div class="card">
-    <div class="slabel">HISTÓRICO DE ANÁLISES</div>
-    <div id="historyList"></div>
-  </div>
+<!-- RESULTADO -->
+<div class="card result" id="result">
+Decisão aparecerá aqui após análise...
 </div>
 
-<!-- CRITERIA -->
-<div id="panel-criteria" class="panel">
-  <div class="card">
-    <div class="slabel">CRITÉRIOS DE ANÁLISE</div>
-    <ul>
-      <li>Posse de bola > 55% casa → tendência de vitória</li>
-      <li>Gols marcados > 1.5 → mercado Over 1.5</li>
-      <li>Gols sofridos < 1 → defesa forte</li>
-      <li>Confiança geral calculada com base nos valores inseridos</li>
-    </ul>
-  </div>
-</div>
-
-</div>
+<!-- HISTÓRICO -->
+<div class="card history" id="history"><b>Histórico das análises:</b></div>
 
 <script>
-let history = JSON.parse(localStorage.getItem('betscout_v4') || '[]');
-
-function switchTab(tab){
-  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active', t.textContent.toLowerCase().includes(tab)));
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('panel-'+tab).classList.add('active');
-  if(tab==='history') renderHistory();
+function analisarTexto(){
+  const texto=document.getElementById("inputStats").value;
+  if(!texto){alert("Cole as estatísticas primeiro.");return;}
+  const d=extrairDados(texto);
+  preencherCampos(d);
+  analyze(d);
+  atualizarBarras(d);
+  salvarHistorico(d);
 }
 
-const v=id=>parseFloat(document.getElementById(id).value)||0;
-
-function analyze(){
-  const home=document.getElementById('teamHome').value||'Casa';
-  const away=document.getElementById('teamAway').value||'Fora';
-  const posseH=v('posse_h'), posseA=v('posse_a'), gmH=v('gm_h'), gmA=v('gm_a'), gsH=v('gs_h'), gsA=v('gs_a');
-  let score=Math.round((posseH-posseA)*0.3+(gmH-gmA)*15+(gsA-gsH)*10);
-  score=Math.min(Math.max(score,0),100);
-  let tier=score>70?'ALTO':score>40?'MÉDIO':'BAIXO';
-  let desc=score>70?'Casa forte favorita':score>40?'Partida equilibrada':'Casa fraca';
-  const resultDiv=document.getElementById('result');
-  resultDiv.innerHTML=`
-    <div class="score-row">
-      <div class="score-ring">
-        <svg viewBox="0 0 36 36" width="88" height="88">
-          <path fill="none" stroke="#333" stroke-width="3" d="M18 2a16 16 0 1 1 0 32a16 16 0 1 1 0-32"/>
-          <path fill="none" stroke="var(--accent)" stroke-width="3" stroke-dasharray="${score},100" d="M18 2a16 16 0 1 1 0 32a16 16 0 1 1 0-32"/>
-        </svg>
-        <div class="score-ring-inner"><div class="score-num">${score}</div><div class="score-lbl">Confiança</div></div>
-      </div>
-      <div class="score-meta">
-        <div class="score-tier">${tier}</div>
-        <div class="score-desc">${desc}</div>
-      </div>
-    </div>
-    <div class="market-list">
-      <div class="market-item ${score>70?'strong':score>40?'medium':'weak'}">
-        <span class="market-badge">Over 1.5</span>
-        <span class="market-reason">Com base na média de gols</span>
-        <span class="market-conf">${score}%</span>
-      </div>
-    </div>
-  `;
-  resultDiv.classList.add('show');
-
-  history.unshift({home,away,league:document.getElementById('league').value,score,tier,date:new Date().toLocaleString()});
-  localStorage.setItem('betscout_v4', JSON.stringify(history));
+function extrairDados(texto){
+  function pegarNumeros(regex){
+    const match=texto.match(regex);
+    if(!match)return [0,0];
+    return match[0].match(/\d+\.?\d*/g).map(Number);
+  }
+  return{
+    posse:pegarNumeros(/Posse de bola.*$/im),
+    gm:pegarNumeros(/Média de gols por partida.*$/im),
+    gs:pegarNumeros(/gols sofridos por partida.*$/im),
+    cg:pegarNumeros(/Chutes no Gol.*$/im),
+    cf:pegarNumeros(/Chutes Fora.*$/im),
+    ap:pegarNumeros(/Ataques Perigosos.*$/im),
+    at:pegarNumeros(/Ataques[^P].*$/im),
+    esc:pegarNumeros(/escanteios.*$/im)
+  };
 }
 
-function renderHistory(){
-  const list=document.getElementById('historyList');
-  if(history.length===0){ list.innerHTML='<p>Nenhuma análise realizada ainda.</p>'; return; }
-  list.innerHTML='';
-  history.forEach(h=>{
-    const div=document.createElement('div');
-    div.className='market-item';
-    div.innerHTML=`<div><strong>${h.home} x ${h.away}</strong> - ${h.league}</div><div class="market-conf">${h.score}% - ${h.tier}</div><div style="font-size:10px;color:var(--muted);">${h.date}</div>`;
-    list.appendChild(div);
+function preencherCampos(d){
+  ['posse','gm','gs','cg','cf','ap','at','esc'].forEach(f=>{
+    document.getElementById(f+'_h').value=d[f][0]||'';
+    document.getElementById(f+'_a').value=d[f][1]||'';
   });
 }
-</script>
 
+function analyze(d){
+  const score=d.gm.reduce((a,b)=>a+b,0)*10;
+  const ap_diff_pct=Math.abs(d.ap[0]-d.ap[1])/Math.max(d.ap[0],1)*100;
+  const dom_cg=Math.max(d.cg[0],d.cg[1]);
+  const cg_total=d.cg[0]+d.cg[1];
+  const ap_total=d.ap[0]+d.ap[1];
+  const dom_name=d.posse[0]>d.posse[1]?'Mandante':'Visitante';
+
+  let gameType='',decision='',decSub='',color='';
+
+  if(ap_diff_pct>30 && dom_cg>4.5) gameType='dominance';
+  else if(cg_total>8 && ap_total>90) gameType='open';
+  else gameType='low';
+
+  if(score<30){decision='SKIP';decSub='Pouca confiança';color='var(--bad)';}
+  else if(gameType==='dominance'){decision=`ML ${dom_name}`;decSub='Jogo de domínio';color='var(--good)';}
+  else if(gameType==='open'){decision='Over 1.5 FT';decSub='Jogo aberto';color='var(--medium)';}
+  else{decision='SKIP';decSub='Baixo volume';color='var(--bad)';}
+
+  document.getElementById('result').innerHTML=`<span class="icon">⚡</span><b>Decisão:</b> ${decision} | <b>Motivo:</b> ${decSub}`;
+  document.getElementById('result').style.background=color;
+}
+
+function atualizarBarras(d){
+  const maxVal=Math.max(...d.posse.concat(d.gm,d.cg,d.ap,d.esc,1));
+  function calcWidth(val){return Math.min(100,Math.round(val/maxVal*100))+'%';}
+  document.getElementById('bar_posse').style.width=calcWidth(Math.max(d.posse[0],d.posse[1]));
+  document.getElementById('bar_gm').style.width=calcWidth(d.gm[0]+d.gm[1]);
+  document.getElementById('bar_cg').style.width=calcWidth(d.cg[0]+d.cg[1]);
+  document.getElementById('bar_ap').style.width=calcWidth(d.ap[0]+d.ap[1]);
+}
+
+function salvarHistorico(d){
+  const h=document.getElementById('history');
+  const timestamp=new Date().toLocaleTimeString();
+  const entry=`<div>[${timestamp}] P:${d.posse[0]}-${d.posse[1]} | G:${d.gm[0]}-${d.gm[1]} | CG:${d.cg[0]}-${d.cg[1]} | AP:${d.ap[0]}-${d.ap[1]} | ESC:${d.esc[0]}-${d.esc[1]}</div>`;
+  h.innerHTML=entry+h.innerHTML;
+}
+</script>
 </body>
 </html>
