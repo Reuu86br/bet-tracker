@@ -3,86 +3,79 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BET SCOUT</title>
+<title>BET SCOUT v4</title>
 <style>
-:root {
-  --surface: #1e1e1e;
-  --border: #333;
-  --text: #fff;
-  --mono: monospace;
-}
-body { background: var(--surface); color: var(--text); font-family: var(--mono); padding:20px; }
-.card { background:#2c2c2c; padding:15px; margin-bottom:15px; border-radius:8px; }
-.slabel { font-weight:bold; margin-bottom:5px; }
-button { padding:8px 12px; margin-top:5px; border:none; border-radius:6px; cursor:pointer; background:#4caf50; color:#fff; font-weight:bold; }
-table { width:100%; border-collapse:collapse; margin-top:15px; }
-th, td { border:1px solid var(--border); padding:6px; text-align:center; }
-th { background:#333; }
-.green { color:lime; font-weight:bold; }
-.red { color:red; font-weight:bold; }
+  :root {
+    --surface: #1e1e1e;
+    --text: #ffffff;
+    --border: #444;
+    --mono: "Space Mono", monospace;
+    --green: #4caf50;
+    --red: #f44336;
+    --yellow: #ffeb3b;
+  }
+  body {
+    background: var(--surface);
+    color: var(--text);
+    font-family: var(--mono);
+    padding: 20px;
+  }
+  .card { background:#2c2c2c; border-radius:8px; padding:15px; margin-bottom:20px; }
+  .slabel { font-weight:bold; margin-bottom:5px; }
+  input, textarea { width:100%; margin-bottom:10px; border-radius:6px; padding:8px; border:1px solid var(--border); background:var(--surface); color:var(--text); }
+  button { padding:10px; border:none; border-radius:6px; cursor:pointer; background:#2196f3; color:#fff; font-weight:bold; }
+  table { width:100%; border-collapse:collapse; margin-top:15px; }
+  th, td { border:1px solid var(--border); padding:6px; text-align:center; }
+  th { background:#333; }
 </style>
 </head>
 <body>
 
 <h1>BET SCOUT v4</h1>
 
-<!-- COLAR ESTATÍSTICAS -->
 <div class="card">
   <div class="slabel">COLAR ESTATÍSTICAS</div>
-  <textarea id="inputStats" placeholder="Cole aqui as estatísticas do jogo..." style="width:100%;height:120px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px;font-family:var(--mono);"></textarea>
+  <textarea id="inputStats" placeholder="Cole aqui as estatísticas do jogo..."></textarea>
   <button onclick="analisarTexto()">⚡ ANALISAR TEXTO</button>
 </div>
 
-<!-- COLAR RESULTADO -->
 <div class="card">
-  <div class="slabel">COLAR RESULTADO</div>
-  <input type="text" id="inputResultado" placeholder="Ex: 2x1" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--border);margin-top:5px;font-family:var(--mono);">
-  <button onclick="adicionarResultado()">✅ ADICIONAR RESULTADO</button>
+  <div class="slabel">RESULTADOS PREVISTOS</div>
+  <div id="resultado"></div>
 </div>
 
-<!-- HISTÓRICO -->
 <div class="card">
   <div class="slabel">HISTÓRICO</div>
   <table id="historico">
     <thead>
       <tr>
-        <th>#</th>
+        <th>Jogo</th>
         <th>Previsão</th>
         <th>Resultado</th>
         <th>Status</th>
       </tr>
     </thead>
-    <tbody>
-      <!-- Linhas geradas automaticamente -->
-      <tr><td>1</td><td>ML Esquerda</td><td></td><td></td></tr>
-      <tr><td>2</td><td>+0.5 Direita</td><td></td><td></td></tr>
-      <tr><td>3</td><td>Over 1.5</td><td></td><td></td></tr>
-    </tbody>
-    <tfoot>
-      <tr>
-        <td colspan="4">Taxa de acerto: <span id="taxaAcerto">0%</span></td>
-      </tr>
-    </tfoot>
+    <tbody></tbody>
   </table>
 </div>
 
 <script>
-/* ==================== ANÁLISE DE ESTATÍSTICAS ==================== */
+// Função principal chamada ao colar estatísticas
 function analisarTexto() {
   const texto = document.getElementById("inputStats").value;
-  if (!texto) return;
-
   const dados = extrairDados(texto);
   preencherCampos(dados);
-  analyze(); // Função principal de análise do app
+  analyze(dados);
 }
 
+// Extrair números da tabela de estatísticas
 function extrairDados(texto) {
   function pegarNumeros(regex) {
     const match = texto.match(regex);
     if (!match) return [0,0];
     return match[0].match(/\d+\.?\d*/g).map(Number);
   }
+
   return {
     posse: pegarNumeros(/Posse de bola.*$/im),
     gm: pegarNumeros(/Média de gols por partida.*$/im),
@@ -95,66 +88,64 @@ function extrairDados(texto) {
   };
 }
 
+// Preenche campos (você pode criar inputs caso queira mostrar)
 function preencherCampos(d) {
-  ['posse','gm','gs','cg','cf','ap','at','esc'].forEach(key=>{
-    document.getElementById(key+'_h')?.value = d[key][0] || '';
-    document.getElementById(key+'_a')?.value = d[key][1] || '';
+  console.log("Dados extraídos:", d);
+}
+
+// Função de análise baseada no seu v3.8
+let historico = [];
+function analyze(d) {
+  const dom_cg = d.cg[0] || 0;
+  const dom_ap = d.ap[0] || 0;
+  const dom_name = "Esquerda";
+  const cg_total = (d.cg[0]||0)+(d.cg[1]||0);
+  const ap_total = (d.ap[0]||0)+(d.ap[1]||0);
+  const score = (d.gm[0]||0)+(d.gm[1]||0);
+
+  let gameType = '';
+  if (ap_total > 90 && dom_cg > 4.5) gameType = 'dominance';
+  else if (cg_total > 8 && ap_total > 90) gameType = 'open';
+  else gameType = 'low';
+
+  let decision = '';
+  let decSub = '';
+
+  if (score < 1.5) {
+    decision = 'SKIP';
+    decSub = 'Pouca confiança';
+  } else if (gameType === 'dominance') {
+    decision = `ML ${dom_name}`;
+    decSub = 'Jogo de domínio';
+  } else if (gameType === 'open') {
+    decision = 'Over 1.5 FT';
+    decSub = 'Jogo aberto';
+  } else {
+    decision = '+0.5 Padrão';
+    decSub = 'Baixo volume';
+  }
+
+  // Mostra resultado na tela
+  document.getElementById("resultado").innerHTML = `<strong>${decision}</strong> - ${decSub}`;
+
+  // Atualiza histórico
+  const jogoNum = historico.length+1;
+  historico.push({jogo:jogoNum, previsao:decision, resultado:'', status:''});
+  atualizarHistorico();
+}
+
+function atualizarHistorico() {
+  const tbody = document.querySelector("#historico tbody");
+  tbody.innerHTML = '';
+  historico.forEach(item=>{
+    tbody.innerHTML += `<tr>
+      <td>${item.jogo}</td>
+      <td>${item.previsao}</td>
+      <td>${item.resultado}</td>
+      <td>${item.status}</td>
+    </tr>`;
   });
 }
-
-/* ==================== ADICIONAR RESULTADO ==================== */
-function adicionarResultado() {
-  const resultadoInput = document.getElementById('inputResultado').value.trim();
-  if(!resultadoInput.match(/^\d+x\d+$/)) return;
-
-  const [golsCasa, golsFora] = resultadoInput.split('x').map(Number);
-  const tbody = document.getElementById('historico').querySelector('tbody');
-  const ultimaLinha = tbody.rows[tbody.rows.length - 1];
-  if(!ultimaLinha) return;
-
-  // Decidir GREEN ou RED
-  let previsao = ultimaLinha.cells[1].textContent;
-  let status = '';
-
-  if(previsao.startsWith('ML Esquerda') && golsCasa > golsFora) status='GREEN';
-  else if(previsao.startsWith('ML Direita') && golsFora > golsCasa) status='GREEN';
-  else if(previsao.includes('+0.5')) {
-    if(previsao.includes('Esquerda') && golsCasa >= 1) status='GREEN';
-    else if(previsao.includes('Direita') && golsFora >= 1) status='GREEN';
-    else status='RED';
-  }
-  else if(previsao.includes('Over 1.5')) {
-    if((golsCasa + golsFora) > 1) status='GREEN';
-    else status='RED';
-  }
-  else if(previsao.includes('Over 2.5')) {
-    if((golsCasa + golsFora) > 2) status='GREEN';
-    else status='RED';
-  }
-  else status='RED'; // padrão
-
-  ultimaLinha.cells[2].textContent = resultadoInput;
-  ultimaLinha.cells[3].textContent = status;
-  ultimaLinha.cells[3].className = status==='GREEN'?'green':'red';
-
-  atualizarTaxaAcerto();
-}
-
-function atualizarTaxaAcerto() {
-  const tbody = document.getElementById('historico').querySelector('tbody');
-  let total=0, green=0;
-  for(let r of tbody.rows){
-    if(r.cells[3].textContent) {
-      total++;
-      if(r.cells[3].textContent==='GREEN') green++;
-    }
-  }
-  const taxa = total>0?((green/total)*100).toFixed(1):0;
-  document.getElementById('taxaAcerto').textContent = taxa+'%';
-}
-
-/* ==================== PLACEHOLDERS DE CAMPOS ==================== */
-/* Você precisa ter campos com ids: posse_h, posse_a, gm_h, gm_a, gs_h, gs_a, cg_h, cg_a, cf_h, cf_a, ap_h, ap_a, at_h, at_a, esc_h, esc_a */
 </script>
 
 </body>
