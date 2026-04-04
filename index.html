@@ -2,155 +2,644 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BET SCOUT v4</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>BET SCOUT</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --surface: #1e1e1e;
-    --border: #555;
-    --text: #fff;
-    --mono: monospace;
-    --green: #4caf50;
-    --red: #f44336;
-    --yellow: #ffc107;
-  }
-  body { background:#111; color:var(--text); font-family:var(--mono); padding:20px; }
-  .card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:15px; margin-bottom:20px; }
-  .slabel { font-weight:bold; margin-bottom:8px; }
-  textarea { width:100%; height:120px; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--text); padding:10px; font-family:var(--mono); }
-  button { padding:10px 15px; border:none; border-radius:5px; background:#2196f3; color:#fff; font-weight:bold; cursor:pointer; }
-  table { width:100%; border-collapse:collapse; margin-top:15px; }
-  th,td { border:1px solid var(--border); padding:5px 10px; text-align:center; }
-  th { background:#222; }
-  .green { color:var(--green); font-weight:bold; }
-  .red { color:var(--red); font-weight:bold; }
+:root {
+  --bg:#07080d;--surface:#0d0f18;--card:#111420;--border:#1a1d2e;
+  --accent:#00ff88;--adim:rgba(0,255,136,0.10);--accent2:#ff5533;
+  --warn:#ffcc00;--text:#dde0f0;--muted:#4a4d6a;
+  --mono:'Space Mono',monospace;--sans:'Barlow Condensed',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;padding-bottom:50px;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,136,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.025) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0;}
+.wrap{max-width:600px;margin:0 auto;padding:20px 14px;position:relative;z-index:1;}
+
+/* HEADER */
+header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.logo{font-family:var(--mono);font-size:20px;font-weight:700;letter-spacing:-1px;}
+.logo em{color:var(--accent);font-style:normal;}
+.logo-sub{font-size:10px;letter-spacing:3px;color:var(--muted);margin-top:3px;}
+.version{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-align:right;}
+
+/* TABS */
+.tabs{display:flex;gap:2px;margin-bottom:20px;background:var(--surface);padding:4px;border-radius:10px;border:1px solid var(--border);}
+.tab{flex:1;padding:10px 4px;background:none;border:none;color:var(--muted);font-family:var(--sans);font-size:14px;font-weight:600;letter-spacing:1px;cursor:pointer;border-radius:7px;transition:all .2s;text-transform:uppercase;}
+.tab.active{background:var(--card);color:var(--accent);border:1px solid rgba(0,255,136,.2);}
+.panel{display:none;}.panel.active{display:block;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;}
+.slabel{font-size:10px;letter-spacing:3px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;margin-bottom:12px;}
+
+/* CONTEXT */
+.ctx-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:11px;letter-spacing:2px;color:var(--muted);font-family:var(--mono);}
+.field input{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:16px;padding:10px 12px;transition:border-color .2s;-webkit-appearance:none;}
+.field input:focus{outline:none;border-color:var(--accent);}
+
+/* PASTE */
+.paste-box{width:100%;min-height:130px;background:var(--surface);border:2px dashed var(--border);border-radius:10px;color:var(--text);font-family:var(--mono);font-size:12px;padding:12px;resize:vertical;line-height:1.7;transition:border-color .2s;margin-bottom:10px;}
+.paste-box:focus{outline:none;border-color:var(--accent);}
+.paste-box::placeholder{color:var(--muted);}
+.paste-hint{font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:12px;}
+.paste-hint b{color:var(--accent);}
+
+.btn-parse{width:100%;padding:13px;background:var(--surface);border:1px solid var(--accent);border-radius:10px;color:var(--accent);font-family:var(--sans);font-size:18px;font-weight:700;letter-spacing:3px;cursor:pointer;transition:all .2s;margin-bottom:14px;}
+.btn-parse:active{background:var(--adim);}
+
+/* PARSED PREVIEW */
+.parsed-preview{display:none;border:1px solid rgba(0,255,136,.25);border-radius:10px;padding:12px;margin-bottom:14px;background:rgba(0,255,136,.04);}
+.parsed-preview.show{display:block;}
+.pp-title{font-size:10px;letter-spacing:3px;color:var(--accent);font-family:var(--mono);margin-bottom:10px;}
+.pp-grid{display:grid;grid-template-columns:1fr 80px 80px;gap:6px;}
+.pp-hdr{font-size:10px;letter-spacing:2px;color:var(--accent);font-family:var(--mono);text-align:center;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.pp-hdr:first-child{text-align:left;}
+.pp-row{display:contents;}
+.pp-row span{font-size:13px;padding:4px 0;border-bottom:1px solid rgba(26,29,46,.5);}
+.pp-row span:first-child{color:var(--muted);}
+.pp-row span:not(:first-child){font-family:var(--mono);text-align:center;color:var(--text);}
+.pp-row span.hi{color:var(--accent);}
+.pp-err{font-size:13px;color:var(--accent2);padding:8px;background:rgba(255,85,51,.08);border-radius:6px;border:1px solid rgba(255,85,51,.2);}
+
+/* ANALYZE BTN */
+.btn-analyze{width:100%;padding:16px;background:var(--accent);color:#000;border:none;border-radius:10px;font-family:var(--sans);font-size:22px;font-weight:900;letter-spacing:4px;text-transform:uppercase;cursor:pointer;margin-bottom:20px;-webkit-tap-highlight-color:transparent;}
+.btn-analyze:active{transform:scale(.98);}
+
+/* RESULT */
+.result-card{display:none;animation:fadeUp .35s ease;}
+.result-card.show{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+.score-row{display:flex;align-items:center;gap:16px;margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--border);}
+.score-ring{position:relative;width:88px;height:88px;flex-shrink:0;}
+.score-ring svg{transform:rotate(-90deg);}
+.score-ring-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.score-num{font-family:var(--mono);font-size:26px;font-weight:700;line-height:1;}
+.score-lbl{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
+.score-meta{flex:1;}
+.score-tier{font-size:28px;font-weight:900;letter-spacing:2px;line-height:1;margin-bottom:5px;}
+.score-desc{font-size:13px;color:var(--muted);line-height:1.5;}
+
+.market-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.mkt{display:flex;align-items:center;gap:10px;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);}
+.mkt.strong{border-color:rgba(0,255,136,.4);background:rgba(0,255,136,.05);}
+.mkt.medium{border-color:rgba(255,204,0,.3);background:rgba(255,204,0,.04);}
+.mkt.weak{border-color:rgba(255,85,51,.3);background:rgba(255,85,51,.04);opacity:.7;}
+.mkt-badge{font-family:var(--mono);font-size:12px;font-weight:700;padding:4px 9px;border-radius:6px;white-space:nowrap;}
+.mkt.strong .mkt-badge{background:var(--adim);color:var(--accent);}
+.mkt.medium .mkt-badge{background:rgba(255,204,0,.1);color:var(--warn);}
+.mkt.weak .mkt-badge{background:rgba(255,85,51,.1);color:var(--accent2);}
+.mkt-reason{font-size:13px;color:var(--muted);flex:1;line-height:1.4;}
+.mkt-conf{font-family:var(--mono);font-size:12px;}
+.mkt.strong .mkt-conf{color:var(--accent);}
+.mkt.medium .mkt-conf{color:var(--warn);}
+.mkt.weak .mkt-conf{color:var(--accent2);}
+
+.alerts{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.alert{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid;}
+.alert.info{border-color:rgba(61,155,255,.3);background:rgba(61,155,255,.05);}
+.alert.warn{border-color:rgba(255,204,0,.3);background:rgba(255,204,0,.05);}
+.alert.danger{border-color:rgba(255,85,51,.3);background:rgba(255,85,51,.05);}
+.alert-icon{font-size:15px;flex-shrink:0;}
+.alert-text{font-size:13px;color:var(--muted);line-height:1.5;}
+.alert-text strong{color:var(--text);}
+
+.decision-box{border:2px solid var(--accent);border-radius:12px;padding:16px;text-align:center;background:var(--adim);margin-bottom:14px;}
+.dec-label{font-size:10px;letter-spacing:3px;color:var(--accent);font-family:var(--mono);margin-bottom:6px;}
+.dec-main{font-size:30px;font-weight:900;letter-spacing:2px;}
+.dec-sub{font-size:13px;color:var(--muted);margin-top:5px;}
+
+.reg-row{display:flex;gap:8px;align-items:center;padding-top:14px;border-top:1px solid var(--border);}
+.reg-row input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:15px;padding:10px 12px;}
+.reg-row input:focus{outline:none;border-color:var(--accent);}
+.btn-g{padding:10px 14px;border-radius:8px;border:1px solid var(--accent);color:var(--accent);background:var(--adim);font-family:var(--sans);font-size:15px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.btn-r{padding:10px 14px;border-radius:8px;border:1px solid var(--accent2);color:var(--accent2);background:rgba(255,85,51,.1);font-family:var(--sans);font-size:15px;font-weight:700;cursor:pointer;white-space:nowrap;}
+
+/* HISTORY */
+.hstats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+.hst{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;}
+.hst-val{font-family:var(--mono);font-size:20px;font-weight:700;}
+.hst-val.g{color:var(--accent);}.hst-val.r{color:var(--accent2);}.hst-val.y{color:var(--warn);}
+.hst-lbl{font-size:10px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
+.hlist{display:flex;flex-direction:column;gap:8px;}
+.hi{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;align-items:center;gap:12px;}
+.hi.gb{border-color:rgba(0,255,136,.3);}.hi.rb{border-color:rgba(255,85,51,.3);}
+.hi-st{font-family:var(--mono);font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;}
+.hi-st.g{background:rgba(0,255,136,.12);color:var(--accent);}.hi-st.r{background:rgba(255,85,51,.12);color:var(--accent2);}
+.hi-info{flex:1;min-width:0;}
+.hi-game{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hi-meta{font-size:12px;color:var(--muted);margin-top:2px;}
+.hi-sc{font-family:var(--mono);font-size:14px;font-weight:700;}
+.hi-sc.g{color:var(--accent);}.hi-sc.r{color:var(--accent2);}
+.no-hist{text-align:center;padding:40px;color:var(--muted);font-size:15px;}
+.btn-sec{background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-family:var(--sans);font-size:13px;padding:6px 12px;cursor:pointer;}
+
+/* CRITERIA */
+.crit{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;}
+.crit-mkt{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--accent);margin-bottom:5px;}
+.crit-rules{font-size:14px;color:var(--muted);line-height:1.6;}
+.crit-rules strong{color:var(--text);}
+
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 </style>
 </head>
 <body>
+<div class="wrap">
 
-<div class="card">
-  <div class="slabel">COLAR ESTATÍSTICAS</div>
-  <textarea id="inputStats" placeholder="Cole aqui as estatísticas do jogo..."></textarea>
-  <button onclick="analisarTexto()">⚡ ANALISAR TEXTO</button>
+<header>
+  <div>
+    <div class="logo">BET<em>SCOUT</em></div>
+    <div class="logo-sub">ANALISADOR PRÉ-JOGO</div>
+  </div>
+  <div class="version">v4.1<br>OFFLINE</div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('analyze')">⚡ Analisar</button>
+  <button class="tab" onclick="switchTab('history')">📊 Histórico</button>
+  <button class="tab" onclick="switchTab('criteria')">📋 Critérios</button>
 </div>
 
-<div class="card">
-  <div class="slabel">RESULTADO DA ANÁLISE</div>
-  <div id="resultado">Nenhuma análise realizada.</div>
+<!-- ANALYZE -->
+<div id="panel-analyze" class="panel active">
+
+  <!-- Jogo -->
+  <div class="card">
+    <div class="slabel">JOGO (opcional — detectado automaticamente)</div>
+    <div class="ctx-grid">
+      <div class="field"><label>CASA</label><input type="text" id="teamHome" placeholder="Detectado do texto"></div>
+      <div class="field"><label>FORA</label><input type="text" id="teamAway" placeholder="Detectado do texto"></div>
+      <div class="field" style="grid-column:1/-1"><label>LIGA</label><input type="text" id="league" placeholder="Detectada do texto"></div>
+    </div>
+  </div>
+
+  <!-- Paste -->
+  <div class="card">
+    <div class="slabel">COLAR ESTATÍSTICAS</div>
+    <div class="paste-hint">
+      Cole o texto com as stats — funciona com qualquer formato que tenha:<br>
+      <b>Nome do time: valor</b> ou <b>Time A: X / Time B: Y</b>
+    </div>
+    <textarea class="paste-box" id="pasteBox" placeholder="Cole aqui o texto com as estatísticas...
+
+Exemplo:
+Posse de bola:
+  - Tijuana: 46.88%
+  - Tigres UANL: 54.69%
+Chutes no Gol:
+  - Tijuana: 3.94
+  - Tigres UANL: 5.29
+..."></textarea>
+    <button class="btn-parse" onclick="parseText()">📋 LER ESTATÍSTICAS</button>
+
+    <!-- Preview -->
+    <div class="parsed-preview" id="parsedPreview">
+      <div class="pp-title">ESTATÍSTICAS DETECTADAS</div>
+      <div class="pp-grid" id="ppGrid"></div>
+    </div>
+  </div>
+
+  <button class="btn-analyze" id="btnAnalyze" onclick="analyze()" style="display:none">🔍 ANALISAR JOGO</button>
+
+  <!-- RESULT -->
+  <div class="result-card" id="resultCard">
+    <div class="card">
+      <div class="score-row">
+        <div class="score-ring">
+          <svg width="88" height="88" viewBox="0 0 88 88">
+            <circle cx="44" cy="44" r="36" fill="none" stroke="#1a1d2e" stroke-width="7"/>
+            <circle id="scoreRing" cx="44" cy="44" r="36" fill="none" stroke="#00ff88" stroke-width="7" stroke-linecap="round" stroke-dasharray="226" stroke-dashoffset="226"/>
+          </svg>
+          <div class="score-ring-inner">
+            <div class="score-num" id="scoreNum">—</div>
+            <div class="score-lbl">SCORE</div>
+          </div>
+        </div>
+        <div class="score-meta">
+          <div class="score-tier" id="scoreTier">—</div>
+          <div class="score-desc" id="scoreDesc">—</div>
+        </div>
+      </div>
+      <div class="alerts" id="alerts"></div>
+      <div class="slabel">MERCADOS</div>
+      <div class="market-list" id="marketList"></div>
+      <div class="decision-box" id="decisionBox">
+        <div class="dec-label">DECISÃO FINAL</div>
+        <div class="dec-main" id="decisionMain">—</div>
+        <div class="dec-sub" id="decisionSub">—</div>
+      </div>
+      <div class="reg-row">
+        <input type="text" id="resultScore" placeholder="Placar (ex: 2x1)">
+        <button class="btn-g" onclick="registerResult('GREEN')">✓ GREEN</button>
+        <button class="btn-r" onclick="registerResult('RED')">✗ RED</button>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="card">
-  <div class="slabel">HISTÓRICO</div>
-  <table id="historico">
-    <thead>
-      <tr>
-        <th>Jogo</th>
-        <th>Previsão</th>
-        <th>Resultado</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+<!-- HISTORY -->
+<div id="panel-history" class="panel">
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div class="slabel" style="margin:0">HISTÓRICO</div>
+      <button class="btn-sec" onclick="clearHistory()">LIMPAR</button>
+    </div>
+    <div class="hstats" id="hstats"></div>
+    <div id="hlist"></div>
+  </div>
 </div>
+
+<!-- CRITERIA -->
+<div id="panel-criteria" class="panel">
+  <div class="card">
+    <div class="slabel">CRITÉRIOS v4.1</div>
+    <div class="crit"><div class="crit-mkt">ML ELITE (+25pts)</div><div class="crit-rules"><strong>Chutes no Gol > 4.5</strong> do time dominante + diferença de <strong>Ataques Perigosos > 30%</strong></div></div>
+    <div class="crit"><div class="crit-mkt">+0.5 REI (+20pts)</div><div class="crit-rules"><strong>Chutes combinado > 3.0</strong> + Ataques Perigosos combinado <strong>< 60</strong></div></div>
+    <div class="crit"><div class="crit-mkt">OVER 1.5 FT (+20pts)</div><div class="crit-rules">Ataques Perigosos combinado <strong>> 90</strong> + Chutes combinado <strong>> 8.0</strong></div></div>
+    <div class="crit"><div class="crit-mkt">OVER 2.5 FT (+15pts)</div><div class="crit-rules">Ataques Perigosos combinado <strong>> 120</strong> + Chutes combinado <strong>> 10.0</strong></div></div>
+    <div class="crit"><div class="crit-mkt">BTTS (+10pts)</div><div class="crit-rules">Gols marcados <strong>> 1.0</strong> e sofridos <strong>> 1.2</strong> em <strong>ambos os times</strong></div></div>
+    <div class="crit"><div class="crit-mkt">OVER 0.5 HT (+10pts)</div><div class="crit-rules">Chutes combinado <strong>> 5.0</strong></div></div>
+    <div style="margin-top:12px;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;">
+      <div class="slabel" style="margin-bottom:8px;">HIERARQUIA</div>
+      <div style="font-size:14px;color:var(--muted);line-height:2.2;"><span style="color:var(--accent)">1.</span> ML Elite → <span style="color:var(--accent)">2.</span> +0.5 Rei → <span style="color:var(--accent)">3.</span> Over 1.5 / BTTS → <span style="color:var(--accent)">4.</span> +0.5 Padrão → <span style="color:var(--accent2)">SKIP</span></div>
+    </div>
+    <div style="margin-top:10px;padding:12px;background:rgba(255,204,0,.05);border:1px solid rgba(255,204,0,.2);border-radius:8px;">
+      <div style="font-size:12px;color:var(--warn);font-family:var(--mono);letter-spacing:2px;margin-bottom:5px;">⚠ AMOSTRA PEQUENA</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6;">Critérios calibrados com ~19 jogos. Valide com <strong style="color:var(--text)">200+ entradas</strong> antes de aumentar stake.</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end wrap -->
 
 <script>
-let jogoCount = 0;
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let history = JSON.parse(localStorage.getItem('betscout_v41') || '[]');
+let currentAnalysis = null;
+let parsedStats = null;
 
-function analisarTexto() {
-  const texto = document.getElementById("inputStats").value;
-  if (!texto) return;
-
-  const dados = extrairDados(texto);
-  preencherCampos(dados);
-
-  const decisao = calcularDecisao(dados);
-  mostrarResultado(decisao);
-  atualizarHistorico(decisao);
+// ─────────────────────────────────────────────
+// TABS
+// ─────────────────────────────────────────────
+function switchTab(tab) {
+  ['analyze','history','criteria'].forEach((t,i) => {
+    document.querySelectorAll('.tab')[i].classList.toggle('active', t === tab);
+  });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+  if (tab === 'history') renderHistory();
 }
 
-function extrairDados(texto) {
-  function pegarNumeros(regex) {
-    const match = texto.match(regex);
-    if (!match) return [0,0];
-    return match[0].match(/\d+\.?\d*/g).map(Number);
+// ─────────────────────────────────────────────
+// TEXT PARSER
+// ─────────────────────────────────────────────
+function parseText() {
+  const raw = document.getElementById('pasteBox').value.trim();
+  if (!raw) { alert('Cole o texto com as estatísticas primeiro.'); return; }
+
+  // ── 1. Detectar times e liga ──────────────────────────────────────────────
+  // Tenta detectar "Time A e Time B" ou "entre Time A e Time B" ou do título
+  let home = '', away = '', league = '';
+
+  // Padrão: "entre X e Y" ou "X e Y (Liga)"
+  const titleMatch = raw.match(/entre\s+([A-ZÀ-Ú][^\n]+?)\s+e\s+([A-ZÀ-Ú][^\n]+?)(?:\s*[\(\-]([^\)\n]+))?(?:\n|$)/i)
+    || raw.match(/([A-ZÀ-Ú][A-Za-zÀ-ú\s]+?)\s+(?:vs?\.?|x)\s+([A-ZÀ-Ú][A-Za-zÀ-ú\s]+?)(?:\s*[\(\-]([^\)\n]+))?(?:\n|$)/i);
+
+  if (titleMatch) {
+    home = titleMatch[1].replace(/[*_]/g,'').trim();
+    away = titleMatch[2].replace(/[*_]/g,'').trim();
+    if (titleMatch[3]) league = titleMatch[3].replace(/[*_]/g,'').trim();
   }
 
-  return {
-    posse: pegarNumeros(/Posse de bola.*$/im),
-    gm: pegarNumeros(/Média de gols por partida.*$/im),
-    gs: pegarNumeros(/Média de gols sofridos.*$/im),
-    cg: pegarNumeros(/Chutes no Gol.*$/im),
-    cf: pegarNumeros(/Chutes Fora.*$/im),
-    ap: pegarNumeros(/Ataques Perigosos.*$/im),
-    at: pegarNumeros(/Ataques[^P].*$/im),
-    esc: pegarNumeros(/escanteios.*$/im),
+  // ── 2. Extrair linhas com padrão "Time: valor" ────────────────────────────
+  // Coletar todos os pares (label, time, valor)
+  const lines = raw.split('\n').map(l => l.replace(/[*_]/g,'').trim()).filter(Boolean);
+
+  // Detectar times pelos padrões "- Time: valor" ou "Time: valor"
+  const teamValues = {}; // { 'Tijuana': { 'Posse de bola': 46.88, ... }, 'Tigres UANL': {...} }
+  let currentStat = '';
+
+  const statAliases = {
+    'posse':           'posse',
+    'media de gols por partida':   'gm',
+    'media de gols por partida (partidas em casa)': 'gm_home',
+    'media de gols por partida (partidas fora': 'gm_away',
+    'media de gols sofridos por partida':  'gs',
+    'media de gols sofridos por partida (partidas em casa)': 'gs_home',
+    'media de gols sofridos por partida (partidas fora': 'gs_away',
+    'chutes no gol':   'cg',
+    'chutes fora do gol': 'cf',
+    'ataques perigosos': 'ap',
+    'ataques':         'at',
+    'escanteios':      'esc',
+    'cartoes amarelos': 'ca',
+    'cartoes vermelhos': 'cv',
+    'impedimentos':    'imp',
+    'faltas':          'flt',
   };
-}
 
-function preencherCampos(d) {
-  document.getElementById('posse_h')?.value = d.posse[0] || '';
-  document.getElementById('posse_a')?.value = d.posse[1] || '';
-  document.getElementById('gm_h')?.value = d.gm[0] || '';
-  document.getElementById('gm_a')?.value = d.gm[1] || '';
-  document.getElementById('gs_h')?.value = d.gs[0] || '';
-  document.getElementById('gs_a')?.value = d.gs[1] || '';
-  document.getElementById('cg_h')?.value = d.cg[0] || '';
-  document.getElementById('cg_a')?.value = d.cg[1] || '';
-  document.getElementById('cf_h')?.value = d.cf[0] || '';
-  document.getElementById('cf_a')?.value = d.cf[1] || '';
-  document.getElementById('ap_h')?.value = d.ap[0] || '';
-  document.getElementById('ap_a')?.value = d.ap[1] || '';
-  document.getElementById('at_h')?.value = d.at[0] || '';
-  document.getElementById('at_a')?.value = d.at[1] || '';
-  document.getElementById('esc_h')?.value = d.esc[0] || '';
-  document.getElementById('esc_a')?.value = d.esc[1] || '';
-}
-
-function calcularDecisao(d) {
-  // Cálculo simplificado de indicadores
-  const chutes_h = d.cg[0] + d.cf[0];
-  const chutes_a = d.cg[1] + d.cf[1];
-  const ap_total = d.ap[0] + d.ap[1];
-  const cg_total = d.cg[0] + d.cg[1];
-  const score = ap_total + cg_total;
-
-  let decision = 'SKIP';
-  let decSub = 'Baixa confiança';
-
-  // Critérios baseados no seu histórico v3.8
-  if (score < 30) {
-    decision = 'SKIP';
-    decSub = 'Pouca confiança';
-  } else if (d.ap[0] - d.ap[1] > 30 && d.cg[0] > 4.5) {
-    decision = `ML Casa`;
-    decSub = 'Jogo de domínio';
-  } else if (cg_total > 8 && ap_total > 90) {
-    decision = 'Over 1.5 FT';
-    decSub = 'Jogo aberto';
-  } else {
-    decision = '+0.5 padrão';
-    decSub = 'Baixo volume';
+  function normKey(s) {
+    return s.toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .replace(/[^a-z0-9\s\(\)]/g,'')
+      .replace(/\s+/g,' ').trim();
   }
 
-  return { decision, decSub };
+  function matchStat(label) {
+    const n = normKey(label);
+    for (const [k, v] of Object.entries(statAliases)) {
+      if (n.startsWith(k)) return v;
+    }
+    return null;
+  }
+
+  // Parse estruturado: detecta "Stat:" depois "- Time: valor"
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Linha de estatística (ex: "Posse de bola:" ou "1. Posse de bola:")
+    const statLine = line.match(/^(?:\d+\.\s*)?([^:\-]+):\s*$/);
+    if (statLine) {
+      const matched = matchStat(statLine[1]);
+      if (matched) currentStat = matched;
+      continue;
+    }
+
+    // Linha de valor (ex: "- Tijuana: 46.88%" ou "Tijuana: 46.88%")
+    const valLine = line.match(/^[-–•]?\s*([^:]+):\s*([\d.,]+)/);
+    if (valLine && currentStat) {
+      const team = valLine[1].trim();
+      const val  = parseFloat(valLine[2].replace(',','.'));
+      if (!isNaN(val)) {
+        if (!teamValues[team]) teamValues[team] = {};
+        teamValues[team][currentStat] = val;
+      }
+      continue;
+    }
+
+    // Linha inline (ex: "Tijuana: 46.88% / Tigres: 54.69%")
+    const inlineMatch = line.match(/([^:]+):\s*([\d.,]+)[^\d]*([^:]+):\s*([\d.,]+)/);
+    if (inlineMatch && currentStat) {
+      const t1 = inlineMatch[1].replace(/[-–•]/g,'').trim();
+      const v1 = parseFloat(inlineMatch[2].replace(',','.'));
+      const t2 = inlineMatch[3].trim();
+      const v2 = parseFloat(inlineMatch[4].replace(',','.'));
+      if (!isNaN(v1) && !isNaN(v2)) {
+        if (!teamValues[t1]) teamValues[t1] = {};
+        if (!teamValues[t2]) teamValues[t2] = {};
+        teamValues[t1][currentStat] = v1;
+        teamValues[t2][currentStat] = v2;
+      }
+    }
+  }
+
+  const teams = Object.keys(teamValues);
+  if (teams.length < 2) {
+    document.getElementById('parsedPreview').className = 'parsed-preview show';
+    document.getElementById('ppGrid').innerHTML = `<div class="pp-err">❌ Não consegui identificar dois times. Verifique o formato do texto.</div>`;
+    return;
+  }
+
+  // Usa os dois primeiros times detectados como Casa e Fora
+  // (Se o usuário preencheu manualmente, respeita)
+  const t1 = teams[0], t2 = teams[1];
+  if (!document.getElementById('teamHome').value) document.getElementById('teamHome').value = t1;
+  if (!document.getElementById('teamAway').value) document.getElementById('teamAway').value = t2;
+  if (!document.getElementById('league').value && league) document.getElementById('league').value = league;
+
+  const d1 = teamValues[t1], d2 = teamValues[t2];
+
+  // Montar objeto de stats normalizado
+  parsedStats = {
+    posse_h:  d1.posse  || 0, posse_a:  d2.posse  || 0,
+    gm_h:     d1.gm     || 0, gm_a:     d2.gm     || 0,
+    gs_h:     d1.gs     || 0, gs_a:     d2.gs     || 0,
+    cg_h:     d1.cg     || 0, cg_a:     d2.cg     || 0,
+    cf_h:     d1.cf     || 0, cf_a:     d2.cf     || 0,
+    ap_h:     d1.ap     || 0, ap_a:     d2.ap     || 0,
+    at_h:     d1.at     || 0, at_a:     d2.at     || 0,
+    esc_h:    d1.esc    || 0, esc_a:    d2.esc    || 0,
+  };
+
+  // ── 3. Mostrar preview ────────────────────────────────────────────────────
+  const rows = [
+    ['Posse (%)',       parsedStats.posse_h, parsedStats.posse_a],
+    ['Gols marcados',  parsedStats.gm_h,    parsedStats.gm_a],
+    ['Gols sofridos',  parsedStats.gs_h,    parsedStats.gs_a],
+    ['Chutes no gol',  parsedStats.cg_h,    parsedStats.cg_a],
+    ['Chutes fora',    parsedStats.cf_h,    parsedStats.cf_a],
+    ['At. Perigosos',  parsedStats.ap_h,    parsedStats.ap_a],
+    ['Ataques',        parsedStats.at_h,    parsedStats.at_a],
+    ['Escanteios',     parsedStats.esc_h,   parsedStats.esc_a],
+  ].filter(r => r[1] > 0 || r[2] > 0);
+
+  const hn = document.getElementById('teamHome').value || t1;
+  const an = document.getElementById('teamAway').value || t2;
+
+  document.getElementById('ppGrid').innerHTML =
+    `<span class="pp-hdr"></span><span class="pp-hdr">${hn.split(' ').slice(0,1).join(' ')}</span><span class="pp-hdr">${an.split(' ').slice(0,1).join(' ')}</span>` +
+    rows.map(([label, h, a]) => {
+      const hiH = h > a ? 'hi' : '';
+      const hiA = a > h ? 'hi' : '';
+      return `<div class="pp-row">
+        <span>${label}</span>
+        <span class="${hiH}">${h || '—'}</span>
+        <span class="${hiA}">${a || '—'}</span>
+      </div>`;
+    }).join('');
+
+  document.getElementById('parsedPreview').classList.add('show');
+  document.getElementById('btnAnalyze').style.display = 'block';
+  document.getElementById('btnAnalyze').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-function mostrarResultado(decisao) {
-  const resultado = document.getElementById('resultado');
-  resultado.innerHTML = `<b>Decisão:</b> ${decisao.decision} <br><b>Sub:</b> ${decisao.decSub}`;
+// ─────────────────────────────────────────────
+// ANALYZE ENGINE
+// ─────────────────────────────────────────────
+function analyze() {
+  if (!parsedStats) { alert('Leia as estatísticas primeiro.'); return; }
+
+  const home   = document.getElementById('teamHome').value.trim() || 'Casa';
+  const away   = document.getElementById('teamAway').value.trim() || 'Fora';
+  const league = document.getElementById('league').value.trim() || '';
+  const s = parsedStats;
+
+  const cg_total  = s.cg_h + s.cg_a;
+  const ap_total  = s.ap_h + s.ap_a;
+  const ap_diff   = Math.abs(s.ap_h - s.ap_a);
+  const ap_diff_pct = ap_total > 0 ? ap_diff / ap_total * 100 : 0;
+  const dominant  = s.ap_h >= s.ap_a ? 'home' : 'away';
+  const dom_name  = dominant === 'home' ? home : away;
+  const dom_cg    = dominant === 'home' ? s.cg_h : s.cg_a;
+
+  const topLeagues = ['bundesliga','eredivisie','premier','serie a','la liga','ligue 1','serie b','mls','liga mx'];
+  const isTop = topLeagues.some(l => league.toLowerCase().includes(l));
+
+  let score = 0;
+  const markets = [];
+  const alerts  = [];
+
+  // ML ELITE
+  const mlElite = dom_cg > 4.5 && ap_diff_pct > 30;
+  if (mlElite) {
+    score += 25;
+    markets.push({ name:`ML ${dom_name}`, strength:'strong', conf:Math.round(65+Math.min(ap_diff_pct,35)*.5)+'%', reason:`Chutes ${dom_cg.toFixed(2)} + dominância ${ap_diff_pct.toFixed(0)}% nos perigosos` });
+  }
+
+  // +0.5 REI
+  const plus05rei = cg_total > 3.0 && ap_total < 60;
+  if (plus05rei) {
+    score += 20;
+    markets.push({ name:`+0.5 ${dom_name}`, strength:'strong', conf:Math.round(70+Math.min(cg_total-3,5)*2)+'%', reason:`Chutes combinado ${cg_total.toFixed(2)} — volume controlado` });
+  }
+
+  // OVER 1.5
+  const over15 = ap_total > 90 && cg_total > 8.0;
+  if (over15) {
+    score += 20;
+    markets.push({ name:'Over 1.5 FT', strength: cg_total>10?'strong':'medium', conf:Math.round(60+Math.min(ap_total-90,60)*.3)+'%', reason:`Perigosos ${ap_total.toFixed(0)} + Chutes ${cg_total.toFixed(2)}` });
+  }
+
+  // OVER 2.5
+  const over25 = ap_total > 120 && cg_total > 10.0;
+  if (over25) {
+    score += 15;
+    markets.push({ name:'Over 2.5 FT', strength:'medium', conf:Math.round(55+Math.min(ap_total-120,40)*.3)+'%', reason:`Alto volume: ${ap_total.toFixed(0)} perigosos` });
+  }
+
+  // BTTS
+  const btts = s.gm_h>1.0 && s.gm_a>1.0 && s.gs_h>1.2 && s.gs_a>1.2;
+  if (btts) {
+    score += 10;
+    markets.push({ name:'BTTS Sim', strength:'medium', conf:Math.round(58+(s.gm_h+s.gm_a-2)*5)+'%', reason:`Ambos marcam e sofrem bem` });
+  }
+
+  // OVER 0.5 HT
+  const over05ht = cg_total > 5.0;
+  if (over05ht) {
+    score += 10;
+    markets.push({ name:'Over 0.5 HT', strength:cg_total>7?'medium':'weak', conf:Math.round(55+Math.min(cg_total-5,5)*3)+'%', reason:`Chutes combinado ${cg_total.toFixed(2)}` });
+  }
+
+  // +0.5 padrão
+  if (!plus05rei && cg_total > 2.0) {
+    score += 5;
+    markets.push({ name:`+0.5 ${dom_name}`, strength:'weak', conf:'52%', reason:`Critério padrão — cg ${cg_total.toFixed(2)}` });
+  }
+
+  if (isTop)         { score += 5; alerts.push({ type:'info',   text:`<strong>${league}</strong> — liga top, bônus +5pts aplicado` }); }
+  if (ap_diff_pct>40) alerts.push({ type:'info',   text:`<strong>${dom_name}</strong> domina com ${ap_diff_pct.toFixed(0)}% nos perigosos` });
+  if (cg_total<2.0)  alerts.push({ type:'warn',   text:`Chutes baixos (${cg_total.toFixed(2)}) — jogo pode ser fechado` });
+  if (s.gs_h<0.5&&s.gs_a<0.5) alerts.push({ type:'warn', text:`Defesas sólidas — cuidado com mercados de gols` });
+  if (score<=5)      alerts.push({ type:'danger', text:`Poucos critérios — <strong>SKIP recomendado</strong>` });
+
+  score = Math.min(100, score);
+
+  let tier, tierDesc;
+  if      (score>=70) { tier='ELITE';    tierDesc='Múltiplos critérios — entrada de alta confiança'; }
+  else if (score>=50) { tier='FORTE';    tierDesc='Critérios principais atendidos — boa entrada'; }
+  else if (score>=30) { tier='MODERADO'; tierDesc='Sinais parciais — entre com cautela'; }
+  else if (score>=10) { tier='FRACO';    tierDesc='Poucos sinais — considere pular'; }
+  else                { tier='SKIP';     tierDesc='Nenhum critério — não entrar'; }
+
+  let decision, decSub;
+  if      (score<=5)   { decision='SKIP';              decSub='Sem critérios suficientes'; }
+  else if (mlElite)    { decision=`ML ${dom_name}`;    decSub='ML Elite — máxima prioridade'; }
+  else if (plus05rei)  { decision=`+0.5 ${dom_name}`;  decSub='+0.5 Rei — alta consistência'; }
+  else if (over15)     { decision='Over 1.5 FT';       decSub='Alto volume ofensivo esperado'; }
+  else if (btts)       { decision='BTTS Sim';          decSub='Ambos têm perfil goleador'; }
+  else if (over05ht)   { decision='Over 0.5 HT';       decSub='Pressão de 1º tempo esperada'; }
+  else                 { decision=`+0.5 ${dom_name}`;  decSub='Critério padrão — stake mínimo'; }
+
+  currentAnalysis = { home, away, league, score, tier, decision, timestamp: new Date().toISOString() };
+  renderResult({ score, tier, tierDesc, markets, alerts, decision, decSub });
 }
 
-function atualizarHistorico(decisao) {
-  jogoCount++;
-  const tbody = document.querySelector('#historico tbody');
-  const status = (decisao.decision.includes('SKIP')) ? 'RED' : 'GREEN';
-  const resultado = status === 'GREEN' ? '✔' : '✖';
-  const tr = document.createElement('tr');
-  tr.innerHTML = `<td>${jogoCount}</td><td>${decisao.decision}</td><td>${resultado}</td><td class="${status.toLowerCase()}">${status}</td>`;
-  tbody.prepend(tr);
+// ─────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────
+function renderResult(r) {
+  const score = r.score;
+  document.getElementById('scoreRing').style.strokeDashoffset = 226-(226*score/100);
+  const color = score>=60?'#00ff88':score>=35?'#ffcc00':'#ff5533';
+  document.getElementById('scoreRing').style.stroke = color;
+  document.getElementById('scoreNum').textContent = score;
+  document.getElementById('scoreNum').style.color = color;
+
+  const tc = { ELITE:'#00ff88',FORTE:'#00ff88',MODERADO:'#ffcc00',FRACO:'#ff5533',SKIP:'#ff5533' };
+  document.getElementById('scoreTier').textContent = r.tier;
+  document.getElementById('scoreTier').style.color = tc[r.tier];
+  document.getElementById('scoreDesc').textContent = r.tierDesc;
+
+  const ai = { info:'ℹ️',warn:'⚠️',danger:'🚨' };
+  document.getElementById('alerts').innerHTML = (r.alerts||[]).map(a =>
+    `<div class="alert ${a.type}"><span class="alert-icon">${ai[a.type]}</span><span class="alert-text">${a.text}</span></div>`
+  ).join('');
+
+  document.getElementById('marketList').innerHTML = (r.markets||[]).map(m =>
+    `<div class="mkt ${m.strength}"><span class="mkt-badge">${m.name}</span><span class="mkt-reason">${m.reason}</span><span class="mkt-conf">${m.conf}</span></div>`
+  ).join('') || '<div style="color:var(--muted);font-size:14px;padding:8px">Nenhum mercado recomendado.</div>';
+
+  const skip = r.tier==='SKIP';
+  const dc = skip?'#ff5533':'#00ff88';
+  document.getElementById('decisionMain').textContent = r.decision;
+  document.getElementById('decisionMain').style.color = dc;
+  document.getElementById('decisionBox').style.borderColor = dc;
+  document.getElementById('decisionBox').style.background = skip?'rgba(255,85,51,.05)':'rgba(0,255,136,.07)';
+  document.getElementById('decisionSub').textContent = r.decSub;
+
+  document.getElementById('resultCard').classList.add('show');
+  document.getElementById('resultCard').scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+// ─────────────────────────────────────────────
+// REGISTER
+// ─────────────────────────────────────────────
+function registerResult(status) {
+  if (!currentAnalysis) { alert('Analise um jogo primeiro.'); return; }
+  const placar = document.getElementById('resultScore').value.trim();
+  history.unshift({ ...currentAnalysis, placar:placar||'?', status, id:Date.now() });
+  localStorage.setItem('betscout_v41', JSON.stringify(history));
+  document.getElementById('resultScore').value = '';
+  alert(status==='GREEN'?'✅ GREEN salvo!':'❌ RED salvo!');
+}
+
+// ─────────────────────────────────────────────
+// HISTORY
+// ─────────────────────────────────────────────
+function renderHistory() {
+  const total  = history.length;
+  const greens = history.filter(h=>h.status==='GREEN').length;
+  const reds   = history.filter(h=>h.status==='RED').length;
+  const pct    = total>0?Math.round(greens/total*100):0;
+  document.getElementById('hstats').innerHTML = `
+    <div class="hst"><div class="hst-val">${total}</div><div class="hst-lbl">TOTAL</div></div>
+    <div class="hst"><div class="hst-val g">${greens}</div><div class="hst-lbl">GREEN</div></div>
+    <div class="hst"><div class="hst-val r">${reds}</div><div class="hst-lbl">RED</div></div>
+    <div class="hst"><div class="hst-val y">${pct}%</div><div class="hst-lbl">ACERTO</div></div>`;
+  if (!total) { document.getElementById('hlist').innerHTML='<div class="no-hist">Nenhuma entrada ainda.</div>'; return; }
+  document.getElementById('hlist').innerHTML = '<div class="hlist">' +
+    history.map(h=>`
+      <div class="hi ${h.status==='GREEN'?'gb':'rb'}">
+        <span class="hi-st ${h.status==='GREEN'?'g':'r'}">${h.status}</span>
+        <div class="hi-info">
+          <div class="hi-game">${h.home} vs ${h.away}</div>
+          <div class="hi-meta">${h.decision} · Score ${h.score} · ${h.league||'—'}</div>
+        </div>
+        <div class="hi-sc ${h.status==='GREEN'?'g':'r'}">${h.placar}</div>
+      </div>`).join('') + '</div>';
+}
+
+function clearHistory() {
+  if (!confirm('Apagar histórico?')) return;
+  history=[]; localStorage.setItem('betscout_v41','[]'); renderHistory();
 }
 </script>
-
 </body>
 </html>
