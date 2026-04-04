@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BET SCOUT</title>
+<title>BET SCOUT v4</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -21,92 +21,145 @@
   --mono: 'Space Mono', monospace;
   --sans: 'Barlow Condensed', sans-serif;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; padding-bottom: 40px; }
+* { box-sizing: border-box; margin:0; padding:0; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height:100vh; padding-bottom:40px;}
 body::before {
-  content: ''; position: fixed; inset: 0;
+  content: ''; position: fixed; inset:0;
   background-image: linear-gradient(rgba(0,255,136,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,136,0.025) 1px, transparent 1px);
-  background-size: 44px 44px; pointer-events: none; z-index: 0;
+  background-size:44px 44px; pointer-events:none; z-index:0;
 }
-.wrap { max-width: 600px; margin: 0 auto; padding: 20px 14px; position: relative; z-index: 1; }
-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
-.logo { font-family: var(--mono); font-size: 20px; font-weight: 700; letter-spacing: -1px; }
-.logo em { color: var(--accent); font-style: normal; }
-.logo-sub { font-size: 10px; letter-spacing: 3px; color: var(--muted); margin-top: 3px; }
-.version { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; text-align: right; }
-.tabs { display: flex; gap: 2px; margin-bottom: 20px; background: var(--surface); padding: 4px; border-radius: 10px; border: 1px solid var(--border); }
-.tab { flex: 1; padding: 10px 4px; background: none; border: none; color: var(--muted); font-family: var(--sans); font-size: 14px; font-weight: 600; letter-spacing: 1px; cursor: pointer; border-radius: 7px; transition: all 0.2s; text-transform: uppercase; }
-.tab.active { background: var(--card); color: var(--accent); border: 1px solid rgba(0,255,136,0.2); }
-.panel { display: none; }
-.panel.active { display: block; }
-.card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
-.slabel { font-size: 10px; letter-spacing: 3px; color: var(--muted); font-family: var(--mono); text-transform: uppercase; margin-bottom: 12px; }
-.context-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-.field { display: flex; flex-direction: column; gap: 5px; }
-.field label { font-size: 11px; letter-spacing: 2px; color: var(--muted); font-family: var(--mono); }
-.field input, .field select { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: var(--sans); font-size: 16px; padding: 10px 12px; transition: border-color 0.2s; -webkit-appearance: none; }
-.field input:focus, .field select:focus { outline: none; border-color: var(--accent); }
-.stats-header { display: grid; grid-template-columns: 1fr 80px 80px; gap: 8px; margin-bottom: 6px; }
-.stats-header span { font-size: 11px; letter-spacing: 2px; color: var(--accent); font-family: var(--mono); text-align: center; }
-.stats-header span:first-child { text-align: left; }
-.stat-row { display: grid; grid-template-columns: 1fr 80px 80px; gap: 8px; align-items: center; margin-bottom: 8px; }
-.stat-name { font-size: 14px; color: var(--muted); }
-.stat-row input { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: var(--mono); font-size: 15px; padding: 8px; text-align: center; transition: border-color 0.2s; width: 100%; }
-.stat-row input:focus { outline: none; border-color: var(--accent); }
-.btn-analyze { width: 100%; padding: 16px; background: var(--accent); color: #000; border: none; border-radius: 10px; font-family: var(--sans); font-size: 22px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; margin-bottom: 20px; -webkit-tap-highlight-color: transparent; }
-.btn-analyze:active { transform: scale(0.98); }
-.result-card { display: none; animation: fadeUp 0.35s ease; }
-.result-card.show { display: block; }
-@keyframes fadeUp { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform:none; } }
-.score-row { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
-.score-ring { position: relative; width: 88px; height: 88px; flex-shrink: 0; }
-.score-ring svg { transform: rotate(-90deg); }
-.score-ring-inner { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.score-num { font-family: var(--mono); font-size: 26px; font-weight: 700; line-height: 1; }
-.score-lbl { font-size: 9px; color: var(--muted); letter-spacing: 1px; margin-top: 2px; }
-.score-meta { flex: 1; }
-.score-tier { font-size: 28px; font-weight: 900; letter-spacing: 2px; line-height: 1; margin-bottom: 5px; }
-.score-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
-.market-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
-.market-item { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); }
-.market-item.strong { border-color: rgba(0,255,136,0.4); background: rgba(0,255,136,0.05); }
-.market-item.medium { border-color: rgba(255,204,0,0.3); background: rgba(255,204,0,0.04); }
-.market-item.weak { border-color: rgba(255,85,51,0.3); background: rgba(255,85,51,0.04); opacity: 0.7; }
-.market-badge { font-family: var(--mono); font-size: 12px; font-weight: 700; padding: 4px 9px; border-radius: 6px; white-space: nowrap; }
-.market-item.strong .market-badge { background: var(--accent-dim); color: var(--accent); }
-.market-item.medium .market-badge { background: rgba(255,204,0,0.1); color: var(--warn); }
-.market-item.weak .market-badge { background: rgba(255,85,51,0.1); color: var(--accent2); }
-.market-reason { font-size: 13px; color: var(--muted); flex: 1; line-height: 1.4; }
-.market-conf { font-family: var(--mono); font-size: 12px; }
-.market-item.strong .market-conf { color: var(--accent); }
-.market-item.medium .market-conf { color: var(--warn); }
-.market-item.weak .market-conf { color: var(--accent2); }
-.alerts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
-.alert-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 8px; border: 1px solid; }
-.alert-item.info { border-color: rgba(61,155,255,0.3); background: rgba(61,155,255,0.05); }
-.alert-item.warn { border-color: rgba(255,204,0,0.3); background: rgba(255,204,0,0.05); }
-.alert-item.danger { border-color: rgba(255,85,51,0.3); background: rgba(255,85,51,0.05); }
-.alert-icon { font-size: 15px; flex-shrink: 0; }
-.alert-text { font-size: 13px; color: var(--muted); line-height: 1.5; }
-.alert-text strong { color: var(--text); }
-.decision-box { border: 2px solid var(--accent); border-radius: 12px; padding: 16px; text-align: center; background: var(--accent-dim); margin-bottom: 14px; }
-.decision-label { font-size: 10px; letter-spacing: 3px; color: var(--accent); font-family: var(--mono); margin-bottom: 6px; }
-.decision-main { font-size: 30px; font-weight: 900; letter-spacing: 2px; }
-.decision-sub { font-size: 13px; color: var(--muted); margin-top: 5px; }
-.register-row { display: flex; gap: 8px; align-items: center; padding-top: 14px; border-top: 1px solid var(--border); }
-.register-row input { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: var(--mono); font-size: 15px; padding: 10px 12px; }
-.register-row input:focus { outline: none; border-color: var(--accent); }
-.btn-reg { padding: 10px 14px; border-radius: 8px; border: 1px solid; font-family: var(--sans); font-size: 15px; font-weight: 700; cursor: pointer; white-space: nowrap; -webkit-tap-highlight-color: transparent; }
-.btn-green { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
-.btn-red { border-color: var(--accent2); color: var(--accent2); background: rgba(255,85,51,0.1); }
+.wrap { max-width:600px; margin:0 auto; padding:20px 14px; position:relative; z-index:1;}
+header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:22px; padding-bottom:14px; border-bottom:1px solid var(--border);}
+.logo { font-family: var(--mono); font-size:20px; font-weight:700; letter-spacing:-1px; }
+.logo em { color: var(--accent); font-style:normal; }
+.logo-sub { font-size:10px; letter-spacing:3px; color: var(--muted); margin-top:3px; }
+.version { font-family: var(--mono); font-size:10px; color: var(--muted); letter-spacing:2px; text-align:right; }
+.tabs { display:flex; gap:2px; margin-bottom:20px; background:var(--surface); padding:4px; border-radius:10px; border:1px solid var(--border);}
+.tab { flex:1; padding:10px 4px; background:none; border:none; color:var(--muted); font-family:var(--sans); font-size:14px; font-weight:600; letter-spacing:1px; cursor:pointer; border-radius:7px; transition: all 0.2s; text-transform:uppercase; }
+.tab.active { background:var(--card); color:var(--accent); border:1px solid rgba(0,255,136,0.2);}
+.panel { display:none; }
+.panel.active { display:block; }
+.card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:14px; }
+.slabel { font-size:10px; letter-spacing:3px; color:var(--muted); font-family:var(--mono); text-transform:uppercase; margin-bottom:12px; }
+.context-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;}
+.field { display:flex; flex-direction:column; gap:5px; }
+.field label { font-size:11px; letter-spacing:2px; color:var(--muted); font-family:var(--mono);}
+.field input, .field select { background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--text); font-family:var(--sans); font-size:16px; padding:10px 12px; transition:border-color 0.2s; -webkit-appearance:none;}
+.field input:focus, .field select:focus { outline:none; border-color:var(--accent);}
+.stats-header { display:grid; grid-template-columns:1fr 80px 80px; gap:8px; margin-bottom:6px;}
+.stats-header span { font-size:11px; letter-spacing:2px; color:var(--accent); font-family:var(--mono); text-align:center;}
+.stats-header span:first-child { text-align:left;}
+.stat-row { display:grid; grid-template-columns:1fr 80px 80px; gap:8px; align-items:center; margin-bottom:8px; }
+.stat-name { font-size:14px; color:var(--muted);}
+.stat-row input { background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--text); font-family:var(--mono); font-size:15px; padding:8px; text-align:center; transition:border-color 0.2s; width:100%;}
+.stat-row input:focus { outline:none; border-color:var(--accent);}
+.btn-analyze { width:100%; padding:16px; background:var(--accent); color:#000; border:none; border-radius:10px; font-family:var(--sans); font-size:22px; font-weight:900; letter-spacing:4px; text-transform:uppercase; cursor:pointer; transition:all 0.2s; margin-bottom:20px; -webkit-tap-highlight-color:transparent;}
+.btn-analyze:active { transform:scale(0.98);}
+.result-card { display:none; animation:fadeUp 0.35s ease;}
+.result-card.show { display:block; }
+@keyframes fadeUp { from {opacity:0; transform:translateY(12px);} to {opacity:1; transform:none;} }
+.score-row { display:flex; align-items:center; gap:16px; margin-bottom:18px; padding-bottom:18px; border-bottom:1px solid var(--border); }
+.score-ring { position:relative; width:88px; height:88px; flex-shrink:0; }
+.score-ring svg { transform:rotate(-90deg);}
+.score-ring-inner { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.score-num { font-family:var(--mono); font-size:26px; font-weight:700; line-height:1;}
+.score-lbl { font-size:9px; color:var(--muted); letter-spacing:1px; margin-top:2px;}
+.score-meta { flex:1;}
+.score-tier { font-size:28px; font-weight:900; letter-spacing:2px; line-height:1; margin-bottom:5px;}
+.score-desc { font-size:13px; color:var(--muted); line-height:1.5;}
+.market-list { display:flex; flex-direction:column; gap:8px; margin-bottom:16px;}
+.market-item { display:flex; align-items:center; gap:10px; padding:12px; border-radius:8px; border:1px solid var(--border); background:var(--surface);}
+.market-item.strong { border-color:rgba(0,255,136,0.4); background:rgba(0,255,136,0.05);}
+.market-item.medium { border-color:rgba(255,204,0,0.3); background:rgba(255,204,0,0.04);}
+.market-item.weak { border-color:rgba(255,85,51,0.3); background:rgba(255,85,51,0.04); opacity:0.7;}
+.market-badge { font-family:var(--mono); font-size:12px; font-weight:700; padding:4px 9px; border-radius:6px; white-space:nowrap;}
+.market-item.strong .market-badge { background:var(--accent-dim); color:var(--accent);}
+.market-item.medium .market-badge { background:rgba(255,204,0,0.1); color:var(--warn);}
+.market-item.weak .market-badge { background:rgba(255,85,51,0.1); color:var(--accent2);}
+.market-reason { font-size:13px; color:var(--muted); flex:1; line-height:1.4;}
+.market-conf { font-family:var(--mono); font-size:12px;}
+.market-item.strong .market-conf { color:var(--accent);}
+.market-item.medium .market-conf { color:var(--warn);}
+.market-item.weak .market-conf { color:var(--accent2);}
+.alerts { display:flex; flex-direction:column; gap:8px; margin-bottom:16px;}
+.alert-item { display:flex; align-items:flex-start; gap:10px; padding:10px 12px; border-radius:8px; border:1px solid;}
+.alert-item.info { border-color:rgba(61,155,255,0.3); background:rgba(61,155,255,0.05);}
+.alert-item.warn { border-color:rgba(255,204,0,0.3); background:rgba(255,204,0,0.05);}
+.alert-item.danger { border-color:rgba(255,85,51,0.3); background:rgba(255,85,51,0.05);}
+.alert-icon { font-size:15px; flex-shrink:0;}
+.alert-text { font-size:13px; color:var(--muted); line-height:1.5;}
+.alert-text strong { color:var(--text);}
+.decision-box { border:2px solid var(--accent); border-radius:12px; padding:16px; text-align:center; background:var(--accent-dim); margin-bottom:14px;}
+.decision-label { font-size:10px; letter-spacing:3px; color:var(--accent); font-family:var(--mono); margin-bottom:6px;}
+.decision-main { font-size:30px; font-weight:900; letter-spacing:2px;}
+.decision-sub { font-size:13px; color:var(--muted); margin-top:5px;}
+.register-row { display:flex; gap:8px; align-items:center; padding-top:14px; border-top:1px solid var(--border);}
+.register-row input { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--text); font-family:var(--mono); font-size:15px; padding:10px 12px;}
+.register-row input:focus { outline:none; border-color:var(--accent);}
+.btn-reg { padding:10px 14px; border-radius:8px; border:1px solid; font-family:var(--sans); font-size:15px; font-weight:700; cursor:pointer; white-space:nowrap; -webkit-tap-highlight-color:transparent;}
+.btn-green { border-color:var(--accent); color:var(--accent); background:var(--accent-dim);}
+.btn-red { border-color:var(--accent2); color:var(--accent2); background:rgba(255,85,51,0.1);}
 </style>
 </head>
 <body>
 <div class="wrap">
-<!-- Aqui vai todo o HTML que já te passei anteriormente do BET SCOUT -->
+
+<header>
+  <div>
+    <div class="logo">BET<em>SCOUT</em></div>
+    <div class="logo-sub">ANALISADOR PRÉ-JOGO</div>
+  </div>
+  <div class="version">v4.0<br>OFFLINE</div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('analyze')">⚡ Analisar</button>
+  <button class="tab" onclick="switchTab('history')">📊 Histórico</button>
+  <button class="tab" onclick="switchTab('criteria')">📋 Critérios</button>
 </div>
+
+<!-- ANALYZE -->
+<div id="panel-analyze" class="panel active">
+  <div class="card">
+    <div class="slabel">JOGO</div>
+    <div class="context-row">
+      <div class="field"><label>CASA</label><input type="text" id="teamHome" placeholder="Time casa"></div>
+      <div class="field"><label>FORA</label><input type="text" id="teamAway" placeholder="Time fora"></div>
+      <div class="field" style="grid-column:1/-1"><label>LIGA</label><input type="text" id="league" placeholder="Ex: Bundesliga"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="slabel">ESTATÍSTICAS DE TEMPORADA</div>
+    <div class="stats-header"><span></span><span>CASA</span><span>FORA</span></div>
+    <div class="stat-row"><span class="stat-name">Posse de bola (%)</span><input type="number" id="posse_h" placeholder="59.7" step="0.1"><input type="number" id="posse_a" placeholder="46.3" step="0.1"></div>
+    <div class="stat-row"><span class="stat-name">Gols marcados/jogo</span><input type="number" id="gm_h" placeholder="1.51" step="0.01"><input type="number" id="gm_a" placeholder="1.36" step="0.01"></div>
+    <div class="stat-row"><span class="stat-name">Gols sofridos/jogo</span><input type="number" id="gs_h" placeholder="0.95" step="0.01"><input type="number" id="gs_a" placeholder="1.13" step="0.01"></div>
+  </div>
+
+  <button class="btn-analyze" onclick="analyze()">🔍 ANALISAR</button>
+</div>
+
+</div>
+
 <script>
-// Aqui vai todo o JS de análise, histórico e critérios que te passei
+let history = JSON.parse(localStorage.getItem('betscout_v4') || '[]');
+
+function switchTab(tab) {
+  ['analyze','history','criteria'].forEach((t,i)=>{
+    document.querySelectorAll('.tab')[i].classList.toggle('active', t===tab);
+  });
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+}
+
+const v=id=>parseFloat(document.getElementById(id).value)||0;
+
+function analyze(){
+  const home=document.getElementById('teamHome').value||'Casa';
+  const away=document.getElementById('teamAway').value||'Fora';
+  alert(`Analisando ${home} x ${away}!`);
+}
 </script>
 </body>
 </html>
