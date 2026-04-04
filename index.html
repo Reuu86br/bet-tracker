@@ -7,31 +7,26 @@
 <style>
   :root {
     --surface: #1e1e1e;
-    --text: #ffffff;
-    --border: #444;
-    --mono: "Space Mono", monospace;
+    --border: #555;
+    --text: #fff;
+    --mono: monospace;
     --green: #4caf50;
     --red: #f44336;
-    --yellow: #ffeb3b;
+    --yellow: #ffc107;
   }
-  body {
-    background: var(--surface);
-    color: var(--text);
-    font-family: var(--mono);
-    padding: 20px;
-  }
-  .card { background:#2c2c2c; border-radius:8px; padding:15px; margin-bottom:20px; }
-  .slabel { font-weight:bold; margin-bottom:5px; }
-  input, textarea { width:100%; margin-bottom:10px; border-radius:6px; padding:8px; border:1px solid var(--border); background:var(--surface); color:var(--text); }
-  button { padding:10px; border:none; border-radius:6px; cursor:pointer; background:#2196f3; color:#fff; font-weight:bold; }
+  body { background:#111; color:var(--text); font-family:var(--mono); padding:20px; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:15px; margin-bottom:20px; }
+  .slabel { font-weight:bold; margin-bottom:8px; }
+  textarea { width:100%; height:120px; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--text); padding:10px; font-family:var(--mono); }
+  button { padding:10px 15px; border:none; border-radius:5px; background:#2196f3; color:#fff; font-weight:bold; cursor:pointer; }
   table { width:100%; border-collapse:collapse; margin-top:15px; }
-  th, td { border:1px solid var(--border); padding:6px; text-align:center; }
-  th { background:#333; }
+  th,td { border:1px solid var(--border); padding:5px 10px; text-align:center; }
+  th { background:#222; }
+  .green { color:var(--green); font-weight:bold; }
+  .red { color:var(--red); font-weight:bold; }
 </style>
 </head>
 <body>
-
-<h1>BET SCOUT v4</h1>
 
 <div class="card">
   <div class="slabel">COLAR ESTATÍSTICAS</div>
@@ -40,8 +35,8 @@
 </div>
 
 <div class="card">
-  <div class="slabel">RESULTADOS PREVISTOS</div>
-  <div id="resultado"></div>
+  <div class="slabel">RESULTADO DA ANÁLISE</div>
+  <div id="resultado">Nenhuma análise realizada.</div>
 </div>
 
 <div class="card">
@@ -60,15 +55,20 @@
 </div>
 
 <script>
-// Função principal chamada ao colar estatísticas
+let jogoCount = 0;
+
 function analisarTexto() {
   const texto = document.getElementById("inputStats").value;
+  if (!texto) return;
+
   const dados = extrairDados(texto);
   preencherCampos(dados);
-  analyze(dados);
+
+  const decisao = calcularDecisao(dados);
+  mostrarResultado(decisao);
+  atualizarHistorico(decisao);
 }
 
-// Extrair números da tabela de estatísticas
 function extrairDados(texto) {
   function pegarNumeros(regex) {
     const match = texto.match(regex);
@@ -79,7 +79,7 @@ function extrairDados(texto) {
   return {
     posse: pegarNumeros(/Posse de bola.*$/im),
     gm: pegarNumeros(/Média de gols por partida.*$/im),
-    gs: pegarNumeros(/gols sofridos por partida.*$/im),
+    gs: pegarNumeros(/Média de gols sofridos.*$/im),
     cg: pegarNumeros(/Chutes no Gol.*$/im),
     cf: pegarNumeros(/Chutes Fora.*$/im),
     ap: pegarNumeros(/Ataques Perigosos.*$/im),
@@ -88,63 +88,67 @@ function extrairDados(texto) {
   };
 }
 
-// Preenche campos (você pode criar inputs caso queira mostrar)
 function preencherCampos(d) {
-  console.log("Dados extraídos:", d);
+  document.getElementById('posse_h')?.value = d.posse[0] || '';
+  document.getElementById('posse_a')?.value = d.posse[1] || '';
+  document.getElementById('gm_h')?.value = d.gm[0] || '';
+  document.getElementById('gm_a')?.value = d.gm[1] || '';
+  document.getElementById('gs_h')?.value = d.gs[0] || '';
+  document.getElementById('gs_a')?.value = d.gs[1] || '';
+  document.getElementById('cg_h')?.value = d.cg[0] || '';
+  document.getElementById('cg_a')?.value = d.cg[1] || '';
+  document.getElementById('cf_h')?.value = d.cf[0] || '';
+  document.getElementById('cf_a')?.value = d.cf[1] || '';
+  document.getElementById('ap_h')?.value = d.ap[0] || '';
+  document.getElementById('ap_a')?.value = d.ap[1] || '';
+  document.getElementById('at_h')?.value = d.at[0] || '';
+  document.getElementById('at_a')?.value = d.at[1] || '';
+  document.getElementById('esc_h')?.value = d.esc[0] || '';
+  document.getElementById('esc_a')?.value = d.esc[1] || '';
 }
 
-// Função de análise baseada no seu v3.8
-let historico = [];
-function analyze(d) {
-  const dom_cg = d.cg[0] || 0;
-  const dom_ap = d.ap[0] || 0;
-  const dom_name = "Esquerda";
-  const cg_total = (d.cg[0]||0)+(d.cg[1]||0);
-  const ap_total = (d.ap[0]||0)+(d.ap[1]||0);
-  const score = (d.gm[0]||0)+(d.gm[1]||0);
+function calcularDecisao(d) {
+  // Cálculo simplificado de indicadores
+  const chutes_h = d.cg[0] + d.cf[0];
+  const chutes_a = d.cg[1] + d.cf[1];
+  const ap_total = d.ap[0] + d.ap[1];
+  const cg_total = d.cg[0] + d.cg[1];
+  const score = ap_total + cg_total;
 
-  let gameType = '';
-  if (ap_total > 90 && dom_cg > 4.5) gameType = 'dominance';
-  else if (cg_total > 8 && ap_total > 90) gameType = 'open';
-  else gameType = 'low';
+  let decision = 'SKIP';
+  let decSub = 'Baixa confiança';
 
-  let decision = '';
-  let decSub = '';
-
-  if (score < 1.5) {
+  // Critérios baseados no seu histórico v3.8
+  if (score < 30) {
     decision = 'SKIP';
     decSub = 'Pouca confiança';
-  } else if (gameType === 'dominance') {
-    decision = `ML ${dom_name}`;
+  } else if (d.ap[0] - d.ap[1] > 30 && d.cg[0] > 4.5) {
+    decision = `ML Casa`;
     decSub = 'Jogo de domínio';
-  } else if (gameType === 'open') {
+  } else if (cg_total > 8 && ap_total > 90) {
     decision = 'Over 1.5 FT';
     decSub = 'Jogo aberto';
   } else {
-    decision = '+0.5 Padrão';
+    decision = '+0.5 padrão';
     decSub = 'Baixo volume';
   }
 
-  // Mostra resultado na tela
-  document.getElementById("resultado").innerHTML = `<strong>${decision}</strong> - ${decSub}`;
-
-  // Atualiza histórico
-  const jogoNum = historico.length+1;
-  historico.push({jogo:jogoNum, previsao:decision, resultado:'', status:''});
-  atualizarHistorico();
+  return { decision, decSub };
 }
 
-function atualizarHistorico() {
-  const tbody = document.querySelector("#historico tbody");
-  tbody.innerHTML = '';
-  historico.forEach(item=>{
-    tbody.innerHTML += `<tr>
-      <td>${item.jogo}</td>
-      <td>${item.previsao}</td>
-      <td>${item.resultado}</td>
-      <td>${item.status}</td>
-    </tr>`;
-  });
+function mostrarResultado(decisao) {
+  const resultado = document.getElementById('resultado');
+  resultado.innerHTML = `<b>Decisão:</b> ${decisao.decision} <br><b>Sub:</b> ${decisao.decSub}`;
+}
+
+function atualizarHistorico(decisao) {
+  jogoCount++;
+  const tbody = document.querySelector('#historico tbody');
+  const status = (decisao.decision.includes('SKIP')) ? 'RED' : 'GREEN';
+  const resultado = status === 'GREEN' ? '✔' : '✖';
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td>${jogoCount}</td><td>${decisao.decision}</td><td>${resultado}</td><td class="${status.toLowerCase()}">${status}</td>`;
+  tbody.prepend(tr);
 }
 </script>
 
